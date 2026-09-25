@@ -1,6 +1,7 @@
 # Backend image. Build from the repository root (the pinned OpenDB snapshot is fetched by scripts/):
 #   docker build -f backend/Dockerfile -t platform-api .
-# Runtime configuration: DATABASE_URL (jdbc:postgresql://...), DATABASE_USERNAME, DATABASE_PASSWORD,
+# Runtime configuration: DATABASE_URL (jdbc:postgresql://... or postgresql://user:pass@host/db), DATABASE_USERNAME,
+# DATABASE_PASSWORD, FRONTEND_SHARED_SECRET,
 # EXAMPLE_PRICES, TRUSTED_PROXIES, PORT.
 
 FROM eclipse-temurin:25-jdk AS build

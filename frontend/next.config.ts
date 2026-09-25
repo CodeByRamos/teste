@@ -1,13 +1,8 @@
 import type { NextConfig } from "next";
 
-const backendUrl = process.env.BACKEND_URL ?? "http://localhost:8080";
-
+// The browser only talks to this origin: /api/* is relayed to the Java backend by
+// src/app/api/[...path]/route.ts, so the backend URL and the shared secret stay server-side.
 const nextConfig: NextConfig = {
-  // The browser only talks to this origin; API calls are proxied to the Java backend,
-  // so the backend URL and any credentials stay server-side.
-  async rewrites() {
-    return [{ source: "/api/:path*", destination: `${backendUrl}/api/:path*` }];
-  },
   poweredByHeader: false,
   async headers() {
     return [

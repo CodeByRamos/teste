@@ -21,9 +21,15 @@ export class ApiError extends Error {
   }
 }
 
-// In the browser, calls go to this origin and are proxied (next.config.ts). On the server, call the backend directly.
+// In the browser, calls go to this origin and are relayed (app/api/[...path]/route.ts). On the server, call the
+// backend directly, with the shared secret the backend requires in production (never exposed to the browser).
 function baseUrl() {
   return typeof window === "undefined" ? (process.env.BACKEND_URL ?? "http://localhost:8080") : "";
+}
+
+function serverHeaders(): Record<string, string> {
+  const secret = typeof window === "undefined" ? process.env.FRONTEND_SHARED_SECRET : undefined;
+  return secret ? { "X-Frontend-Secret": secret } : {};
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -31,7 +37,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     response = await fetch(`${baseUrl()}${path}`, {
       ...init,
-      headers: { "Content-Type": "application/json", ...init?.headers },
+      headers: { "Content-Type": "application/json", ...serverHeaders(), ...init?.headers },
       cache: "no-store",
     });
   } catch {

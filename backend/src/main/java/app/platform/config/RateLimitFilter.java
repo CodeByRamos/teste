@@ -16,8 +16,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Fixed-window limit per client for write/compute endpoints (POST). In-memory: fine for a single instance;
  * behind a load balancer with several instances this moves to the gateway (e.g. AWS WAF rate rules).
  *
- * <p>The client key is the socket address. X-Forwarded-For is honored only when the request comes from a
- * configured trusted proxy (the web frontend), because any client can set that header.
+ * <p>The client key is the visitor's address reported by the frontend (requests proven by {@link FrontendGate}),
+ * otherwise the socket address. X-Forwarded-For is honored only when the request comes from a configured trusted
+ * proxy, because any client can set that header.
  */
 @Component
 class RateLimitFilter extends OncePerRequestFilter {
@@ -27,9 +28,11 @@ class RateLimitFilter extends OncePerRequestFilter {
 
     private final int limit;
     private final Set<String> trustedProxies;
+    private final FrontendGate gate;
     private final Map<String, Window> windows = new ConcurrentHashMap<>();
 
-    RateLimitFilter(PlatformProperties properties) {
+    RateLimitFilter(PlatformProperties properties, FrontendGate gate) {
+        this.gate = gate;
         this.limit = properties.rateLimit().requestsPerMinute();
         this.trustedProxies = Set.copyOf(properties.rateLimit().trustedProxies());
     }
@@ -63,6 +66,10 @@ class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private String clientKey(HttpServletRequest request) {
+        String reported = gate.reportedClientAddress(request);
+        if (reported != null) {
+            return reported;
+        }
         String remote = request.getRemoteAddr();
         String forwarded = request.getHeader("X-Forwarded-For");
         if (forwarded != null && trustedProxies.contains(remote)) {

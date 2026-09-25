@@ -33,7 +33,7 @@ cd backend && ./mvnw spring-boot:test-run
 cd frontend && npm install && npm run dev
 ```
 
-Testes: `cd backend && ./mvnw test` (63 testes, incluindo ponta a ponta com PostgreSQL real),
+Testes: `cd backend && ./mvnw test` (69 testes, incluindo ponta a ponta com PostgreSQL real),
 `cd 3d && node src/validate.ts` (modelos 3D)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 
@@ -74,24 +74,17 @@ Veja [`licenses/opendb/NOTICE.md`](licenses/opendb/NOTICE.md) e [`docs/ARCHITECT
 
 ## Deploy
 
-O frontend e o backend sobem separados.
+Backend no **Railway** (API + PostgreSQL, configurado por [`railway.json`](railway.json)) e frontend no **Vercel**.
+Passo a passo em [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
-**Backend (Java + PostgreSQL)** — qualquer serviço que rode container: AWS App Runner/ECS (planejado), Railway, Render, Fly.
+| Onde | Variável | Valor |
+|---|---|---|
+| Railway (API) | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` — aceita `postgresql://…` ou `jdbc:postgresql://…` |
+| Railway (API) | `FRONTEND_SHARED_SECRET` | segredo aleatório; com ele, a API só atende o site |
+| Railway (API) | `EXAMPLE_PRICES` | `true` até existir um provedor real de preços |
+| Vercel (site) | `BACKEND_URL` | URL pública da API |
+| Vercel (site) | `FRONTEND_SHARED_SECRET` | o mesmo segredo |
 
-```bash
-docker build -f backend/Dockerfile -t platform-api .   # a partir da raiz do repositório
-```
-
-| Variável | Exemplo |
-|---|---|
-| `DATABASE_URL` | `jdbc:postgresql://host:5432/db` (formato JDBC) |
-| `DATABASE_USERNAME` / `DATABASE_PASSWORD` | credenciais do banco (RDS: Secrets Manager) |
-| `PORT` | definido pela plataforma (padrão 8080) |
-| `EXAMPLE_PRICES` | `true` até existir um provedor real de preços |
-| `TRUSTED_PROXIES` | IP do frontend, se o rate limit deve usar o IP real do usuário |
-
-A imagem já contém o snapshot fixado do OpenDB. A primeira inicialização importa os dados (alguns minutos);
-as seguintes pulam a importação. Health check: `GET /actuator/health`.
-
-**Frontend (Vercel)** — importar o repositório, *Root Directory* = `frontend`, variável `BACKEND_URL` com a URL
-pública do backend (usada no build para o proxy `/api/*`). Opcional: `NEXT_PUBLIC_APP_NAME`.
+A imagem (`backend/Dockerfile`) já contém o snapshot fixado do OpenDB e roda em qualquer serviço de containers
+(AWS App Runner/ECS, Render, Fly). A primeira inicialização importa os dados; o health check
+`/actuator/health/readiness` só fica verde depois que o catálogo está carregado.
