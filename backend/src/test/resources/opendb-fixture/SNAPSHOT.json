@@ -1,0 +1,9 @@
+{
+  "source": "buildcores-opendb",
+  "repository": "https://github.com/buildcores/buildcores-open-db",
+  "commit": "399c7168eac711f70b8a9ae98e972d7188454f46",
+  "committedAt": "2026-09-24T18:27:04Z",
+  "fetchedAt": "2026-09-25T02:12:34Z",
+  "license": "ODC-By-1.0",
+  "categories": ["CPU","GPU","Motherboard","RAM","Storage","PSU","PCCase","CPUCooler"]
+}

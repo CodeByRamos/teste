@@ -1,0 +1,13 @@
+# Pinned OpenDB snapshots are fetched by scripts/fetch-opendb.sh, never committed
+/data/opendb/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
