@@ -110,7 +110,7 @@ for (const height of [30, 47, 130, 155, 172]) {
 for (const length of [99, 150, 241]) valid(`psu ${length}`, psuLayout({ form: "atx", lengthMm: length, modular: true }));
 for (const height of [30, 42, 57]) valid(`ram ${height}`, ramLayout({ heightMm: height, heatSpreader: true, rgb: true }));
 
-const report = { generatedAt: new Date().toISOString(), models: results, parameterSweep: sweep.length ? sweep : "ok" };
+const report = { models: results, parameterSweep: sweep.length ? sweep : "ok" };
 writeFileSync(resolve(import.meta.dirname, "..", "..", "docs", "3d", "validation.json"), JSON.stringify(report, null, 2));
 for (const r of results) {
   console.log(`${r.ok ? "ok  " : "FAIL"} ${r.modelId.padEnd(26)} ${r.measuredMm?.join(" × ")} mm${r.problems.length ? "  " + r.problems.join("; ") : ""}`);

@@ -1,6 +1,6 @@
 "use client";
 
-import { ContactShadows, OrbitControls, useGLTF } from "@react-three/drei";
+import { ContactShadows, Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import { Canvas, useThree, type ThreeEvent } from "@react-three/fiber";
 import { Component, Suspense, useEffect, useMemo, type ReactNode } from "react";
 import * as THREE from "three";
@@ -173,19 +173,15 @@ function TubeMesh({ from, to }: { from: THREE.Vector3; to: THREE.Vector3 }) {
 
 /** Image-based lighting generated on the GPU from a procedural room (no HDR download). Metals need it to read. */
 function StudioEnvironment() {
-  const { gl, scene } = useThree();
-  useEffect(() => {
+  const gl = useThree((state) => state.gl);
+  const texture = useMemo(() => {
     const pmrem = new THREE.PMREMGenerator(gl);
-    const texture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    scene.environment = texture;
-    scene.environmentIntensity = 0.9;
-    return () => {
-      scene.environment = null;
-      texture.dispose();
-      pmrem.dispose();
-    };
-  }, [gl, scene]);
-  return null;
+    const map = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+    return map;
+  }, [gl]);
+  useEffect(() => () => texture.dispose(), [texture]);
+  return <Environment map={texture} environmentIntensity={0.9} />;
 }
 
 function StatsReporter({ onStats }: { onStats: (stats: SceneStats) => void }) {

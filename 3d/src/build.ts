@@ -104,7 +104,7 @@ async function main() {
     entries.push(entry);
   }
   mkdirSync(OUT, { recursive: true });
-  writeFileSync(join(OUT, "catalog.json"), JSON.stringify({ version: 1, generatedAt: new Date().toISOString(), units: "m", models: entries }, null, 2));
+  writeFileSync(join(OUT, "catalog.json"), JSON.stringify({ version: 1, units: "m", models: entries }, null, 2));
   console.log(`\n${selected.length} models built → ${relative(process.cwd(), OUT)}`);
 }
 
