@@ -11,6 +11,7 @@ import app.platform.pricing.PriceService;
 import app.platform.recommendation.Alternative;
 import app.platform.recommendation.BuildRequest;
 import app.platform.recommendation.ComponentExplainer;
+import app.platform.recommendation.FutureOutlookAnalyzer;
 import app.platform.recommendation.Recommendation;
 import app.platform.recommendation.RecommendationEngine;
 import app.platform.recommendation.RequirementAnalyzer;
@@ -34,11 +35,13 @@ public final class BuildAssembler {
     private final RecommendationEngine recommendations;
     private final CompatibilityEngine compatibility;
     private final PriceService prices;
+    private final FutureOutlookAnalyzer future;
 
     public BuildAssembler(RecommendationEngine recommendations, CompatibilityEngine compatibility, PriceService prices) {
         this.recommendations = recommendations;
         this.compatibility = compatibility;
         this.prices = prices;
+        this.future = new FutureOutlookAnalyzer(compatibility);
     }
 
     public BuildResult recommend(Catalog catalog, BuildRequest request) {
@@ -89,6 +92,6 @@ public final class BuildAssembler {
                     alternatives.getOrDefault(component.category(), List.of())));
         }
         Boolean withinBudget = request == null ? null : total.compareTo(request.budgetBrl()) <= 0;
-        return new BuildResult(request, profile, items, report, total, withinBudget, allPriced, examples, notes, catalog.version());
+        return new BuildResult(request, profile, items, report, future.analyze(catalog, parts, profile), total, withinBudget, allPriced, examples, notes, catalog.version());
     }
 }

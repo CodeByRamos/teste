@@ -149,8 +149,8 @@ public final class ComponentExplainer {
             text.append(" e usa memória ").append(board.ramType());
         }
         text.append('.');
-        if (board.m2Slots() != null && !board.m2Slots().isEmpty()) {
-            text.append(" Oferece ").append(board.m2Slots().size()).append(board.m2Slots().size() == 1 ? " encaixe" : " encaixes")
+        if (board.m2Slots() != null && !board.driveM2Slots().isEmpty()) {
+            text.append(" Oferece ").append(board.driveM2Slots().size()).append(board.driveM2Slots().size() == 1 ? " encaixe" : " encaixes")
                     .append(" M.2 para SSDs rápidos.");
         }
         if (engineChoice) {
@@ -267,7 +267,7 @@ public final class ComponentExplainer {
                 specs.add(new Spec("Tamanho", orUnknown(board.formFactor())));
                 specs.add(new Spec("Memória", board.ramType() == null ? UNKNOWN : board.ramType() + " · " + orUnknown(board.memorySlots())
                         + " encaixes · até " + orUnknown(board.maxMemoryGb()) + " GB"));
-                specs.add(new Spec("Encaixes M.2", board.m2Slots() == null ? UNKNOWN : String.valueOf(board.m2Slots().size())));
+                specs.add(new Spec("Encaixes M.2", board.m2Slots() == null ? UNKNOWN : String.valueOf(board.driveM2Slots().size())));
                 specs.add(new Spec("Portas SATA", orUnknown(board.sataPorts())));
                 specs.add(new Spec("Wi-Fi", board.wireless() == null ? UNKNOWN : board.hasWifi() ? board.wireless() : "Não"));
             }

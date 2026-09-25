@@ -33,7 +33,7 @@ cd backend && ./mvnw spring-boot:test-run
 cd frontend && npm install && npm run dev
 ```
 
-Testes: `cd backend && ./mvnw test` (56 testes, incluindo ponta a ponta com PostgreSQL real),
+Testes: `cd backend && ./mvnw test` (63 testes, incluindo ponta a ponta com PostgreSQL real),
 `cd 3d && node src/validate.ts` (modelos 3D)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 
@@ -46,6 +46,9 @@ e `cd frontend && npm run lint && npx tsc --noEmit`.
 - **Tenho um PC**: verificação de compatibilidade das peças informadas.
 - **Quero melhorar meu PC**: diagnóstico do PC atual (bom / suficiente / fraco / gargalo) e o upgrade de maior ganho
   dentro do orçamento, com tudo o que precisa mudar junto (fonte, gabinete, placa-mãe, memória, cooler) e o que continua.
+- **Pensando no futuro**: em cada configuração, o que dá para melhorar depois sem trocar outras peças
+  (processador no mesmo encaixe, placa de vídeo que a fonte e o gabinete aguentam, slots de memória e M.2 livres,
+  geração da memória), sempre com exemplos reais do catálogo verificados pelo motor de compatibilidade.
 - **Visualização 3D**: cada configuração pode ser vista em 3D, montada com modelos paramétricos adaptados às medidas
   reais de cada peça; clicar numa peça abre a explicação dela. Cena de teste com verificação de colisões em
   `/laboratorio-3d`. Biblioteca e pipeline em [`3d/`](3d/README.md).

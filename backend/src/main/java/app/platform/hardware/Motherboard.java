@@ -28,13 +28,28 @@ public record Motherboard(
             sizes = Hardware.sortedSet(sizes);
         }
 
+        /** "E"-key slots hold Wi-Fi/Bluetooth cards, not drives; "M" (and "B+M") slots take SSDs. */
+        public boolean forDrives() {
+            return key == null || key.contains("M");
+        }
+
+        /** Records spell the bus as "PCIe 4.0 x4", "PCIE 3.0 x4" or "Gen4". */
         public boolean acceptsNvme() {
-            return interfaceName != null && interfaceName.contains("PCIe");
+            if (!forDrives() || interfaceName == null) {
+                return false;
+            }
+            String bus = interfaceName.toUpperCase(java.util.Locale.ROOT);
+            return bus.contains("PCIE") || bus.startsWith("GEN");
         }
 
         public boolean acceptsSata() {
-            return interfaceName != null && interfaceName.contains("SATA");
+            return forDrives() && interfaceName != null && interfaceName.toUpperCase(java.util.Locale.ROOT).contains("SATA");
         }
+    }
+
+    /** M.2 slots that take drives (Wi-Fi card slots excluded); {@code null} when the record does not list M.2 slots. */
+    public List<M2Slot> driveM2Slots() {
+        return m2Slots == null ? null : m2Slots.stream().filter(M2Slot::forDrives).toList();
     }
 
     public record PcieSlot(String generation, int quantity, int lanes) {

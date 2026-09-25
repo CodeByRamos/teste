@@ -7,6 +7,7 @@ import app.platform.pricing.Offer;
 import app.platform.recommendation.Alternative;
 import app.platform.recommendation.BuildRequest;
 import app.platform.recommendation.ComponentExplainer;
+import app.platform.recommendation.FutureOutlook;
 import app.platform.recommendation.RequirementProfile;
 
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import java.util.List;
  *
  * @param request       {@code null} when the person assembled the parts themselves
  * @param withinBudget  {@code null} when there is no budget to compare with
+ * @param future        room to evolve part by part; {@code null} without a motherboard or when the build does not work
  * @param allPriced     false when some part to be bought has no price from any provider
  */
 public record BuildResult(
@@ -24,6 +26,7 @@ public record BuildResult(
         RequirementProfile profile,
         List<Item> items,
         CompatibilityReport compatibility,
+        FutureOutlook future,
         BigDecimal totalBrl,
         Boolean withinBudget,
         boolean allPriced,

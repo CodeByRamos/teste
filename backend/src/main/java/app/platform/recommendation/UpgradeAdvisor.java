@@ -426,7 +426,7 @@ public final class UpgradeAdvisor {
         int wanted = Math.max(500, profile.minStorageGb());
         Priced<Storage> drive = null;
         String how;
-        if (board.m2Slots() != null && board.m2Slots().size() > usedM2) {
+        if (board.m2Slots() != null && board.driveM2Slots().size() > usedM2) {
             drive = RecommendationEngine.cheapestDrive(pools, board, wanted);
             how = "Vai num encaixe M.2 livre da sua placa-mãe.";
         } else {
@@ -667,7 +667,7 @@ public final class UpgradeAdvisor {
         long m2 = drives.stream().filter(Storage::isM2).count();
         long sata = drives.stream().filter(Storage::usesSataPort).count();
         boolean m2Ok = drives.stream().filter(Storage::isM2).allMatch(drive -> Fit.m2DriveOnBoard(drive, board) == Fit.Verdict.YES)
-                && (m2 == 0 || board.m2Slots() != null && board.m2Slots().size() >= m2);
+                && (m2 == 0 || board.m2Slots() != null && board.driveM2Slots().size() >= m2);
         boolean sataOk = sata == 0 || board.sataPorts() == null || board.sataPorts() >= sata;
         return m2Ok && sataOk;
     }

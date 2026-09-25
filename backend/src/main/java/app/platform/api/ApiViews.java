@@ -18,6 +18,7 @@ final class ApiViews {
             List<String> requirements,
             List<Item> items,
             Compatibility compatibility,
+            Future future,
             Totals totals,
             List<String> notes,
             DataSource dataSource,
@@ -84,6 +85,12 @@ final class ApiViews {
     }
 
     record Finding(String ruleId, String status, List<String> involves, String title, String explanation, String technicalDetail, boolean verified) {
+    }
+
+    record Future(String summary, List<FutureAspect> aspects, String disclaimer) {
+    }
+
+    record FutureAspect(String id, String title, String level, String headline, String explanation, String technicalDetail, List<String> involves) {
     }
 
     record Power(int estimatedLoadWatts, int recommendedPsuWatts, boolean complete) {

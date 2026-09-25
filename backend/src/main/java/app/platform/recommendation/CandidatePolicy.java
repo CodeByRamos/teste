@@ -46,6 +46,16 @@ final class CandidatePolicy {
                 && cpu.integratedGraphics() != null && cpu.includesCooler() != null;
     }
 
+    /**
+     * Desktop consumer processor with the data the estimators need, on any socket. Used to look for
+     * upgrades of an existing platform, which may be older than the platforms new builds use.
+     */
+    static boolean consumerCpu(Cpu cpu) {
+        return cpu.socket() != null && !NON_CONSUMER_CPU.matcher(cpu.name()).find()
+                && cpu.cores() != null && cpu.threads() != null && cpu.boostClockGhz() != null
+                && !cpu.memoryTypes().isEmpty();
+    }
+
     static boolean gpu(Gpu gpu) {
         return gpu.chipset() != null && CURRENT_GPU_FAMILY.matcher(gpu.chipset()).matches()
                 && gpu.coreCount() != null && gpu.boostClockMhz() != null && gpu.vramGb() != null

@@ -122,7 +122,7 @@ public final class ModelResolver {
         Map<String, Object> params = new LinkedHashMap<>();
         params.put("form", variant);
         if (board.memorySlots() != null) params.put("ramSlots", Math.min(4, board.memorySlots()));
-        if (board.m2Slots() != null) params.put("m2Slots", Math.min(3, board.m2Slots().size()));
+        if (board.m2Slots() != null) params.put("m2Slots", Math.min(3, board.driveM2Slots().size()));
         if (board.pcieSlots() != null) {
             int x16 = board.pcieSlots().stream().filter(slot -> slot.lanes() >= 16).mapToInt(Motherboard.PcieSlot::quantity).sum();
             params.put("x16Slots", Math.max(1, x16));

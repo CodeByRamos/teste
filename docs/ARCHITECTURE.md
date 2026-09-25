@@ -101,6 +101,17 @@ backend (`ModelResolver`) associa componente → família → parâmetros a part
 opcional: o diagrama 2D continua sendo o padrão e funciona sem WebGL. Detalhes em
 [`docs/3d/MODEL_LIBRARY.md`](3d/MODEL_LIBRARY.md).
 
+### D11 — "Pensando no futuro" sem prever o futuro
+
+`FutureOutlookAnalyzer` mede quanto cada configuração pode evoluir **peça a peça**. Para processador e placa de
+vídeo, percorre o catálogo do mais rápido para o mais lento e cita o primeiro candidato que entra na configuração
+sem nenhum problema novo no `CompatibilityEngine`. Se o mais forte esbarra em algo, o texto nomeia a peça que
+limita (fonte, gabinete, cooler, placa-mãe). Aviso de atualização de BIOS é tratado como ressalva, não como troca.
+Memória e armazenamento usam slots livres. A "geração" da memória e a idade do encaixe vêm do ano de lançamento
+dos processadores no catálogo (ex.: os lançados nos dois anos mais recentes usam só DDR5). Nenhuma afirmação sobre
+lançamentos futuros: tudo é fato do catálogo atual, com aviso na interface. Placas de vídeo são citadas pelo chip
+(`GeForce RTX 5070`), não por um SKU específico.
+
 ## Segurança
 
 - Validação de entrada com Bean Validation; erros em ProblemDetail sem detalhes internos.
@@ -115,6 +126,6 @@ opcional: o diagrama 2D continua sendo o padrão e funciona sem WebGL. Detalhes 
 1. Provedor de preços real (lojas brasileiras / afiliados), casando produtos por EAN/GTIN.
 2. Tabela curada de desempenho (benchmarks com fonte citada) no lugar da estimativa por especificação.
 3. Autenticação (Amazon Cognito) e configurações por usuário.
-4. Planejamento futuro ("o que comprar agora pensando nos próximos anos") sobre o `UpgradeAdvisor`.
+4. Usar o "Pensando no futuro" (D11) também na escolha: opção "priorizar upgrades futuros" no pedido.
 5. Camada de IA usando os motores como ferramentas (interpretar e explicar, nunca decidir compatibilidade).
 6. Biblioteca 3D: famílias planejadas (GPU blower/híbrida, gabinetes SFF/HTPC, radiador 420) e fans do OpenDB (CaseFan).

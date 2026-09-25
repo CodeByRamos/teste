@@ -36,10 +36,10 @@ final class StorageRule implements CompatibilityRule {
                         null));
             }
         }
-        if (board.m2Slots() != null && m2Drives.size() > board.m2Slots().size()) {
+        if (board.m2Slots() != null && m2Drives.size() > board.driveM2Slots().size()) {
             findings.add(CompatibilityFinding.incompatible("storage.m2-count", List.of(STORAGE, MOTHERBOARD),
                     "SSDs M.2 demais",
-                    "Foram escolhidos " + m2Drives.size() + " SSDs M.2, mas a placa-mãe tem " + board.m2Slots().size() + " encaixes M.2.",
+                    "Foram escolhidos " + m2Drives.size() + " SSDs M.2, mas a placa-mãe tem " + board.driveM2Slots().size() + " encaixes M.2.",
                     null));
         }
         if (!sataDrives.isEmpty()) {

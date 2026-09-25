@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { brl, signedBrl } from "@/lib/format";
 import type { Alternative, BuildItem, BuildView as Build, Category } from "@/lib/types";
 import { CompatibilityPanel } from "./compatibility-panel";
+import { FuturePanel } from "./future-panel";
 import { ChevronIcon, ExternalIcon, InfoIcon, SparkIcon } from "./icons";
 import { PcDiagram } from "./pc-diagram";
 import { Build3d } from "./pc3d/build-3d";
@@ -175,6 +176,8 @@ export function BuildView({
           </section>
 
           <CompatibilityPanel compatibility={build.compatibility} />
+
+          {build.future && <FuturePanel future={build.future} />}
 
           {actions && <div className="flex flex-wrap gap-3">{actions}</div>}
 

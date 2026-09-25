@@ -11,6 +11,7 @@ import app.platform.pricing.Offer;
 import app.platform.recommendation.Alternative;
 import app.platform.recommendation.BuildRequest;
 import app.platform.recommendation.ComponentExplainer;
+import app.platform.recommendation.FutureOutlook;
 import app.platform.recommendation.PerformanceEstimator;
 import app.platform.recommendation.RecommendationEngine;
 import app.platform.visualization.ModelResolver;
@@ -36,6 +37,7 @@ final class ViewMapper {
                 result.profile() == null ? List.of() : result.profile().reasons(),
                 items,
                 compatibility(result.compatibility()),
+                future(result.future()),
                 new ApiViews.Totals(result.totalBrl(), request == null ? null : request.budgetBrl(), result.withinBudget(),
                         result.allPriced(), result.pricesAreExamples()),
                 result.notes(),
@@ -103,6 +105,17 @@ final class ViewMapper {
         return new ApiViews.AlternativeView(
                 new ApiViews.ComponentSummary(component.id(), component.name(), component.category().name(), component.category().label()),
                 alternative.priceBrl(), alternative.priceDeltaBrl(), alternative.direction().name(), alternative.impact());
+    }
+
+    private static ApiViews.Future future(FutureOutlook outlook) {
+        if (outlook == null) {
+            return null;
+        }
+        return new ApiViews.Future(outlook.summary(),
+                outlook.aspects().stream().map(aspect -> new ApiViews.FutureAspect(
+                        aspect.id(), aspect.title(), aspect.level().name(), aspect.headline(), aspect.explanation(),
+                        aspect.technicalDetail(), aspect.involves().stream().map(Enum::name).toList())).toList(),
+                FutureOutlook.DISCLAIMER);
     }
 
     private static ApiViews.Compatibility compatibility(CompatibilityReport report) {

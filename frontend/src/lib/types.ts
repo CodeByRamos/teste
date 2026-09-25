@@ -101,6 +101,24 @@ export interface Finding {
   verified: boolean;
 }
 
+export type FutureLevel = "GOOD" | "PARTIAL" | "LIMITED";
+
+export interface FutureAspect {
+  id: string;
+  title: string;
+  level: FutureLevel;
+  headline: string;
+  explanation: string;
+  technicalDetail: string | null;
+  involves: Category[];
+}
+
+export interface FutureOutlook {
+  summary: string;
+  aspects: FutureAspect[];
+  disclaimer: string;
+}
+
 export interface BuildView {
   needs: {
     budgetBrl: number;
@@ -117,6 +135,8 @@ export interface BuildView {
     findings: Finding[];
     power: { estimatedLoadWatts: number; recommendedPsuWatts: number; complete: boolean };
   };
+  /** Absent when the build has no motherboard or does not work as it is. */
+  future: FutureOutlook | null;
   totals: {
     totalBrl: number;
     budgetBrl: number | null;
