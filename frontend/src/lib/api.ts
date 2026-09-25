@@ -7,6 +7,8 @@ import type {
   Options,
   SavedBuildDocument,
   SearchResult,
+  UpgradeAdvice,
+  UpgradeGoals,
 } from "./types";
 
 /** Error with a user-facing message taken from the backend problem document. */
@@ -78,4 +80,12 @@ export const api = {
   },
 
   dataSources: () => request<DataSources>("/api/meta/data-sources"),
+
+  component: (id: string) => request<SearchResult>(`/api/catalog/components/${encodeURIComponent(id)}`),
+
+  upgrade: (currentComponentIds: string[], goals: UpgradeGoals, focus: Category | null) =>
+    request<UpgradeAdvice>("/api/upgrades", {
+      method: "POST",
+      body: JSON.stringify({ currentComponentIds, goals, focus }),
+    }),
 };

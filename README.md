@@ -32,7 +32,7 @@ cd backend && ./mvnw spring-boot:test-run
 cd frontend && npm install && npm run dev
 ```
 
-Testes: `cd backend && ./mvnw test` (45 testes, incluindo ponta a ponta com PostgreSQL real)
+Testes: `cd backend && ./mvnw test` (51 testes, incluindo ponta a ponta com PostgreSQL real)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 
 ## O que já funciona
@@ -42,6 +42,8 @@ e `cd frontend && npm run lint && npx tsc --noEmit`.
 - **Motor de compatibilidade**: 11 pares verificados por regras, com três resultados (compatível, atenção,
   incompatível) e explicação simples. Dados ausentes viram "atenção — não conseguimos confirmar", nunca suposição.
 - **Tenho um PC**: verificação de compatibilidade das peças informadas.
+- **Quero melhorar meu PC**: diagnóstico do PC atual (bom / suficiente / fraco / gargalo) e o upgrade de maior ganho
+  dentro do orçamento, com tudo o que precisa mudar junto (fonte, gabinete, placa-mãe, memória, cooler) e o que continua.
 - **Salvar configurações**: link permanente com o que foi mostrado no momento.
 - **Créditos**: atribuição ODC-By, versão dos dados e completude por categoria.
 
@@ -50,7 +52,7 @@ e `cd frontend && npm run lint && npx tsc --noEmit`.
 | Tema | Situação |
 |---|---|
 | Preços | **Fictícios** (`ExamplePriceProvider`), rotulados em toda a interface. Provedores reais (lojas brasileiras) são o próximo passo. |
-| Desempenho | Estimativa a partir de especificações (núcleos, frequência, cache), não benchmark. Tende a subestimar GPUs AMD frente às NVIDIA. |
+| Desempenho | Estimativa a partir de especificações (núcleos, frequência, cache) com calibração aproximada por arquitetura de GPU; não é benchmark. Os ganhos aparecem arredondados. |
 | Requisitos de jogos | Sem base de requisitos por jogo; usamos perfis de uso (competitivo / pesado + resolução). |
 | BIOS | Sem dados de BIOS no OpenDB; casos conhecidos (ex.: Ryzen 5000 em B450) geram "atenção". |
 | Contas de usuário | Ainda não há login; configurações salvas são acessadas pelo link (ID aleatório). |
@@ -62,10 +64,26 @@ As especificações técnicas vêm do [BuildCores OpenDB](https://github.com/bui
 disponibilizado sob a [Open Data Commons Attribution License (ODC-By) v1.0](https://opendatacommons.org/licenses/by/1-0/).
 Veja [`licenses/opendb/NOTICE.md`](licenses/opendb/NOTICE.md) e [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## Produção (AWS) — planejado
+## Deploy
 
-- Backend: container (ECS Fargate ou App Runner) com `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`
-  apontando para **Amazon RDS for PostgreSQL 17**; segredos no Secrets Manager.
-- Importação do OpenDB como job separado (`OPENDB_SNAPSHOT_DIR` + `OPENDB_INGEST_ON_STARTUP=true`).
-- `EXAMPLE_PRICES=false` assim que houver um provedor real de preços.
-- Frontend: `BACKEND_URL` apontando para a API; `TRUSTED_PROXIES` no backend com o endereço do frontend.
+O frontend e o backend sobem separados.
+
+**Backend (Java + PostgreSQL)** — qualquer serviço que rode container: AWS App Runner/ECS (planejado), Railway, Render, Fly.
+
+```bash
+docker build -f backend/Dockerfile -t platform-api .   # a partir da raiz do repositório
+```
+
+| Variável | Exemplo |
+|---|---|
+| `DATABASE_URL` | `jdbc:postgresql://host:5432/db` (formato JDBC) |
+| `DATABASE_USERNAME` / `DATABASE_PASSWORD` | credenciais do banco (RDS: Secrets Manager) |
+| `PORT` | definido pela plataforma (padrão 8080) |
+| `EXAMPLE_PRICES` | `true` até existir um provedor real de preços |
+| `TRUSTED_PROXIES` | IP do frontend, se o rate limit deve usar o IP real do usuário |
+
+A imagem já contém o snapshot fixado do OpenDB. A primeira inicialização importa os dados (alguns minutos);
+as seguintes pulam a importação. Health check: `GET /actuator/health`.
+
+**Frontend (Vercel)** — importar o repositório, *Root Directory* = `frontend`, variável `BACKEND_URL` com a URL
+pública do backend (usada no build para o proxy `/api/*`). Opcional: `NEXT_PUBLIC_APP_NAME`.

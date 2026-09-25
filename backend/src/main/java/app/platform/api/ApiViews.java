@@ -126,4 +126,18 @@ final class ApiViews {
 
     record Option(String value, String label, String description) {
     }
+
+    record Upgrade(List<Assessment> assessment, Plan recommended, List<Plan> alternatives, List<String> notes, Disclaimers disclaimers) {
+    }
+
+    record Assessment(String category, String categoryLabel, ComponentSummary component, String level, String title, String explanation) {
+    }
+
+    record Plan(String kind, String title, String impact, BigDecimal costBrl, List<ChangeView> changes,
+                List<ComponentSummary> kept, List<String> dependencies, Build after) {
+    }
+
+    record ChangeView(String category, String categoryLabel, String role, ComponentSummary replaces, ComponentSummary part,
+                      Price price, String reason) {
+    }
 }

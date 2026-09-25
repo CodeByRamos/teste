@@ -71,6 +71,28 @@ vídeo/sprite 360°, usa IDs próprios (não o `opendb_id`) e não expõe clique
 diagrama esquemático interativo, que funciona para 100% das configurações; o 3D será avaliado em prova de conceito
 depois de conversar com a BuildCores (preço, mapeamento de IDs, cobertura de modelos, interação).
 
+### D7 — Upgrades sempre com dependências
+
+`UpgradeAdvisor` avalia o PC atual (bom / suficiente / fraco / gargalo) e gera planos por tipo: placa de vídeo,
+processador no mesmo encaixe, plataforma (processador + placa-mãe + memória se o tipo mudar), memória e SSD.
+Cada plano verifica o que a troca força — fonte (potência e conectores), gabinete (comprimento), cooler (encaixe e
+altura), discos que precisam continuar conectados — e o PC resultante passa pelo motor de compatibilidade; um plano
+só é descartado se criar uma incompatibilidade nova. A recomendação compara combinações (troca principal com espaço
+reservado para correções baratas de memória e SSD) e escolhe o maior ganho dentro do orçamento, mesclando compras da
+mesma peça.
+
+### D8 — Reimportação incremental e versionada
+
+A ingestão grava a versão do mapeador junto do commit (`source_snapshot.mapper_version`): mudar uma regra de
+validação reimporta o mesmo commit. A carga usa tabela de staging e reescreve só registros que mudaram. Conjuntos
+no modelo de domínio são ordenados, então o JSON gravado é determinístico entre execuções.
+
+### D9 — Calibração de desempenho de GPU
+
+Núcleos × frequência superestima placas NVIDIA a partir da série RTX 30 (núcleos FP32 contados em dobro). Um fator
+por arquitetura (`PerformanceEstimator`) aproxima as gerações; ganhos são exibidos arredondados ("cerca de 2,5×").
+Continua sendo estimativa até existir a tabela de benchmarks com fonte.
+
 ## Segurança
 
 - Validação de entrada com Bean Validation; erros em ProblemDetail sem detalhes internos.
@@ -85,6 +107,6 @@ depois de conversar com a BuildCores (preço, mapeamento de IDs, cobertura de mo
 1. Provedor de preços real (lojas brasileiras / afiliados), casando produtos por EAN/GTIN.
 2. Tabela curada de desempenho (benchmarks com fonte citada) no lugar da estimativa por especificação.
 3. Autenticação (Amazon Cognito) e configurações por usuário.
-4. Meu PC → análise de gargalos e upgrades (reaproveita `BuildParts` e o motor de compatibilidade).
+4. Planejamento futuro ("o que comprar agora pensando nos próximos anos") sobre o `UpgradeAdvisor`.
 5. Camada de IA usando os motores como ferramentas (interpretar e explicar, nunca decidir compatibilidade).
 6. Prova de conceito do renderer 3D.

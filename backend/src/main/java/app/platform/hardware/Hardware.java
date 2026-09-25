@@ -1,6 +1,10 @@
 package app.platform.hardware;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +27,14 @@ public final class Hardware {
             "lga1851", "LGA 1851");
 
     private Hardware() {
+    }
+
+    /**
+     * Immutable, alphabetically ordered copy. Ordering matters: these sets are serialized, and a stable order keeps
+     * stored documents identical between runs (so re-ingestion can tell real changes apart).
+     */
+    public static Set<String> sortedSet(Collection<String> values) {
+        return values == null ? Set.of() : Collections.unmodifiableSortedSet(new TreeSet<>(values));
     }
 
     /** Canonical socket name, or the trimmed input when no alias applies. */

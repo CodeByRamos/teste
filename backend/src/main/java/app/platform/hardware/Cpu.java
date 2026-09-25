@@ -23,7 +23,7 @@ public record Cpu(
         Boolean includesCooler) implements HardwareComponent {
 
     public Cpu {
-        memoryTypes = memoryTypes == null ? Set.of() : Set.copyOf(memoryTypes);
+        memoryTypes = Hardware.sortedSet(memoryTypes);
     }
 
     /**

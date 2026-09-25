@@ -19,11 +19,11 @@ const actions = [
     available: true,
   },
   {
-    href: null,
+    href: "/melhorar",
     title: "Quero melhorar meu PC",
     description: "Descubra o que trocar primeiro e o que mais precisa mudar junto.",
     Icon: WrenchIcon,
-    available: false,
+    available: true,
   },
   {
     href: null,

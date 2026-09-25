@@ -68,7 +68,7 @@ public final class ExamplePriceProvider implements PriceProvider {
                 yield "AM4".equals(cpu.socket()) ? price * 0.85 : price;
             }
             case Gpu gpu -> {
-                Double score = PerformanceEstimator.gpuScore(gpu);
+                Double score = PerformanceEstimator.gpuThroughput(gpu);
                 if (score == null) {
                     yield null;
                 }

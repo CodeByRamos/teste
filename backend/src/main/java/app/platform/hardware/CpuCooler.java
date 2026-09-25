@@ -12,7 +12,7 @@ public record CpuCooler(
         Integer fanCount) implements HardwareComponent {
 
     public CpuCooler {
-        sockets = sockets == null ? Set.of() : Set.copyOf(sockets);
+        sockets = Hardware.sortedSet(sockets);
     }
 
     public boolean isAirCooler() {

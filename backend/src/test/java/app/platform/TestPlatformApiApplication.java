@@ -24,6 +24,8 @@ public class TestPlatformApiApplication {
                 .setDataDirectory(dataDirectory)
                 .setCleanDataDirectory(false)
                 .setPort(DEV_DATABASE_PORT)
+                // After an unclean stop PostgreSQL replays its log before accepting connections.
+                .setPGStartupWait(java.time.Duration.ofSeconds(90))
                 .start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {

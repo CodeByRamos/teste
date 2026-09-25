@@ -164,3 +164,53 @@ export interface DataSources {
     { records: number; rejected: number; averageQuality: number; issues: Record<string, Record<string, number>> }
   >;
 }
+
+export type AssessmentLevel = "GOOD" | "ENOUGH" | "WEAK" | "BOTTLENECK";
+
+export interface ComponentSummary {
+  id: string;
+  name: string;
+  category: Category;
+  categoryLabel: string;
+}
+
+export interface UpgradePlan {
+  kind: "GPU" | "CPU" | "PLATFORM" | "MEMORY" | "STORAGE" | "COMBINED";
+  title: string;
+  impact: string;
+  costBrl: number;
+  changes: {
+    category: Category;
+    categoryLabel: string;
+    role: "MAIN" | "REQUIRED";
+    replaces: ComponentSummary | null;
+    part: ComponentSummary;
+    price: Price | null;
+    reason: string;
+  }[];
+  kept: ComponentSummary[];
+  dependencies: string[];
+  after: BuildView;
+}
+
+export interface UpgradeAdvice {
+  assessment: {
+    category: Category;
+    categoryLabel: string;
+    component: ComponentSummary | null;
+    level: AssessmentLevel;
+    title: string;
+    explanation: string;
+  }[];
+  recommended: UpgradePlan | null;
+  alternatives: UpgradePlan[];
+  notes: string[];
+  disclaimers: { prices: string | null; performance: string };
+}
+
+export interface UpgradeGoals {
+  budgetBrl: number;
+  useCases: UseCase[];
+  primaryUse?: UseCase | null;
+  resolution?: Resolution | null;
+}

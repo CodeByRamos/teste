@@ -11,6 +11,7 @@ import app.platform.infra.pricing.ExamplePriceProvider;
 import app.platform.pricing.PriceProvider;
 import app.platform.pricing.PriceService;
 import app.platform.recommendation.RecommendationEngine;
+import app.platform.recommendation.UpgradeAdvisor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,6 +58,11 @@ public class PlatformConfiguration {
     @Bean
     RecommendationEngine recommendationEngine(PriceService prices, CompatibilityEngine compatibility) {
         return new RecommendationEngine(prices, compatibility);
+    }
+
+    @Bean
+    UpgradeAdvisor upgradeAdvisor(RecommendationEngine recommendations, CompatibilityEngine compatibility) {
+        return new UpgradeAdvisor(recommendations, compatibility);
     }
 
     @Bean

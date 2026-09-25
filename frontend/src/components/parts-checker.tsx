@@ -6,7 +6,7 @@ import type { BuildView as Build, SearchResult } from "@/lib/types";
 import { BuildView } from "./build-view";
 import { XIcon } from "./icons";
 import { CATEGORY_LABELS, PartPicker } from "./part-picker";
-import { Button, Notice } from "./ui";
+import { Button, ButtonLink, Notice } from "./ui";
 
 export function PartsChecker() {
   const [parts, setParts] = useState<SearchResult[]>([]);
@@ -42,9 +42,12 @@ export function PartsChecker() {
         title="Resultado da verificação"
         subtitle="Peças informadas por você."
         actions={
-          <Button variant="secondary" onClick={() => setBuild(null)}>
-            Editar peças
-          </Button>
+          <>
+            <ButtonLink href={`/melhorar?pecas=${parts.map((part) => part.id).join(",")}`}>Quero melhorar este PC</ButtonLink>
+            <Button variant="secondary" onClick={() => setBuild(null)}>
+              Editar peças
+            </Button>
+          </>
         }
       />
     );

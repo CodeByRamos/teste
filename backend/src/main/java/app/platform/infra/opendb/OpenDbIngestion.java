@@ -58,8 +58,9 @@ public final class OpenDbIngestion {
     }
 
     public boolean alreadyIngested(OpenDbSnapshot snapshot) {
-        Integer count = jdbc.queryForObject("select count(*) from source_snapshot where source = ? and source_version = ?",
-                Integer.class, OpenDbRecordMapper.SOURCE, snapshot.commit());
+        Integer count = jdbc.queryForObject(
+                "select count(*) from source_snapshot where source = ? and source_version = ? and mapper_version = ?",
+                Integer.class, OpenDbRecordMapper.SOURCE, snapshot.commit(), OpenDbRecordMapper.VERSION);
         return count != null && count > 0;
     }
 
@@ -85,18 +86,21 @@ public final class OpenDbIngestion {
 
         transactions.executeWithoutResult(status -> {
             Long snapshotId = jdbc.queryForObject("""
-                    insert into source_snapshot (source, source_version, source_url, license, committed_at, record_count, quality_summary)
-                    values (?, ?, ?, ?, cast(? as timestamptz), ?, cast(? as jsonb))
+                    insert into source_snapshot (source, source_version, source_url, license, committed_at, record_count,
+                        quality_summary, mapper_version)
+                    values (?, ?, ?, ?, cast(? as timestamptz), ?, cast(? as jsonb), ?)
                     returning id
                     """, Long.class,
                     OpenDbRecordMapper.SOURCE, snapshot.commit(), snapshot.repository(), snapshot.license(),
-                    snapshot.committedAt(), parsed.size(), json.writeValueAsString(quality));
+                    snapshot.committedAt(), parsed.size(), json.writeValueAsString(quality), OpenDbRecordMapper.VERSION);
             upsertComponents(new ArrayList<>(parsed), snapshotId);
             int removed = jdbc.update("""
                     update hardware_component set status = 'removed_upstream'
                     where source = ? and snapshot_id <> ? and status = 'active'
                     """, OpenDbRecordMapper.SOURCE, snapshotId);
+            long identifiersStarted = System.nanoTime();
             replaceIdentifiers(new ArrayList<>(parsed));
+            log.info("OpenDB identifiers replaced in {} ms", (System.nanoTime() - identifiersStarted) / 1_000_000);
             log.info("OpenDB {}: {} records stored, {} rejected, {} marked removed upstream",
                     snapshot.commit(), parsed.size(), rejectedTotal, removed);
         });
@@ -125,21 +129,27 @@ public final class OpenDbIngestion {
         }
     }
 
+    /**
+     * Loads records into a temporary staging table, then applies set-based changes: rewrite only rows whose content
+     * changed (large JSON documents are not rewritten when identical), touch the snapshot reference of unchanged rows,
+     * and insert new ones.
+     */
     private void upsertComponents(List<Parsed> records, long snapshotId) {
-        String sql = """
-                insert into hardware_component (id, source, external_id, category, name, manufacturer, series, variant,
-                    release_year, specs, raw, quality_score, quality_issues, status, snapshot_id)
-                values (?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as jsonb), cast(? as jsonb), ?, cast(? as jsonb), 'active', ?)
-                on conflict (source, external_id) do update set
-                    category = excluded.category, name = excluded.name, manufacturer = excluded.manufacturer,
-                    series = excluded.series, variant = excluded.variant, release_year = excluded.release_year,
-                    specs = excluded.specs, raw = excluded.raw, quality_score = excluded.quality_score,
-                    quality_issues = excluded.quality_issues, status = 'active', snapshot_id = excluded.snapshot_id,
-                    last_seen_at = now()
+        long started = System.nanoTime();
+        jdbc.execute("""
+                create temporary table staging_component (
+                    id uuid, source text, external_id text, category text, name text, manufacturer text, series text,
+                    variant text, release_year integer, specs jsonb, raw jsonb, quality_score real, quality_issues jsonb
+                ) on commit drop
+                """);
+        String insert = """
+                insert into staging_component (id, source, external_id, category, name, manufacturer, series, variant,
+                    release_year, specs, raw, quality_score, quality_issues)
+                values (?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as jsonb), cast(? as jsonb), ?, cast(? as jsonb))
                 """;
         for (int from = 0; from < records.size(); from += BATCH_SIZE) {
             List<Parsed> batch = records.subList(from, Math.min(records.size(), from + BATCH_SIZE));
-            jdbc.batchUpdate(sql, batch, batch.size(), (statement, record) -> {
+            jdbc.batchUpdate(insert, batch, batch.size(), (statement, record) -> {
                 HardwareComponent component = record.mapped().component();
                 var info = component.info();
                 statement.setObject(1, info.id());
@@ -159,9 +169,38 @@ public final class OpenDbIngestion {
                 statement.setString(11, record.raw());
                 statement.setDouble(12, info.quality().score());
                 statement.setString(13, json.writeValueAsString(info.quality().issues()));
-                statement.setLong(14, snapshotId);
             });
         }
+        jdbc.execute("create index on staging_component (source, external_id)");
+        jdbc.execute("analyze staging_component");
+        long staged = System.nanoTime();
+
+        int changed = jdbc.update("""
+                update hardware_component h set
+                    category = s.category, name = s.name, manufacturer = s.manufacturer, series = s.series,
+                    variant = s.variant, release_year = s.release_year, specs = s.specs, raw = s.raw,
+                    quality_score = s.quality_score, quality_issues = s.quality_issues, status = 'active',
+                    snapshot_id = ?, last_seen_at = now()
+                from staging_component s
+                where h.source = s.source and h.external_id = s.external_id
+                  and (h.specs <> s.specs or h.raw <> s.raw or h.quality_issues <> s.quality_issues
+                       or h.name is distinct from s.name or h.category <> s.category or h.status <> 'active')
+                """, snapshotId);
+        int unchanged = jdbc.update("""
+                update hardware_component h set snapshot_id = ?, last_seen_at = now()
+                from staging_component s
+                where h.source = s.source and h.external_id = s.external_id and h.snapshot_id <> ?
+                """, snapshotId, snapshotId);
+        int inserted = jdbc.update("""
+                insert into hardware_component (id, source, external_id, category, name, manufacturer, series, variant,
+                    release_year, specs, raw, quality_score, quality_issues, status, snapshot_id)
+                select s.id, s.source, s.external_id, s.category, s.name, s.manufacturer, s.series, s.variant,
+                    s.release_year, s.specs, s.raw, s.quality_score, s.quality_issues, 'active', ?
+                from staging_component s
+                where not exists (select 1 from hardware_component h where h.source = s.source and h.external_id = s.external_id)
+                """, snapshotId);
+        log.info("OpenDB upsert: {} staged in {} ms; {} changed, {} unchanged, {} new in {} ms", records.size(),
+                (staged - started) / 1_000_000, changed, unchanged, inserted, (System.nanoTime() - staged) / 1_000_000);
     }
 
     private void replaceIdentifiers(List<Parsed> records) {

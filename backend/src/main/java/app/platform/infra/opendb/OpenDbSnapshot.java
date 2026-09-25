@@ -23,7 +23,19 @@ public record OpenDbSnapshot(Path directory, String commit, String repository, S
     private static final Map<ComponentCategory, String> DIRECTORY_BY_CATEGORY = OpenDbRecordMapper.DIRECTORIES.entrySet().stream()
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
 
+    /**
+     * @param directory a snapshot directory, or the parent {@code data/opendb} folder whose CURRENT file names the
+     *                  snapshot to use (as written by scripts/fetch-opendb.sh)
+     */
     public static OpenDbSnapshot open(Path directory, JsonMapper json) {
+        Path current = directory.resolve("CURRENT");
+        if (!Files.isRegularFile(directory.resolve("SNAPSHOT.json")) && Files.isRegularFile(current)) {
+            try {
+                directory = directory.resolve(Files.readString(current).trim());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
         Path descriptor = directory.resolve("SNAPSHOT.json");
         if (!Files.isRegularFile(descriptor)) {
             throw new IllegalStateException("Not an OpenDB snapshot (missing SNAPSHOT.json): " + directory.toAbsolutePath()

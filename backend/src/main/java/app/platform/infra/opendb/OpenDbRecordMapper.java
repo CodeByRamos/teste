@@ -35,6 +35,9 @@ public final class OpenDbRecordMapper {
 
     public static final String SOURCE = "buildcores-opendb";
 
+    /** Bump when mapping or validation rules change: the same upstream commit is then re-ingested. */
+    public static final String VERSION = "opendb-mapper-v4";
+
     /** OpenDB category directory → domain category. */
     public static final Map<String, ComponentCategory> DIRECTORIES = Map.of(
             "CPU", ComponentCategory.CPU,
@@ -171,6 +174,11 @@ public final class OpenDbRecordMapper {
         Integer sata6 = r.integer("storage_devices.sata_6_gb_s");
         Integer sata3 = r.integer("storage_devices.sata_3_gb_s");
         Integer sata = sata6 == null && sata3 == null ? null : orZero(sata6) + orZero(sata3);
+        if (sata != null && sata == 0) {
+            // Desktop boards essentially always have SATA ports; a zero here is a data-entry gap, not a fact.
+            r.unrecognized("storage_devices", "0 portas SATA é implausível para uma placa-mãe de desktop; tratado como desconhecido", false);
+            sata = null;
+        }
         return new Motherboard(info,
                 socket(r, "socket", true),
                 r.critical("chipset", r.text("chipset")),

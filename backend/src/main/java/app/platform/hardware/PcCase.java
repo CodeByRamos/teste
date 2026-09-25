@@ -16,7 +16,7 @@ public record PcCase(
         Boolean transparentSidePanel) implements HardwareComponent {
 
     public PcCase {
-        supportedMotherboardFormFactors = supportedMotherboardFormFactors == null ? Set.of() : Set.copyOf(supportedMotherboardFormFactors);
-        supportedPsuFormFactors = supportedPsuFormFactors == null ? Set.of() : Set.copyOf(supportedPsuFormFactors);
+        supportedMotherboardFormFactors = Hardware.sortedSet(supportedMotherboardFormFactors);
+        supportedPsuFormFactors = Hardware.sortedSet(supportedPsuFormFactors);
     }
 }

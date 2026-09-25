@@ -25,7 +25,7 @@ public record Motherboard(
     public record M2Slot(Set<String> sizes, String key, String interfaceName) {
 
         public M2Slot {
-            sizes = sizes == null ? Set.of() : Set.copyOf(sizes);
+            sizes = Hardware.sortedSet(sizes);
         }
 
         public boolean acceptsNvme() {

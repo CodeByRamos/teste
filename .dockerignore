@@ -1,0 +1,8 @@
+.git
+.claude
+data
+docs
+frontend
+backend/target
+backend/.local
+**/node_modules

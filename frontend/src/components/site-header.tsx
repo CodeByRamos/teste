@@ -4,6 +4,7 @@ import { brand } from "@/config/brand";
 const links = [
   { href: "/montar", label: "Montar PC" },
   { href: "/verificar", label: "Verificar peças" },
+  { href: "/melhorar", label: "Melhorar meu PC" },
   { href: "/minhas-configuracoes", label: "Minhas configurações" },
 ];
 

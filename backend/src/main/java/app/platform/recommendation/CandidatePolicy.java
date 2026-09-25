@@ -82,6 +82,11 @@ final class CandidatePolicy {
                 && storage.capacityGb() != null && storage.capacityGb() >= 250;
     }
 
+    /** 2.5" SATA SSDs: the upgrade path for older boards without a free M.2 slot. */
+    static boolean sataSsd(Storage storage) {
+        return storage.isSsd() && storage.usesSataPort() && storage.capacityGb() != null && storage.capacityGb() >= 240;
+    }
+
     static boolean powerSupply(PowerSupply psu) {
         return "ATX".equals(psu.formFactor()) && psu.wattage() != null
                 && in(ACCEPTED_EFFICIENCY, psu.efficiencyRating())

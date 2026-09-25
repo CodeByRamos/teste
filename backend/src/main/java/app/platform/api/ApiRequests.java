@@ -1,5 +1,6 @@
 package app.platform.api;
 
+import app.platform.hardware.ComponentCategory;
 import app.platform.recommendation.BuildRequest;
 import app.platform.recommendation.TargetResolution;
 import app.platform.recommendation.UseCase;
@@ -49,5 +50,24 @@ final class ApiRequests {
     }
 
     record Interpret(@NotBlank @Size(max = 1000) String text) {
+    }
+
+    /** Upgrade budgets can be much smaller than a full build. */
+    record UpgradeGoals(
+            @NotNull @DecimalMin("200") @DecimalMax("100000") BigDecimal budgetBrl,
+            @NotEmpty @Size(max = 7) Set<@NotNull UseCase> useCases,
+            UseCase primaryUse,
+            TargetResolution resolution) {
+
+        BuildRequest toDomain(List<UUID> currentIds) {
+            return new BuildRequest(budgetBrl, useCases, primaryUse != null && useCases.contains(primaryUse) ? primaryUse : null,
+                    resolution, currentIds);
+        }
+    }
+
+    record Upgrade(
+            @NotEmpty @Size(max = 16) List<@NotNull UUID> currentComponentIds,
+            @NotNull @Valid UpgradeGoals goals,
+            ComponentCategory focus) {
     }
 }

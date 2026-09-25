@@ -275,7 +275,7 @@ public final class RecommendationEngine {
         return new Chassis(pcCase, psu, pcCase.price().add(psu.price()));
     }
 
-    private static boolean caseFits(PcCase pcCase, Motherboard board, Gpu gpu, CpuCooler cooler) {
+    static boolean caseFits(PcCase pcCase, Motherboard board, Gpu gpu, CpuCooler cooler) {
         if (Fit.motherboardInCase(board, pcCase) != Fit.Verdict.YES) {
             return false;
         }
@@ -287,14 +287,14 @@ public final class RecommendationEngine {
                 && pcCase.maxCoolerHeightMm() - cooler.heightMm() >= Fit.TIGHT_CLEARANCE_MM;
     }
 
-    private static boolean psuFits(PowerSupply psu, PowerEstimate power, Gpu gpu, PcCase pcCase) {
+    static boolean psuFits(PowerSupply psu, PowerEstimate power, Gpu gpu, PcCase pcCase) {
         return psu.wattage() >= power.recommendedPsuWatts()
                 && (gpu == null || Fit.psuConnectorsForGpu(psu, gpu) == Fit.Verdict.YES)
                 && Fit.psuFormFactorInCase(psu, pcCase) == Fit.Verdict.YES
                 && Fit.psuLengthInCase(psu, pcCase) != Fit.Verdict.NO;
     }
 
-    private static Priced<Memory> cheapestMemory(Pools pools, Motherboard board, int capacityGb) {
+    static Priced<Memory> cheapestMemory(Pools pools, Motherboard board, int capacityGb) {
         Predicate<Priced<Memory>> fits = kit -> kit.part().ramType().equals(board.ramType())
                 && kit.part().totalCapacityGb() >= capacityGb
                 && Fit.memorySlots(kit.part(), board) == Fit.Verdict.YES
@@ -305,7 +305,7 @@ public final class RecommendationEngine {
                 .orElse(null);
     }
 
-    private static Priced<Storage> cheapestDrive(Pools pools, Motherboard board, int capacityGb) {
+    static Priced<Storage> cheapestDrive(Pools pools, Motherboard board, int capacityGb) {
         return pools.drives().stream()
                 .filter(drive -> drive.part().capacityGb() >= capacityGb
                         && Fit.m2DriveOnBoard(drive.part(), board) == Fit.Verdict.YES)
@@ -316,7 +316,7 @@ public final class RecommendationEngine {
         return Boolean.TRUE.equals(cpu.includesCooler()) && cpu.powerBudgetWatts() != null && cpu.powerBudgetWatts() <= STOCK_COOLER_MAX_WATTS;
     }
 
-    private static int minimumCoolerHeight(Cpu cpu) {
+    static int minimumCoolerHeight(Cpu cpu) {
         int power = Objects.requireNonNullElse(cpu.powerBudgetWatts(), HIGH_POWER_WATTS);
         if (power >= HIGH_POWER_WATTS) {
             return HIGH_POWER_COOLER_HEIGHT_MM;
@@ -329,7 +329,7 @@ public final class RecommendationEngine {
      * part, so GPUs (a ~30× range) and CPUs (a ~5× range) are comparable tier for tier. For gaming, a GPU far
      * stronger or far weaker than the CPU is penalized: the weaker part would hold the other back.
      */
-    private static double utility(Pools pools, RequirementProfile profile, Cpu cpu, Gpu gpu) {
+    static double utility(Pools pools, RequirementProfile profile, Cpu cpu, Gpu gpu) {
         double enough = profile.enoughPerformance();
         double gpuNorm = gpu == null ? 0 : Math.min(enough, pools.gpuRange().normalize(PerformanceEstimator.gpuScore(gpu)));
         double multiNorm = Math.min(enough, pools.cpuMultiRange().normalize(PerformanceEstimator.cpuMultiThreadScore(cpu)));
@@ -587,13 +587,22 @@ public final class RecommendationEngine {
         return new Alternative(option.part(), option.price(), option.price().subtract(currentPrice), direction, impact);
     }
 
-    private static String percentText(double alternative, double current, String metric) {
-        long percent = Math.round(Math.abs(alternative / current - 1) * 100);
-        String direction = alternative < current ? "menos" : "mais";
-        return "Cerca de " + percent + "% " + direction + " " + metric + " (estimativa pelas especificações).";
+    /**
+     * Rounded on purpose: these are estimates from specifications, so precise figures would overstate accuracy.
+     * Large gains read as multiples ("cerca de 2,5×"), small ones as percentages rounded to 5%.
+     */
+    static String percentText(double alternative, double current, String metric) {
+        double ratio = alternative / current;
+        if (ratio >= 1.8) {
+            return String.format(Locale.of("pt", "BR"), "Cerca de %.1f× o %s atual (estimativa pelas especificações).",
+                    Math.round(ratio * 2) / 2.0, metric);
+        }
+        long percent = Math.round(Math.abs(ratio - 1) * 20) * 5;
+        String direction = ratio < 1 ? "menos" : "mais";
+        return "Cerca de " + Math.max(5, percent) + "% " + direction + " " + metric + " (estimativa pelas especificações).";
     }
 
-    private static String capacityText(int gb) {
+    static String capacityText(int gb) {
         return gb >= 1000 ? (gb % 1000 == 0 ? gb / 1000 + " TB" : String.format(Locale.ROOT, "%.1f TB", gb / 1000.0)) : gb + " GB";
     }
 
@@ -613,7 +622,7 @@ public final class RecommendationEngine {
         return BuildParts.of(components);
     }
 
-    private Pools pools(Catalog catalog) {
+    Pools pools(Catalog catalog) {
         Pools pools = cachedPools;
         if (pools == null || pools.catalog() != catalog) {
             synchronized (this) {
@@ -646,6 +655,7 @@ public final class RecommendationEngine {
                 priced(catalog.all(ComponentCategory.POWER_SUPPLY, PowerSupply.class), CandidatePolicy::powerSupply, priceById),
                 priced(catalog.all(ComponentCategory.CASE, PcCase.class), CandidatePolicy::pcCase, priceById),
                 priced(catalog.all(ComponentCategory.CPU_COOLER, CpuCooler.class), CandidatePolicy::cooler, priceById),
+                priced(catalog.all(ComponentCategory.STORAGE, Storage.class), CandidatePolicy::sataSsd, priceById),
                 ScoreRange.of(gpus.stream().mapToDouble(gpu -> PerformanceEstimator.gpuScore(gpu.part())).toArray()),
                 ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuMultiThreadScore(cpu.part())).toArray()),
                 ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuGamingScore(cpu.part())).toArray()));
@@ -663,7 +673,7 @@ public final class RecommendationEngine {
                 .toList();
     }
 
-    private static String brl(BigDecimal value) {
+    static String brl(BigDecimal value) {
         return NumberFormat.getCurrencyInstance(Locale.of("pt", "BR")).format(value);
     }
 
@@ -691,7 +701,7 @@ public final class RecommendationEngine {
     }
 
     /** Log-scale position of a score between the pool minimum (0) and maximum (1). */
-    private record ScoreRange(double min, double max) {
+    record ScoreRange(double min, double max) {
 
         static ScoreRange of(double[] scores) {
             double min = Math.max(Arrays.stream(scores).min().orElse(1), 1e-6);
@@ -707,10 +717,10 @@ public final class RecommendationEngine {
         }
     }
 
-    private record Pools(Catalog catalog, Map<UUID, BigDecimal> priceById, List<Priced<Cpu>> cpus, List<Priced<Gpu>> gpus,
+    record Pools(Catalog catalog, Map<UUID, BigDecimal> priceById, List<Priced<Cpu>> cpus, List<Priced<Gpu>> gpus,
                          List<Priced<Motherboard>> boards, List<Priced<Memory>> memory, List<Priced<Storage>> drives,
                          List<Priced<PowerSupply>> psus, List<Priced<PcCase>> cases, List<Priced<CpuCooler>> coolers,
-                         ScoreRange gpuRange, ScoreRange cpuMultiRange, ScoreRange cpuGamingRange) {
+                         List<Priced<Storage>> sataSsds, ScoreRange gpuRange, ScoreRange cpuMultiRange, ScoreRange cpuGamingRange) {
 
         BigDecimal price(HardwareComponent component) {
             return priceById.get(component.id());
