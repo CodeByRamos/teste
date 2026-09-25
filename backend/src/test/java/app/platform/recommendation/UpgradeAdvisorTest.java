@@ -43,7 +43,7 @@ class UpgradeAdvisorTest {
 
     private static ComponentInfo info(ComponentCategory category, String name) {
         SourceRef ref = new SourceRef("test", name);
-        return new ComponentInfo(ref.internalId(), ref, category, name, null, null, null, null, new DataQuality(1, List.of()));
+        return new ComponentInfo(ref.internalId(), ref, category, name, null, null, null, null, new DataQuality(1, List.of()), null);
     }
 
     private final Gpu oldGpu = new Gpu(info(ComponentCategory.GPU, "Old GTX 1650"), "NVIDIA", "GeForce GTX 1650", 4, "GDDR5",

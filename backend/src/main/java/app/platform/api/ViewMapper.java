@@ -13,6 +13,7 @@ import app.platform.recommendation.BuildRequest;
 import app.platform.recommendation.ComponentExplainer;
 import app.platform.recommendation.PerformanceEstimator;
 import app.platform.recommendation.RecommendationEngine;
+import app.platform.visualization.ModelResolver;
 
 import java.util.List;
 
@@ -93,7 +94,8 @@ final class ViewMapper {
                 price(item.offer()),
                 new ApiViews.Explanation(explanation.whatItIs(), explanation.whyItMatters(), explanation.reason()),
                 specs(explanation.specs()),
-                item.alternatives().stream().map(ViewMapper::alternative).toList());
+                item.alternatives().stream().map(ViewMapper::alternative).toList(),
+                ModelResolver.resolve(component));
     }
 
     private static ApiViews.AlternativeView alternative(Alternative alternative) {

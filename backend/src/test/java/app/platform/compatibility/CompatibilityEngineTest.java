@@ -35,7 +35,7 @@ class CompatibilityEngineTest {
 
     private static ComponentInfo info(ComponentCategory category, String name) {
         SourceRef ref = new SourceRef("test", name);
-        return new ComponentInfo(ref.internalId(), ref, category, name, null, null, null, null, new DataQuality(1, List.of()));
+        return new ComponentInfo(ref.internalId(), ref, category, name, null, null, null, null, new DataQuality(1, List.of()), null);
     }
 
     @Test

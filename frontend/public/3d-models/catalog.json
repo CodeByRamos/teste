@@ -1,0 +1,1666 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-25T17:09:09.582Z",
+  "units": "m",
+  "models": [
+    {
+      "modelId": "gpu-triple-fan-v1",
+      "category": "gpu",
+      "variant": "triple-fan",
+      "status": "implemented",
+      "description": "Placa de vídeo com três ventoinhas (maioria das placas intermediárias e topo de linha).",
+      "parameters": [
+        "lengthMm",
+        "heightMm",
+        "slots",
+        "fanCount",
+        "fanSizeMm",
+        "backplate",
+        "eightPinConnectors",
+        "highPowerConnector",
+        "color"
+      ],
+      "coverage": {
+        "records": 1693,
+        "weighted": 5003,
+        "current": 590
+      },
+      "stats": {
+        "triangles": 6216,
+        "bytes": 44616,
+        "lod1Triangles": 4944,
+        "lod1Bytes": 39932,
+        "materials": 8
+      },
+      "baseDimensionsMm": {
+        "x": 143,
+        "y": 59.6,
+        "z": 309.2
+      },
+      "parts": [
+        "bracket",
+        "pcb",
+        "backplate",
+        "shroud",
+        "pcie_fingers",
+        "fan_0",
+        "fan_1",
+        "fan_2",
+        "power_connector"
+      ],
+      "mounts": [],
+      "base": {
+        "lengthMm": 308,
+        "heightMm": 125,
+        "slots": 3,
+        "fanCount": 3,
+        "fanSizeMm": 92,
+        "backplate": true,
+        "eightPinConnectors": 0,
+        "highPowerConnector": true
+      },
+      "url": "/3d-models/gpu/triple-fan/gpu-triple-fan-v1.glb",
+      "lod1Url": "/3d-models/gpu/triple-fan/gpu-triple-fan-v1.lod1.glb"
+    },
+    {
+      "modelId": "gpu-dual-fan-v1",
+      "category": "gpu",
+      "variant": "dual-fan",
+      "status": "implemented",
+      "description": "Placa de vídeo com duas ventoinhas (maioria das placas de entrada e intermediárias).",
+      "parameters": [
+        "lengthMm",
+        "heightMm",
+        "slots",
+        "fanCount",
+        "fanSizeMm",
+        "backplate",
+        "eightPinConnectors",
+        "highPowerConnector",
+        "color"
+      ],
+      "coverage": {
+        "records": 1464,
+        "weighted": 3872,
+        "current": 350
+      },
+      "stats": {
+        "triangles": 4528,
+        "bytes": 43092,
+        "lod1Triangles": 3680,
+        "lod1Bytes": 38384,
+        "materials": 8
+      },
+      "baseDimensionsMm": {
+        "x": 138,
+        "y": 39.2,
+        "z": 246.2
+      },
+      "parts": [
+        "bracket",
+        "pcb",
+        "backplate",
+        "shroud",
+        "pcie_fingers",
+        "fan_0",
+        "fan_1",
+        "power_connector"
+      ],
+      "mounts": [],
+      "base": {
+        "lengthMm": 245,
+        "heightMm": 120,
+        "slots": 2,
+        "fanCount": 2,
+        "fanSizeMm": 95,
+        "backplate": true,
+        "eightPinConnectors": 1,
+        "highPowerConnector": false
+      },
+      "url": "/3d-models/gpu/dual-fan/gpu-dual-fan-v1.glb",
+      "lod1Url": "/3d-models/gpu/dual-fan/gpu-dual-fan-v1.lod1.glb"
+    },
+    {
+      "modelId": "gpu-single-fan-v1",
+      "category": "gpu",
+      "variant": "single-fan",
+      "status": "implemented",
+      "description": "Placa de vídeo compacta com uma ventoinha.",
+      "parameters": [
+        "lengthMm",
+        "heightMm",
+        "slots",
+        "fanCount",
+        "fanSizeMm",
+        "backplate",
+        "eightPinConnectors",
+        "highPowerConnector",
+        "color"
+      ],
+      "coverage": {
+        "records": 544,
+        "weighted": 1341,
+        "current": 32
+      },
+      "stats": {
+        "triangles": 2876,
+        "bytes": 42804,
+        "lod1Triangles": 2452,
+        "lod1Bytes": 38136,
+        "materials": 8
+      },
+      "baseDimensionsMm": {
+        "x": 133,
+        "y": 39.2,
+        "z": 185.2
+      },
+      "parts": [
+        "bracket",
+        "pcb",
+        "backplate",
+        "shroud",
+        "pcie_fingers",
+        "fan_0",
+        "power_connector"
+      ],
+      "mounts": [],
+      "base": {
+        "lengthMm": 184,
+        "heightMm": 115,
+        "slots": 2,
+        "fanCount": 1,
+        "fanSizeMm": 90,
+        "backplate": false,
+        "eightPinConnectors": 1,
+        "highPowerConnector": false
+      },
+      "url": "/3d-models/gpu/single-fan/gpu-single-fan-v1.glb",
+      "lod1Url": "/3d-models/gpu/single-fan/gpu-single-fan-v1.lod1.glb"
+    },
+    {
+      "modelId": "gpu-blower-v1",
+      "category": "gpu",
+      "variant": "blower",
+      "status": "planned",
+      "description": "Placa com cooler tipo turbina (blower): corpo fechado, ventoinha radial na ponta.",
+      "parameters": [],
+      "coverage": {
+        "records": 20,
+        "weighted": 76,
+        "current": 19
+      }
+    },
+    {
+      "modelId": "gpu-hybrid-v1",
+      "category": "gpu",
+      "variant": "hybrid",
+      "status": "planned",
+      "description": "Placa com refrigeração líquida/híbrida: corpo curto + radiador (reaproveita aio-radiator).",
+      "parameters": [],
+      "coverage": {
+        "records": 88,
+        "weighted": 227,
+        "current": 18
+      }
+    },
+    {
+      "modelId": "gpu-passive-v1",
+      "category": "gpu",
+      "variant": "passive",
+      "status": "planned",
+      "description": "Placa sem ventoinha, só dissipador.",
+      "parameters": [],
+      "coverage": {
+        "records": 38,
+        "weighted": 105,
+        "current": 3
+      }
+    },
+    {
+      "modelId": "case-atx-mid-tower-v1",
+      "category": "case",
+      "variant": "atx-mid-tower",
+      "status": "implemented",
+      "description": "Gabinete com painéis separados e pontos de montagem para placa-mãe, fonte, fans, radiadores e discos.",
+      "parameters": [
+        "widthMm",
+        "heightMm",
+        "depthMm",
+        "psuShroud",
+        "glassSide",
+        "expansionSlots",
+        "color"
+      ],
+      "coverage": {
+        "records": 2353,
+        "weighted": 6460,
+        "current": 499
+      },
+      "stats": {
+        "triangles": 7056,
+        "bytes": 76456,
+        "lod1Triangles": 4176,
+        "lod1Bytes": 43192,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 235,
+        "y": 481,
+        "z": 465
+      },
+      "parts": [
+        "tray_panel",
+        "side_panel",
+        "top_panel",
+        "bottom_panel",
+        "front_panel",
+        "rear_panel",
+        "psu_shroud",
+        "expansion_slots",
+        "foot_0",
+        "foot_1",
+        "foot_2",
+        "foot_3"
+      ],
+      "mounts": [
+        "motherboard",
+        "psu",
+        "fan_rear",
+        "fan_front_0",
+        "fan_front_1",
+        "fan_front_2",
+        "fan_top_0",
+        "fan_top_1",
+        "fan_top_2",
+        "radiator_top",
+        "radiator_front",
+        "drive_bay_0"
+      ],
+      "base": {
+        "form": "atx-mid",
+        "widthMm": 235,
+        "heightMm": 481,
+        "depthMm": 465,
+        "psuShroud": true,
+        "glassSide": true,
+        "expansionSlots": 7
+      },
+      "url": "/3d-models/case/atx-mid-tower/case-atx-mid-tower-v1.glb",
+      "lod1Url": "/3d-models/case/atx-mid-tower/case-atx-mid-tower-v1.lod1.glb"
+    },
+    {
+      "modelId": "case-matx-tower-v1",
+      "category": "case",
+      "variant": "matx-tower",
+      "status": "implemented",
+      "description": "Gabinete com painéis separados e pontos de montagem para placa-mãe, fonte, fans, radiadores e discos.",
+      "parameters": [
+        "widthMm",
+        "heightMm",
+        "depthMm",
+        "psuShroud",
+        "glassSide",
+        "expansionSlots",
+        "color"
+      ],
+      "coverage": {
+        "records": 642,
+        "weighted": 1633,
+        "current": 85
+      },
+      "stats": {
+        "triangles": 7020,
+        "bytes": 76368,
+        "lod1Triangles": 4140,
+        "lod1Bytes": 42692,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 215,
+        "y": 398,
+        "z": 407
+      },
+      "parts": [
+        "tray_panel",
+        "side_panel",
+        "top_panel",
+        "bottom_panel",
+        "front_panel",
+        "rear_panel",
+        "psu_shroud",
+        "expansion_slots",
+        "foot_0",
+        "foot_1",
+        "foot_2",
+        "foot_3"
+      ],
+      "mounts": [
+        "motherboard",
+        "psu",
+        "fan_rear",
+        "fan_front_0",
+        "fan_front_1",
+        "fan_top_0",
+        "fan_top_1",
+        "radiator_top",
+        "radiator_front",
+        "drive_bay_0"
+      ],
+      "base": {
+        "form": "matx",
+        "widthMm": 215,
+        "heightMm": 398,
+        "depthMm": 407,
+        "psuShroud": true,
+        "glassSide": true,
+        "expansionSlots": 4
+      },
+      "url": "/3d-models/case/matx-tower/case-matx-tower-v1.glb",
+      "lod1Url": "/3d-models/case/matx-tower/case-matx-tower-v1.lod1.glb"
+    },
+    {
+      "modelId": "case-atx-full-tower-v1",
+      "category": "case",
+      "variant": "atx-full-tower",
+      "status": "implemented",
+      "description": "Gabinete com painéis separados e pontos de montagem para placa-mãe, fonte, fans, radiadores e discos.",
+      "parameters": [
+        "widthMm",
+        "heightMm",
+        "depthMm",
+        "psuShroud",
+        "glassSide",
+        "expansionSlots",
+        "color"
+      ],
+      "coverage": {
+        "records": 339,
+        "weighted": 919,
+        "current": 55
+      },
+      "stats": {
+        "triangles": 7068,
+        "bytes": 74848,
+        "lod1Triangles": 4188,
+        "lod1Bytes": 42036,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 268,
+        "y": 532,
+        "z": 532
+      },
+      "parts": [
+        "tray_panel",
+        "side_panel",
+        "top_panel",
+        "bottom_panel",
+        "front_panel",
+        "rear_panel",
+        "psu_shroud",
+        "expansion_slots",
+        "foot_0",
+        "foot_1",
+        "foot_2",
+        "foot_3"
+      ],
+      "mounts": [
+        "motherboard",
+        "psu",
+        "fan_rear",
+        "fan_front_0",
+        "fan_front_1",
+        "fan_front_2",
+        "fan_top_0",
+        "fan_top_1",
+        "fan_top_2",
+        "radiator_top",
+        "radiator_front",
+        "drive_bay_0"
+      ],
+      "base": {
+        "form": "atx-full",
+        "widthMm": 268,
+        "heightMm": 532,
+        "depthMm": 532,
+        "psuShroud": true,
+        "glassSide": true,
+        "expansionSlots": 8
+      },
+      "url": "/3d-models/case/atx-full-tower/case-atx-full-tower-v1.glb",
+      "lod1Url": "/3d-models/case/atx-full-tower/case-atx-full-tower-v1.lod1.glb"
+    },
+    {
+      "modelId": "case-itx-tower-v1",
+      "category": "case",
+      "variant": "itx-tower",
+      "status": "implemented",
+      "description": "Gabinete com painéis separados e pontos de montagem para placa-mãe, fonte, fans, radiadores e discos.",
+      "parameters": [
+        "widthMm",
+        "heightMm",
+        "depthMm",
+        "psuShroud",
+        "glassSide",
+        "expansionSlots",
+        "color"
+      ],
+      "coverage": {
+        "records": 337,
+        "weighted": 926,
+        "current": 24
+      },
+      "stats": {
+        "triangles": 6996,
+        "bytes": 75924,
+        "lod1Triangles": 4116,
+        "lod1Bytes": 41856,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 205,
+        "y": 295,
+        "z": 326
+      },
+      "parts": [
+        "tray_panel",
+        "side_panel",
+        "top_panel",
+        "bottom_panel",
+        "front_panel",
+        "rear_panel",
+        "psu_shroud",
+        "expansion_slots",
+        "foot_0",
+        "foot_1",
+        "foot_2",
+        "foot_3"
+      ],
+      "mounts": [
+        "motherboard",
+        "psu",
+        "fan_rear",
+        "fan_front_0",
+        "fan_top_0",
+        "radiator_top",
+        "radiator_front",
+        "drive_bay_0"
+      ],
+      "base": {
+        "form": "itx",
+        "widthMm": 205,
+        "heightMm": 295,
+        "depthMm": 326,
+        "psuShroud": false,
+        "glassSide": true,
+        "expansionSlots": 2
+      },
+      "url": "/3d-models/case/itx-tower/case-itx-tower-v1.glb",
+      "lod1Url": "/3d-models/case/itx-tower/case-itx-tower-v1.lod1.glb"
+    },
+    {
+      "modelId": "case-sff-compact-v1",
+      "category": "case",
+      "variant": "sff-compact",
+      "status": "planned",
+      "description": "Gabinete compacto tipo sanduíche (placa de vídeo com riser).",
+      "parameters": [],
+      "coverage": {
+        "records": 337,
+        "weighted": 926,
+        "current": 24
+      }
+    },
+    {
+      "modelId": "case-desktop-htpc-v1",
+      "category": "case",
+      "variant": "desktop-htpc",
+      "status": "planned",
+      "description": "Gabinete horizontal de mesa / HTPC.",
+      "parameters": [],
+      "coverage": {
+        "records": 111,
+        "weighted": 258,
+        "current": 0
+      }
+    },
+    {
+      "modelId": "mb-atx-v1",
+      "category": "motherboard",
+      "variant": "atx",
+      "status": "implemented",
+      "description": "Placa-mãe ATX: encaixe, slots de memória e PCIe, dissipadores, I/O e M.2.",
+      "parameters": [
+        "form",
+        "ramSlots",
+        "m2Slots",
+        "x16Slots",
+        "color"
+      ],
+      "coverage": {
+        "records": 1689,
+        "weighted": 4687,
+        "current": 373
+      },
+      "stats": {
+        "triangles": 2904,
+        "bytes": 42512,
+        "lod1Triangles": 2496,
+        "lod1Bytes": 37288,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 47,
+        "y": 305,
+        "z": 247
+      },
+      "parts": [
+        "pcb",
+        "io_cover",
+        "io_shield",
+        "socket",
+        "cpu",
+        "vrm_top",
+        "vrm_rear",
+        "eps_connector",
+        "atx_connector",
+        "sata_ports",
+        "chipset",
+        "ram_slot_0",
+        "ram_slot_1",
+        "ram_slot_2",
+        "ram_slot_3",
+        "pcie_x16_0",
+        "pcie_x16_1",
+        "m2_slot_0",
+        "m2_slot_1",
+        "m2_slot_2"
+      ],
+      "mounts": [
+        "cpu",
+        "ram_0",
+        "ram_1",
+        "ram_2",
+        "ram_3",
+        "pcie_x16_0",
+        "pcie_x16_1",
+        "m2_0",
+        "m2_1",
+        "m2_2"
+      ],
+      "base": {
+        "form": "atx",
+        "ramSlots": 4,
+        "m2Slots": 3,
+        "x16Slots": 2
+      },
+      "url": "/3d-models/motherboard/atx/mb-atx-v1.glb",
+      "lod1Url": "/3d-models/motherboard/atx/mb-atx-v1.lod1.glb"
+    },
+    {
+      "modelId": "mb-matx-v1",
+      "category": "motherboard",
+      "variant": "matx",
+      "status": "implemented",
+      "description": "Placa-mãe MATX: encaixe, slots de memória e PCIe, dissipadores, I/O e M.2.",
+      "parameters": [
+        "form",
+        "ramSlots",
+        "m2Slots",
+        "x16Slots",
+        "color"
+      ],
+      "coverage": {
+        "records": 1520,
+        "weighted": 3287,
+        "current": 223
+      },
+      "stats": {
+        "triangles": 2892,
+        "bytes": 42140,
+        "lod1Triangles": 2484,
+        "lod1Bytes": 36912,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 47,
+        "y": 244,
+        "z": 247
+      },
+      "parts": [
+        "pcb",
+        "io_cover",
+        "io_shield",
+        "socket",
+        "cpu",
+        "vrm_top",
+        "vrm_rear",
+        "eps_connector",
+        "atx_connector",
+        "sata_ports",
+        "chipset",
+        "ram_slot_0",
+        "ram_slot_1",
+        "ram_slot_2",
+        "ram_slot_3",
+        "pcie_x16_0",
+        "pcie_x16_1",
+        "m2_slot_0",
+        "m2_slot_1"
+      ],
+      "mounts": [
+        "cpu",
+        "ram_0",
+        "ram_1",
+        "ram_2",
+        "ram_3",
+        "pcie_x16_0",
+        "pcie_x16_1",
+        "m2_0",
+        "m2_1"
+      ],
+      "base": {
+        "form": "matx",
+        "ramSlots": 4,
+        "m2Slots": 2,
+        "x16Slots": 2
+      },
+      "url": "/3d-models/motherboard/matx/mb-matx-v1.glb",
+      "lod1Url": "/3d-models/motherboard/matx/mb-matx-v1.lod1.glb"
+    },
+    {
+      "modelId": "mb-itx-v1",
+      "category": "motherboard",
+      "variant": "itx",
+      "status": "implemented",
+      "description": "Placa-mãe ITX: encaixe, slots de memória e PCIe, dissipadores, I/O e M.2.",
+      "parameters": [
+        "form",
+        "ramSlots",
+        "m2Slots",
+        "x16Slots",
+        "color"
+      ],
+      "coverage": {
+        "records": 307,
+        "weighted": 740,
+        "current": 41
+      },
+      "stats": {
+        "triangles": 2556,
+        "bytes": 38036,
+        "lod1Triangles": 2256,
+        "lod1Bytes": 34036,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 47,
+        "y": 170,
+        "z": 173
+      },
+      "parts": [
+        "pcb",
+        "io_cover",
+        "io_shield",
+        "socket",
+        "cpu",
+        "vrm_top",
+        "vrm_rear",
+        "eps_connector",
+        "atx_connector",
+        "sata_ports",
+        "chipset",
+        "ram_slot_0",
+        "ram_slot_1",
+        "pcie_x16_0",
+        "m2_slot_0"
+      ],
+      "mounts": [
+        "cpu",
+        "ram_0",
+        "ram_1",
+        "pcie_x16_0",
+        "m2_0"
+      ],
+      "base": {
+        "form": "itx",
+        "ramSlots": 2,
+        "m2Slots": 1,
+        "x16Slots": 1
+      },
+      "url": "/3d-models/motherboard/itx/mb-itx-v1.glb",
+      "lod1Url": "/3d-models/motherboard/itx/mb-itx-v1.lod1.glb"
+    },
+    {
+      "modelId": "mb-eatx-v1",
+      "category": "motherboard",
+      "variant": "eatx",
+      "status": "implemented",
+      "description": "Placa-mãe EATX: encaixe, slots de memória e PCIe, dissipadores, I/O e M.2.",
+      "parameters": [
+        "form",
+        "ramSlots",
+        "m2Slots",
+        "x16Slots",
+        "color"
+      ],
+      "coverage": {
+        "records": 182,
+        "weighted": 481,
+        "current": 32
+      },
+      "stats": {
+        "triangles": 2928,
+        "bytes": 42872,
+        "lod1Triangles": 2520,
+        "lod1Bytes": 37648,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 47,
+        "y": 305,
+        "z": 333
+      },
+      "parts": [
+        "pcb",
+        "io_cover",
+        "io_shield",
+        "socket",
+        "cpu",
+        "vrm_top",
+        "vrm_rear",
+        "eps_connector",
+        "atx_connector",
+        "sata_ports",
+        "chipset",
+        "ram_slot_0",
+        "ram_slot_1",
+        "ram_slot_2",
+        "ram_slot_3",
+        "pcie_x16_0",
+        "pcie_x16_1",
+        "pcie_x16_2",
+        "m2_slot_0",
+        "m2_slot_1",
+        "m2_slot_2"
+      ],
+      "mounts": [
+        "cpu",
+        "ram_0",
+        "ram_1",
+        "ram_2",
+        "ram_3",
+        "pcie_x16_0",
+        "pcie_x16_1",
+        "pcie_x16_2",
+        "m2_0",
+        "m2_1",
+        "m2_2"
+      ],
+      "base": {
+        "form": "eatx",
+        "ramSlots": 4,
+        "m2Slots": 3,
+        "x16Slots": 3
+      },
+      "url": "/3d-models/motherboard/eatx/mb-eatx-v1.glb",
+      "lod1Url": "/3d-models/motherboard/eatx/mb-eatx-v1.lod1.glb"
+    },
+    {
+      "modelId": "cooler-single-tower-v1",
+      "category": "cooler",
+      "variant": "single-tower",
+      "status": "implemented",
+      "description": "Air cooler torre única com uma ventoinha.",
+      "parameters": [
+        "heightMm",
+        "fanSizeMm",
+        "fanCount",
+        "color"
+      ],
+      "coverage": {
+        "records": 790,
+        "weighted": 1989,
+        "current": 21
+      },
+      "stats": {
+        "triangles": 5744,
+        "bytes": 64204,
+        "lod1Triangles": 2600,
+        "lod1Bytes": 36640,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 155,
+        "y": 122,
+        "z": 77.5
+      },
+      "parts": [
+        "base",
+        "heatpipes",
+        "fin_stack_0",
+        "top_cover_0",
+        "fan_0"
+      ],
+      "mounts": [],
+      "base": {
+        "style": "single-tower",
+        "heightMm": 155,
+        "fanSizeMm": 120,
+        "fanCount": 1
+      },
+      "url": "/3d-models/cooler/single-tower/cooler-single-tower-v1.glb",
+      "lod1Url": "/3d-models/cooler/single-tower/cooler-single-tower-v1.lod1.glb"
+    },
+    {
+      "modelId": "cooler-dual-tower-v1",
+      "category": "cooler",
+      "variant": "dual-tower",
+      "status": "implemented",
+      "description": "Air cooler de torre dupla (duas pilhas de aletas).",
+      "parameters": [
+        "heightMm",
+        "fanSizeMm",
+        "fanCount",
+        "color"
+      ],
+      "coverage": {
+        "records": 102,
+        "weighted": 348,
+        "current": 33
+      },
+      "stats": {
+        "triangles": 8664,
+        "bytes": 66392,
+        "lod1Triangles": 4240,
+        "lod1Bytes": 38160,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 158,
+        "y": 122,
+        "z": 147.5
+      },
+      "parts": [
+        "base",
+        "heatpipes",
+        "fin_stack_0",
+        "top_cover_0",
+        "fin_stack_1",
+        "top_cover_1",
+        "fan_0",
+        "fan_1"
+      ],
+      "mounts": [],
+      "base": {
+        "style": "dual-tower",
+        "heightMm": 158,
+        "fanSizeMm": 120,
+        "fanCount": 2
+      },
+      "url": "/3d-models/cooler/dual-tower/cooler-dual-tower-v1.glb",
+      "lod1Url": "/3d-models/cooler/dual-tower/cooler-dual-tower-v1.lod1.glb"
+    },
+    {
+      "modelId": "cooler-low-profile-v1",
+      "category": "cooler",
+      "variant": "low-profile",
+      "status": "implemented",
+      "description": "Cooler baixo com ventoinha sobre as aletas (gabinetes compactos).",
+      "parameters": [
+        "heightMm",
+        "fanSizeMm",
+        "color"
+      ],
+      "coverage": {
+        "records": 231,
+        "weighted": 671,
+        "current": 10
+      },
+      "stats": {
+        "triangles": 2704,
+        "bytes": 43800,
+        "lod1Triangles": 1532,
+        "lod1Bytes": 27616,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 47,
+        "y": 92,
+        "z": 92
+      },
+      "parts": [
+        "base",
+        "fin_stack_0",
+        "fan_0"
+      ],
+      "mounts": [],
+      "base": {
+        "style": "low-profile",
+        "heightMm": 47,
+        "fanSizeMm": 92,
+        "fanCount": 1
+      },
+      "url": "/3d-models/cooler/low-profile/cooler-low-profile-v1.glb",
+      "lod1Url": "/3d-models/cooler/low-profile/cooler-low-profile-v1.lod1.glb"
+    },
+    {
+      "modelId": "aio-radiator-120-v1",
+      "category": "aio",
+      "variant": "radiator-120",
+      "status": "implemented",
+      "description": "Radiador de water cooler 120 mm com 1 ventoinha(s).",
+      "parameters": [
+        "fanCount",
+        "fanSizeMm",
+        "color"
+      ],
+      "coverage": {
+        "records": 123,
+        "weighted": 260,
+        "current": 5
+      },
+      "stats": {
+        "triangles": 3016,
+        "bytes": 45924,
+        "lod1Triangles": 1844,
+        "lod1Bytes": 29620,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 126,
+        "y": 61.5,
+        "z": 160
+      },
+      "parts": [
+        "core",
+        "tank_0",
+        "tank_1",
+        "fittings",
+        "fan_0"
+      ],
+      "mounts": [
+        "tube_in",
+        "tube_out"
+      ],
+      "base": {
+        "fanCount": 1,
+        "fanSizeMm": 120
+      },
+      "url": "/3d-models/aio/radiator-120/aio-radiator-120-v1.glb",
+      "lod1Url": "/3d-models/aio/radiator-120/aio-radiator-120-v1.lod1.glb"
+    },
+    {
+      "modelId": "aio-radiator-240-v1",
+      "category": "aio",
+      "variant": "radiator-240",
+      "status": "implemented",
+      "description": "Radiador de water cooler 240 mm com 2 ventoinha(s).",
+      "parameters": [
+        "fanCount",
+        "fanSizeMm",
+        "color"
+      ],
+      "coverage": {
+        "records": 455,
+        "weighted": 1391,
+        "current": 58
+      },
+      "stats": {
+        "triangles": 5396,
+        "bytes": 52476,
+        "lod1Triangles": 3064,
+        "lod1Bytes": 32984,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 126,
+        "y": 61.5,
+        "z": 280
+      },
+      "parts": [
+        "core",
+        "tank_0",
+        "tank_1",
+        "fittings",
+        "fan_0",
+        "fan_1"
+      ],
+      "mounts": [
+        "tube_in",
+        "tube_out"
+      ],
+      "base": {
+        "fanCount": 2,
+        "fanSizeMm": 120
+      },
+      "url": "/3d-models/aio/radiator-240/aio-radiator-240-v1.glb",
+      "lod1Url": "/3d-models/aio/radiator-240/aio-radiator-240-v1.lod1.glb"
+    },
+    {
+      "modelId": "aio-radiator-280-v1",
+      "category": "aio",
+      "variant": "radiator-280",
+      "status": "implemented",
+      "description": "Radiador de water cooler 280 mm com 2 ventoinha(s).",
+      "parameters": [
+        "fanCount",
+        "fanSizeMm",
+        "color"
+      ],
+      "coverage": {
+        "records": 112,
+        "weighted": 413,
+        "current": 27
+      },
+      "stats": {
+        "triangles": 5552,
+        "bytes": 54092,
+        "lod1Triangles": 3148,
+        "lod1Bytes": 33628,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 146,
+        "y": 61.5,
+        "z": 320
+      },
+      "parts": [
+        "core",
+        "tank_0",
+        "tank_1",
+        "fittings",
+        "fan_0",
+        "fan_1"
+      ],
+      "mounts": [
+        "tube_in",
+        "tube_out"
+      ],
+      "base": {
+        "fanCount": 2,
+        "fanSizeMm": 140
+      },
+      "url": "/3d-models/aio/radiator-280/aio-radiator-280-v1.glb",
+      "lod1Url": "/3d-models/aio/radiator-280/aio-radiator-280-v1.lod1.glb"
+    },
+    {
+      "modelId": "aio-radiator-360-v1",
+      "category": "aio",
+      "variant": "radiator-360",
+      "status": "implemented",
+      "description": "Radiador de water cooler 360 mm com 3 ventoinha(s).",
+      "parameters": [
+        "fanCount",
+        "fanSizeMm",
+        "color"
+      ],
+      "coverage": {
+        "records": 519,
+        "weighted": 1672,
+        "current": 99
+      },
+      "stats": {
+        "triangles": 7776,
+        "bytes": 58292,
+        "lod1Triangles": 4284,
+        "lod1Bytes": 36024,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 126,
+        "y": 61.5,
+        "z": 400
+      },
+      "parts": [
+        "core",
+        "tank_0",
+        "tank_1",
+        "fittings",
+        "fan_0",
+        "fan_1",
+        "fan_2"
+      ],
+      "mounts": [
+        "tube_in",
+        "tube_out"
+      ],
+      "base": {
+        "fanCount": 3,
+        "fanSizeMm": 120
+      },
+      "url": "/3d-models/aio/radiator-360/aio-radiator-360-v1.glb",
+      "lod1Url": "/3d-models/aio/radiator-360/aio-radiator-360-v1.lod1.glb"
+    },
+    {
+      "modelId": "aio-pump-v1",
+      "category": "aio",
+      "variant": "pump",
+      "status": "implemented",
+      "description": "Bloco da bomba do water cooler (vai sobre o processador; mangueiras geradas na cena).",
+      "parameters": [
+        "color"
+      ],
+      "coverage": {
+        "records": 455,
+        "weighted": 1391,
+        "current": 58
+      },
+      "stats": {
+        "triangles": 1280,
+        "bytes": 17324,
+        "lod1Triangles": 1088,
+        "lod1Bytes": 16196,
+        "materials": 4
+      },
+      "baseDimensionsMm": {
+        "x": 47,
+        "y": 68,
+        "z": 79
+      },
+      "parts": [
+        "block",
+        "cap",
+        "fittings"
+      ],
+      "mounts": [
+        "tube_in",
+        "tube_out"
+      ],
+      "base": {},
+      "url": "/3d-models/aio/pump/aio-pump-v1.glb",
+      "lod1Url": "/3d-models/aio/pump/aio-pump-v1.lod1.glb"
+    },
+    {
+      "modelId": "aio-radiator-420-v1",
+      "category": "aio",
+      "variant": "radiator-420",
+      "status": "planned",
+      "description": "Radiador 420 mm (3 × 140 mm).",
+      "parameters": [],
+      "coverage": {
+        "records": 49,
+        "weighted": 191,
+        "current": 15
+      }
+    },
+    {
+      "modelId": "ram-heatsink-v1",
+      "category": "ram",
+      "variant": "heatsink",
+      "status": "implemented",
+      "description": "Memória com dissipador.",
+      "parameters": [
+        "heightMm",
+        "heatSpreader",
+        "rgb",
+        "modules",
+        "color"
+      ],
+      "coverage": {
+        "records": 2205,
+        "weighted": 6104,
+        "current": 209
+      },
+      "stats": {
+        "triangles": 780,
+        "bytes": 12616,
+        "lod1Triangles": 780,
+        "lod1Bytes": 12616,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 34,
+        "y": 133.4,
+        "z": 7
+      },
+      "parts": [
+        "pcb",
+        "chips",
+        "heatspreader",
+        "rgb_bar"
+      ],
+      "mounts": [],
+      "base": {
+        "heightMm": 34,
+        "heatSpreader": true,
+        "rgb": false
+      },
+      "url": "/3d-models/ram/heatsink/ram-heatsink-v1.glb",
+      "lod1Url": "/3d-models/ram/heatsink/ram-heatsink-v1.lod1.glb"
+    },
+    {
+      "modelId": "ram-rgb-v1",
+      "category": "ram",
+      "variant": "rgb",
+      "status": "implemented",
+      "description": "Memória com dissipador e barra de iluminação RGB.",
+      "parameters": [
+        "heightMm",
+        "heatSpreader",
+        "rgb",
+        "modules",
+        "color"
+      ],
+      "coverage": {
+        "records": 1721,
+        "weighted": 5147,
+        "current": 311
+      },
+      "stats": {
+        "triangles": 780,
+        "bytes": 12592,
+        "lod1Triangles": 780,
+        "lod1Bytes": 12592,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 44,
+        "y": 133.4,
+        "z": 7
+      },
+      "parts": [
+        "pcb",
+        "chips",
+        "heatspreader",
+        "rgb_bar"
+      ],
+      "mounts": [],
+      "base": {
+        "heightMm": 44,
+        "heatSpreader": true,
+        "rgb": true
+      },
+      "url": "/3d-models/ram/rgb/ram-rgb-v1.glb",
+      "lod1Url": "/3d-models/ram/rgb/ram-rgb-v1.lod1.glb"
+    },
+    {
+      "modelId": "ram-standard-v1",
+      "category": "ram",
+      "variant": "standard",
+      "status": "implemented",
+      "description": "Memória sem dissipador (chips expostos).",
+      "parameters": [
+        "heightMm",
+        "heatSpreader",
+        "rgb",
+        "modules",
+        "color"
+      ],
+      "coverage": {
+        "records": 807,
+        "weighted": 2147,
+        "current": 14
+      },
+      "stats": {
+        "triangles": 780,
+        "bytes": 12524,
+        "lod1Triangles": 780,
+        "lod1Bytes": 12524,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 31.3,
+        "y": 133.4,
+        "z": 3
+      },
+      "parts": [
+        "pcb",
+        "chips",
+        "heatspreader",
+        "rgb_bar"
+      ],
+      "mounts": [],
+      "base": {
+        "heightMm": 31.25,
+        "heatSpreader": false,
+        "rgb": false
+      },
+      "url": "/3d-models/ram/standard/ram-standard-v1.glb",
+      "lod1Url": "/3d-models/ram/standard/ram-standard-v1.lod1.glb"
+    },
+    {
+      "modelId": "psu-atx-v1",
+      "category": "psu",
+      "variant": "atx",
+      "status": "implemented",
+      "description": "Fonte ATX: corpo, grade traseira, ventoinha e painel modular.",
+      "parameters": [
+        "lengthMm",
+        "modular",
+        "color"
+      ],
+      "coverage": {
+        "records": 3081,
+        "weighted": 6532,
+        "current": 85
+      },
+      "stats": {
+        "triangles": 5024,
+        "bytes": 62184,
+        "lod1Triangles": 3588,
+        "lod1Bytes": 44300,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 150,
+        "y": 87.5,
+        "z": 154
+      },
+      "parts": [
+        "body",
+        "rear_grille",
+        "power_inlet",
+        "fan_grille",
+        "modular_panel",
+        "label"
+      ],
+      "mounts": [],
+      "base": {
+        "form": "atx",
+        "lengthMm": 150,
+        "modular": true
+      },
+      "url": "/3d-models/psu/atx/psu-atx-v1.glb",
+      "lod1Url": "/3d-models/psu/atx/psu-atx-v1.lod1.glb"
+    },
+    {
+      "modelId": "psu-sfx-v1",
+      "category": "psu",
+      "variant": "sfx",
+      "status": "implemented",
+      "description": "Fonte SFX: corpo, grade traseira, ventoinha e painel modular.",
+      "parameters": [
+        "lengthMm",
+        "modular",
+        "color"
+      ],
+      "coverage": {
+        "records": 159,
+        "weighted": 469,
+        "current": 5
+      },
+      "stats": {
+        "triangles": 5024,
+        "bytes": 62896,
+        "lod1Triangles": 3588,
+        "lod1Bytes": 44468,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 125,
+        "y": 65,
+        "z": 104
+      },
+      "parts": [
+        "body",
+        "rear_grille",
+        "power_inlet",
+        "fan_grille",
+        "modular_panel",
+        "label"
+      ],
+      "mounts": [],
+      "base": {
+        "form": "sfx",
+        "lengthMm": 100,
+        "modular": true
+      },
+      "url": "/3d-models/psu/sfx/psu-sfx-v1.glb",
+      "lod1Url": "/3d-models/psu/sfx/psu-sfx-v1.lod1.glb"
+    },
+    {
+      "modelId": "psu-sfx-l-v1",
+      "category": "psu",
+      "variant": "sfx-l",
+      "status": "implemented",
+      "description": "Fonte SFX-L: corpo, grade traseira, ventoinha e painel modular.",
+      "parameters": [
+        "lengthMm",
+        "modular",
+        "color"
+      ],
+      "coverage": {
+        "records": 1,
+        "weighted": 5,
+        "current": 0
+      },
+      "stats": {
+        "triangles": 5024,
+        "bytes": 62852,
+        "lod1Triangles": 3588,
+        "lod1Bytes": 44480,
+        "materials": 6
+      },
+      "baseDimensionsMm": {
+        "x": 125,
+        "y": 65,
+        "z": 134
+      },
+      "parts": [
+        "body",
+        "rear_grille",
+        "power_inlet",
+        "fan_grille",
+        "modular_panel",
+        "label"
+      ],
+      "mounts": [],
+      "base": {
+        "form": "sfx-l",
+        "lengthMm": 130,
+        "modular": true
+      },
+      "url": "/3d-models/psu/sfx-l/psu-sfx-l-v1.glb",
+      "lod1Url": "/3d-models/psu/sfx-l/psu-sfx-l-v1.lod1.glb"
+    },
+    {
+      "modelId": "fan-120-v1",
+      "category": "fan",
+      "variant": "120",
+      "status": "implemented",
+      "description": "Ventoinha de 120 mm (moldura, pás, cubo, anel RGB opcional).",
+      "parameters": [
+        "sizeMm",
+        "rgb",
+        "color"
+      ],
+      "coverage": {
+        "records": 2114,
+        "weighted": 5493,
+        "current": 388
+      },
+      "stats": {
+        "triangles": 2892,
+        "bytes": 46676,
+        "lod1Triangles": 1908,
+        "lod1Bytes": 33012,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 120,
+        "y": 120,
+        "z": 25
+      },
+      "parts": [
+        "frame",
+        "rotor",
+        "hub",
+        "rgb_ring"
+      ],
+      "mounts": [],
+      "base": {
+        "sizeMm": 120,
+        "rgb": false
+      },
+      "url": "/3d-models/fan/120/fan-120-v1.glb",
+      "lod1Url": "/3d-models/fan/120/fan-120-v1.lod1.glb"
+    },
+    {
+      "modelId": "fan-140-v1",
+      "category": "fan",
+      "variant": "140",
+      "status": "implemented",
+      "description": "Ventoinha de 140 mm (moldura, pás, cubo, anel RGB opcional).",
+      "parameters": [
+        "sizeMm",
+        "rgb",
+        "color"
+      ],
+      "coverage": {
+        "records": 833,
+        "weighted": 2265,
+        "current": 135
+      },
+      "stats": {
+        "triangles": 2892,
+        "bytes": 46180,
+        "lod1Triangles": 1908,
+        "lod1Bytes": 32580,
+        "materials": 5
+      },
+      "baseDimensionsMm": {
+        "x": 140,
+        "y": 140,
+        "z": 25
+      },
+      "parts": [
+        "frame",
+        "rotor",
+        "hub",
+        "rgb_ring"
+      ],
+      "mounts": [],
+      "base": {
+        "sizeMm": 140,
+        "rgb": false
+      },
+      "url": "/3d-models/fan/140/fan-140-v1.glb",
+      "lod1Url": "/3d-models/fan/140/fan-140-v1.lod1.glb"
+    },
+    {
+      "modelId": "fan-92-v1",
+      "category": "fan",
+      "variant": "92",
+      "status": "planned",
+      "description": "Ventoinha de 92 mm (coolers compactos).",
+      "parameters": [],
+      "coverage": {
+        "records": 116,
+        "weighted": 299,
+        "current": 8
+      }
+    },
+    {
+      "modelId": "ssd-m2-v1",
+      "category": "storage",
+      "variant": "m2",
+      "status": "implemented",
+      "description": "SSD M.2 (comprimento 2230–22110).",
+      "parameters": [
+        "lengthMm"
+      ],
+      "coverage": {
+        "records": 1607,
+        "weighted": 5147,
+        "current": 38
+      },
+      "stats": {
+        "triangles": 60,
+        "bytes": 5956,
+        "lod1Triangles": 60,
+        "lod1Bytes": 5956,
+        "materials": 3
+      },
+      "baseDimensionsMm": {
+        "x": 2.3,
+        "y": 22,
+        "z": 80
+      },
+      "parts": [
+        "pcb",
+        "nand",
+        "controller",
+        "label"
+      ],
+      "mounts": [],
+      "base": {
+        "lengthMm": 80
+      },
+      "url": "/3d-models/storage/m2/ssd-m2-v1.glb",
+      "lod1Url": "/3d-models/storage/m2/ssd-m2-v1.lod1.glb"
+    },
+    {
+      "modelId": "drive-25-v1",
+      "category": "storage",
+      "variant": "2.5",
+      "status": "implemented",
+      "description": "SSD SATA / HD de 2,5\".",
+      "parameters": [],
+      "coverage": {
+        "records": 831,
+        "weighted": 2231,
+        "current": 2
+      },
+      "stats": {
+        "triangles": 324,
+        "bytes": 6700,
+        "lod1Triangles": 324,
+        "lod1Bytes": 6700,
+        "materials": 3
+      },
+      "baseDimensionsMm": {
+        "x": 69.9,
+        "y": 7,
+        "z": 102
+      },
+      "parts": [
+        "body",
+        "label",
+        "connector"
+      ],
+      "mounts": [],
+      "base": {
+        "bay": "2.5"
+      },
+      "url": "/3d-models/storage/2.5/drive-25-v1.glb",
+      "lod1Url": "/3d-models/storage/2.5/drive-25-v1.lod1.glb"
+    },
+    {
+      "modelId": "hdd-35-v1",
+      "category": "storage",
+      "variant": "3.5",
+      "status": "implemented",
+      "description": "HD de 3,5\".",
+      "parameters": [],
+      "coverage": {
+        "records": 835,
+        "weighted": 2733,
+        "current": 10
+      },
+      "stats": {
+        "triangles": 324,
+        "bytes": 6712,
+        "lod1Triangles": 324,
+        "lod1Bytes": 6712,
+        "materials": 3
+      },
+      "baseDimensionsMm": {
+        "x": 101.6,
+        "y": 26.1,
+        "z": 149
+      },
+      "parts": [
+        "body",
+        "label",
+        "connector"
+      ],
+      "mounts": [],
+      "base": {
+        "bay": "3.5"
+      },
+      "url": "/3d-models/storage/3.5/hdd-35-v1.glb",
+      "lod1Url": "/3d-models/storage/3.5/hdd-35-v1.lod1.glb"
+    }
+  ]
+}

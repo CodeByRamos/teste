@@ -1,5 +1,7 @@
 package app.platform.api;
 
+import app.platform.visualization.ModelSpec;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -37,7 +39,9 @@ final class ApiViews {
             Price price,
             Explanation explanation,
             List<Spec> specs,
-            List<AlternativeView> alternatives) {
+            List<AlternativeView> alternatives,
+            /* 3D models that draw this part (an AIO is radiator + pump); empty when none applies. */
+            List<ModelSpec> models) {
     }
 
     record Component(

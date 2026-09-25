@@ -1,0 +1,945 @@
+{
+  "generatedAt": "2026-09-25T15:58:53.866Z",
+  "source": "C:\\Users\\Ramos\\Documents\\teste\\data\\opendb\\399c7168eac711f70b8a9ae98e972d7188454f46",
+  "counts": {
+    "CPU": 789,
+    "CPUCooler": 2405,
+    "GPU": 3862,
+    "Motherboard": 3701,
+    "PCCase": 3783,
+    "PSU": 3297,
+    "RAM": 4876,
+    "Storage": 3495,
+    "CaseFan": 3465
+  },
+  "popularityProxies": {
+    "listedShareByCategory": {
+      "CPU": 86,
+      "CPUCooler": 57,
+      "GPU": 51,
+      "Motherboard": 44,
+      "PCCase": 52,
+      "PSU": 36,
+      "RAM": 54,
+      "Storage": 60,
+      "CaseFan": 46
+    }
+  },
+  "gpu": {
+    "cooling": {
+      "3 Fans": 1682,
+      "2 Fans": 1464,
+      "1 Fan": 544,
+      "Hybrid": 54,
+      "Passive": 38,
+      "Water Cooled": 34,
+      "Blower": 20,
+      "<unknown>": 15,
+      "4 Fans": 11
+    },
+    "fans": {
+      "1": 544,
+      "2": 1464,
+      "3": 1682,
+      "4": 11,
+      "liquid": 88,
+      "passive": 38,
+      "blower": 20,
+      "<unknown>": 15
+    },
+    "lengthMm": {
+      "n": 3859,
+      "min": 0,
+      "p10": 189.89,
+      "median": 272,
+      "p90": 330,
+      "max": 385
+    },
+    "lengthBuckets": {
+      "250-299": 1313,
+      "300-339": 1111,
+      "200-249": 772,
+      "<200": 475,
+      "340+": 188,
+      "<unknown>": 3
+    },
+    "slotWidth": {
+      "0": 50,
+      "1": 131,
+      "2": 1764,
+      "3": 1110,
+      "4": 206,
+      "2.5": 190,
+      "3.5": 57,
+      "2.7": 32,
+      "2.1": 24,
+      "2.2": 23,
+      "2.55": 19,
+      "2.05": 19,
+      "2.9": 18,
+      "3.8": 18,
+      "2.8": 15,
+      "2.3": 15,
+      "2.75": 13,
+      "3.1": 12,
+      "3.2": 12,
+      "2.15": 11
+    },
+    "slotBuckets": {
+      "2": 1979,
+      "3": 1214,
+      "4": 249,
+      "2.5": 307,
+      "3.5": 108,
+      "<unknown>": 5
+    },
+    "lengthByFans": {
+      "1": {
+        "n": 544,
+        "min": 110,
+        "p10": 150,
+        "median": 184,
+        "p90": 270,
+        "max": 355.6
+      },
+      "2": {
+        "n": 1462,
+        "min": 0,
+        "p10": 201,
+        "median": 245,
+        "p90": 280,
+        "max": 355.5
+      },
+      "3": {
+        "n": 1682,
+        "min": 0,
+        "p10": 281,
+        "median": 308,
+        "p90": 340,
+        "max": 385
+      }
+    },
+    "color": {
+      "BLACK": 2654,
+      "<unknown>": 601,
+      "WHITE": 302,
+      "GREY": 196,
+      "BLUE": 36,
+      "GOLD": 30,
+      "RED": 18,
+      "PINK": 6
+    },
+    "powerConnector16Pin": 608,
+    "families": {
+      "gpu-triple-fan": {
+        "records": 1693,
+        "weighted": 5003,
+        "current": 590
+      },
+      "gpu-dual-fan": {
+        "records": 1464,
+        "weighted": 3872,
+        "current": 350
+      },
+      "gpu-single-fan": {
+        "records": 544,
+        "weighted": 1341,
+        "current": 32
+      },
+      "gpu-liquid": {
+        "records": 88,
+        "weighted": 227,
+        "current": 18
+      },
+      "gpu-passive": {
+        "records": 38,
+        "weighted": 105,
+        "current": 3
+      },
+      "gpu-blower": {
+        "records": 20,
+        "weighted": 76,
+        "current": 19
+      },
+      "gpu-dual-fan (default: cooling unknown)": {
+        "records": 15,
+        "weighted": 61,
+        "current": 3
+      }
+    }
+  },
+  "case": {
+    "formFactor": {
+      "ATX Mid Tower": 2322,
+      "Micro ATX Mini Tower": 396,
+      "Mini ITX Tower": 337,
+      "ATX Full Tower": 313,
+      "Micro ATX Mid Tower": 214,
+      "HTPC": 45,
+      "Micro ATX Desktop": 44,
+      "EATX Mid Tower": 31,
+      "EATX Full Tower": 26,
+      "ATX Mini Tower": 19,
+      "Micro ATX Slim Tower": 13,
+      "ATX Desktop": 11,
+      "ATX Test Bench": 7,
+      "Mini ITX Test Bench": 4,
+      "<unknown>": 1
+    },
+    "dimensionsByFamily": {
+      "case-atx-full-tower": {
+        "depth": {
+          "n": 116,
+          "min": 240,
+          "p10": 457,
+          "median": 532,
+          "p90": 658,
+          "max": 702
+        },
+        "width": {
+          "n": 116,
+          "min": 218,
+          "p10": 234,
+          "median": 268,
+          "p90": 327,
+          "max": 618
+        },
+        "height": {
+          "n": 116,
+          "min": 220,
+          "p10": 476,
+          "median": 531.9,
+          "p90": 645,
+          "max": 732
+        },
+        "maxGpu": {
+          "n": 328,
+          "min": 0,
+          "p10": 342,
+          "median": 426,
+          "p90": 512,
+          "max": 635
+        }
+      },
+      "case-atx-mid-tower": {
+        "depth": {
+          "n": 835,
+          "min": 215,
+          "p10": 406,
+          "median": 465,
+          "p90": 520,
+          "max": 635
+        },
+        "width": {
+          "n": 835,
+          "min": 175.768,
+          "p10": 210,
+          "median": 235,
+          "p90": 300,
+          "max": 619.76
+        },
+        "height": {
+          "n": 835,
+          "min": 222,
+          "p10": 439.4,
+          "median": 481,
+          "p90": 530,
+          "max": 610
+        },
+        "maxGpu": {
+          "n": 2316,
+          "min": 0,
+          "p10": 320,
+          "median": 390,
+          "p90": 430,
+          "max": 491
+        }
+      },
+      "case-matx-tower": {
+        "depth": {
+          "n": 183,
+          "min": 202,
+          "p10": 290,
+          "median": 407,
+          "p90": 460,
+          "max": 542
+        },
+        "width": {
+          "n": 183,
+          "min": 95,
+          "p10": 192,
+          "median": 215,
+          "p90": 304,
+          "max": 460
+        },
+        "height": {
+          "n": 183,
+          "min": 41.2,
+          "p10": 345,
+          "median": 398,
+          "p90": 465,
+          "max": 551
+        },
+        "maxGpu": {
+          "n": 609,
+          "min": 0,
+          "p10": 300,
+          "median": 340,
+          "p90": 410,
+          "max": 470
+        }
+      },
+      "case-itx-tower": {
+        "depth": {
+          "n": 91,
+          "min": 135,
+          "p10": 230,
+          "median": 326,
+          "p90": 391,
+          "max": 457
+        },
+        "width": {
+          "n": 91,
+          "min": 105,
+          "p10": 153,
+          "median": 205,
+          "p90": 281,
+          "max": 376
+        },
+        "height": {
+          "n": 91,
+          "min": 107,
+          "p10": 181,
+          "median": 295,
+          "p90": 506,
+          "max": 537
+        },
+        "maxGpu": {
+          "n": 288,
+          "min": 150,
+          "p10": 254,
+          "median": 325,
+          "p90": 360,
+          "max": 551
+        }
+      }
+    },
+    "sidePanel": {
+      "Tempered Glass": 2456,
+      "Solid": 592,
+      "Acrylic": 435,
+      "Mesh": 147,
+      "Tinted Tempered Glass": 123,
+      "Steel": 12,
+      "Aluminum": 9,
+      "Tinted Acrylic": 7
+    },
+    "transparentSide": {
+      "true": 3135,
+      "false": 630,
+      "<unknown>": 18
+    },
+    "color": {
+      "BLACK": 2419,
+      "WHITE": 851,
+      "<unknown>": 190,
+      "GREY": 120,
+      "PINK": 57,
+      "BLUE": 40
+    },
+    "families": {
+      "case-atx-mid-tower": {
+        "records": 2353,
+        "weighted": 6460,
+        "current": 499
+      },
+      "case-matx-tower": {
+        "records": 642,
+        "weighted": 1633,
+        "current": 85
+      },
+      "case-atx-full-tower": {
+        "records": 339,
+        "weighted": 919,
+        "current": 55
+      },
+      "case-itx-tower": {
+        "records": 337,
+        "weighted": 926,
+        "current": 24
+      },
+      "case-desktop-htpc (later)": {
+        "records": 111,
+        "weighted": 258,
+        "current": 0
+      }
+    }
+  },
+  "motherboard": {
+    "formFactor": {
+      "ATX": 1689,
+      "Micro ATX": 1520,
+      "Mini-ITX": 301,
+      "EATX": 154,
+      "SSI EEB": 11,
+      "SSI CEB": 8,
+      "XL ATX": 6,
+      "Thin Mini-ITX": 5,
+      "HPTX": 3,
+      "<unknown>": 2,
+      "Mini DTX": 1,
+      "Flex ATX": 1
+    },
+    "memorySlotsByForm": {
+      "ATX": {
+        "2": 35,
+        "4": 1513,
+        "6": 14,
+        "8": 126,
+        "<unknown>": 1
+      },
+      "Micro ATX": {
+        "1": 1,
+        "2": 693,
+        "4": 824,
+        "6": 1,
+        "<unknown>": 1
+      },
+      "Mini-ITX": {
+        "2": 292,
+        "4": 9
+      }
+    },
+    "m2Slots": {
+      "0": 732,
+      "1": 120,
+      "2": 964,
+      "3": 381,
+      "4": 786,
+      "5": 287,
+      "6": 189,
+      "7": 99,
+      "8": 87,
+      "9": 29,
+      "10": 14,
+      "11": 8,
+      "12": 2,
+      "13": 1,
+      "15": 2
+    },
+    "color": {
+      "BLACK": 2513,
+      "GREY": 412,
+      "<unknown>": 302,
+      "WHITE": 150,
+      "BROWN": 122,
+      "GREEN": 84
+    },
+    "families": {
+      "mb-atx": {
+        "records": 1689,
+        "weighted": 4687,
+        "current": 373
+      },
+      "mb-matx": {
+        "records": 1520,
+        "weighted": 3287,
+        "current": 223
+      },
+      "mb-itx": {
+        "records": 307,
+        "weighted": 740,
+        "current": 41
+      },
+      "mb-eatx": {
+        "records": 182,
+        "weighted": 481,
+        "current": 32
+      }
+    }
+  },
+  "cooler": {
+    "waterCooled": {
+      "true": 1272,
+      "false": 1131,
+      "<unknown>": 2
+    },
+    "radiator": {
+      "120": 123,
+      "140": 9,
+      "240": 455,
+      "280": 112,
+      "360": 519,
+      "394": 1,
+      "420": 49,
+      "<unknown>": 4
+    },
+    "airHeightMm": {
+      "n": 1123,
+      "min": 0,
+      "p10": 56,
+      "median": 154,
+      "p90": 161,
+      "max": 172
+    },
+    "airHeightBuckets": {
+      "150-169": 657,
+      "130-149": 140,
+      "<60": 128,
+      "60-79": 103,
+      "80-129": 87,
+      "<unknown>": 8,
+      "170+": 8
+    },
+    "fanSize": {
+      "0": 1,
+      "70": 1,
+      "77": 1,
+      "90": 3,
+      "92": 21,
+      "95": 4,
+      "100": 5,
+      "120": 463,
+      "130": 1,
+      "135": 3,
+      "140": 65,
+      "240": 2,
+      "280": 2,
+      "360": 4,
+      "420": 2,
+      "<unknown>": 1826,
+      "94.5": 1
+    },
+    "fanQuantity": {
+      "0": 3,
+      "1": 58,
+      "2": 139,
+      "3": 132,
+      "<unknown>": 2073
+    },
+    "families": {
+      "cooler-single-tower": {
+        "records": 790,
+        "weighted": 1989,
+        "current": 21
+      },
+      "aio-360": {
+        "records": 519,
+        "weighted": 1672,
+        "current": 99
+      },
+      "aio-240": {
+        "records": 455,
+        "weighted": 1391,
+        "current": 58
+      },
+      "cooler-low-profile": {
+        "records": 231,
+        "weighted": 671,
+        "current": 10
+      },
+      "aio-120": {
+        "records": 123,
+        "weighted": 260,
+        "current": 5
+      },
+      "aio-280": {
+        "records": 112,
+        "weighted": 413,
+        "current": 27
+      },
+      "cooler-dual-tower": {
+        "records": 102,
+        "weighted": 348,
+        "current": 33
+      },
+      "aio-420": {
+        "records": 49,
+        "weighted": 191,
+        "current": 15
+      },
+      "air-unknown-height": {
+        "records": 10,
+        "weighted": 36,
+        "current": 2
+      },
+      "aio-140": {
+        "records": 9,
+        "weighted": 13,
+        "current": 0
+      },
+      "aio-other": {
+        "records": 5,
+        "weighted": 13,
+        "current": 2
+      }
+    }
+  },
+  "ram": {
+    "modules": {
+      "1": 1073,
+      "2": 3313,
+      "3": 4,
+      "4": 398,
+      "6": 1,
+      "8": 87
+    },
+    "heatSpreader": {
+      "true": 3923,
+      "false": 657,
+      "<unknown>": 296
+    },
+    "rgb": {
+      "false": 2763,
+      "true": 1721,
+      "<unknown>": 392
+    },
+    "heightMm": {
+      "n": 830,
+      "min": -1,
+      "p10": 31.25,
+      "median": 42,
+      "p90": 46.1,
+      "max": 57.3
+    },
+    "color": {
+      "BLACK": 2978,
+      "WHITE": 842,
+      "GREY": 347,
+      "<unknown>": 222,
+      "RED": 210,
+      "GREEN": 185
+    },
+    "families": {
+      "ram-heatsink": {
+        "records": 2205,
+        "weighted": 6104,
+        "current": 209
+      },
+      "ram-rgb": {
+        "records": 1721,
+        "weighted": 5147,
+        "current": 311
+      },
+      "ram-standard": {
+        "records": 807,
+        "weighted": 2147,
+        "current": 14
+      },
+      "ram-sodimm (not modeled)": {
+        "records": 143,
+        "weighted": 519,
+        "current": 0
+      }
+    }
+  },
+  "psu": {
+    "formFactor": {
+      "ATX": 3078,
+      "SFX": 159,
+      "TFX": 26,
+      "Flex ATX": 13,
+      "Mini-ITX": 12,
+      "<unknown>": 5,
+      "ATX/EPS": 3,
+      "SFX-L": 1
+    },
+    "lengthByForm": {
+      "ATX": {
+        "n": 2980,
+        "min": 0,
+        "p10": 140,
+        "median": 150,
+        "p90": 180,
+        "max": 241
+      },
+      "SFX": {
+        "n": 157,
+        "min": 99,
+        "p10": 100,
+        "median": 100,
+        "p90": 125,
+        "max": 130
+      }
+    },
+    "modular": {
+      "Full": 1586,
+      "Non-Modular": 1188,
+      "Semi-Modular": 518,
+      "<unknown>": 5
+    },
+    "color": {
+      "BLACK": 1608,
+      "<unknown>": 1438,
+      "WHITE": 197,
+      "GREY": 43,
+      "BLUE": 3,
+      "PINK": 3
+    },
+    "families": {
+      "psu-atx": {
+        "records": 3081,
+        "weighted": 6532,
+        "current": 85
+      },
+      "psu-sfx": {
+        "records": 159,
+        "weighted": 469,
+        "current": 5
+      },
+      "psu-other (TFX)": {
+        "records": 26,
+        "weighted": 60,
+        "current": 0
+      },
+      "psu-other (Flex ATX)": {
+        "records": 13,
+        "weighted": 46,
+        "current": 0
+      },
+      "psu-other (Mini-ITX)": {
+        "records": 12,
+        "weighted": 18,
+        "current": 0
+      },
+      "psu-sfx-l": {
+        "records": 1,
+        "weighted": 5,
+        "current": 0
+      }
+    }
+  },
+  "storage": {
+    "formFactor": {
+      "M.2-2280": 1533,
+      "2.5\"": 996,
+      "3.5\"": 835,
+      "PCIe": 45,
+      "M.2-2230": 34,
+      "M.2-2242": 29,
+      "mSATA": 10,
+      "M.2-22110": 7,
+      "M.2-2260": 4,
+      "<unknown>": 2
+    },
+    "families": {
+      "ssd-m2": {
+        "records": 1607,
+        "weighted": 5147,
+        "current": 38
+      },
+      "hdd-35": {
+        "records": 835,
+        "weighted": 2733,
+        "current": 10
+      },
+      "ssd-sata-25": {
+        "records": 831,
+        "weighted": 2231,
+        "current": 2
+      },
+      "hdd-25": {
+        "records": 165,
+        "weighted": 490,
+        "current": 0
+      },
+      "storage-other (PCIe)": {
+        "records": 45,
+        "weighted": 98,
+        "current": 0
+      },
+      "storage-other (mSATA)": {
+        "records": 10,
+        "weighted": 27,
+        "current": 0
+      },
+      "storage-other (unknown)": {
+        "records": 2,
+        "weighted": 9,
+        "current": 0
+      }
+    }
+  },
+  "fan": {
+    "size": {
+      "40": 28,
+      "50": 2,
+      "60": 16,
+      "70": 2,
+      "80": 190,
+      "92": 116,
+      "100": 1,
+      "120": 2114,
+      "140": 833,
+      "160": 8,
+      "170": 4,
+      "180": 17,
+      "193": 4,
+      "200": 72,
+      "230": 16,
+      "240": 2,
+      "280": 2,
+      "360": 17,
+      "420": 8,
+      "<unknown>": 11
+    },
+    "quantityPerPack": {
+      "1": 2605,
+      "2": 136,
+      "3": 600,
+      "4": 26,
+      "5": 67,
+      "6": 15,
+      "10": 2,
+      "<unknown>": 14
+    },
+    "lighting": {
+      "None": 1399,
+      "Addressable RGB": 692,
+      "ARGB": 508,
+      "RGB": 189,
+      "Blue": 173,
+      "Red": 128,
+      "<unknown>": 114,
+      "White": 110
+    },
+    "color": {
+      "BLACK": 1968,
+      "WHITE": 948,
+      "<unknown>": 150,
+      "BROWN": 87,
+      "BLUE": 80,
+      "GREY": 63
+    },
+    "sampleKeys": [
+      "opendb_id",
+      "size",
+      "color",
+      "lighting",
+      "quantity",
+      "min_airflow",
+      "max_airflow",
+      "min_noise_level",
+      "max_noise_level",
+      "pwm",
+      "led",
+      "connector",
+      "controller",
+      "static_pressure",
+      "flow_direction",
+      "isOEM"
+    ],
+    "families": {
+      "fan-120": {
+        "records": 2114,
+        "weighted": 5493,
+        "current": 388
+      },
+      "fan-140": {
+        "records": 833,
+        "weighted": 2265,
+        "current": 135
+      },
+      "fan-80 (later)": {
+        "records": 190,
+        "weighted": 403,
+        "current": 1
+      },
+      "fan-92 (later)": {
+        "records": 116,
+        "weighted": 299,
+        "current": 8
+      },
+      "fan-200 (later)": {
+        "records": 72,
+        "weighted": 149,
+        "current": 1
+      },
+      "fan-40 (later)": {
+        "records": 28,
+        "weighted": 87,
+        "current": 1
+      },
+      "fan-180 (later)": {
+        "records": 17,
+        "weighted": 57,
+        "current": 4
+      },
+      "fan-360 (later)": {
+        "records": 17,
+        "weighted": 41,
+        "current": 10
+      },
+      "fan-60 (later)": {
+        "records": 16,
+        "weighted": 68,
+        "current": 2
+      },
+      "fan-230 (later)": {
+        "records": 16,
+        "weighted": 16,
+        "current": 0
+      },
+      "fan-unknown": {
+        "records": 11,
+        "weighted": 39,
+        "current": 0
+      },
+      "fan-160 (later)": {
+        "records": 8,
+        "weighted": 8,
+        "current": 0
+      },
+      "fan-420 (later)": {
+        "records": 8,
+        "weighted": 16,
+        "current": 8
+      },
+      "fan-193 (later)": {
+        "records": 4,
+        "weighted": 4,
+        "current": 0
+      },
+      "fan-170 (later)": {
+        "records": 4,
+        "weighted": 4,
+        "current": 0
+      },
+      "fan-70 (later)": {
+        "records": 2,
+        "weighted": 2,
+        "current": 0
+      },
+      "fan-240 (later)": {
+        "records": 2,
+        "weighted": 10,
+        "current": 2
+      },
+      "fan-50 (later)": {
+        "records": 2,
+        "weighted": 6,
+        "current": 0
+      },
+      "fan-280 (later)": {
+        "records": 2,
+        "weighted": 10,
+        "current": 2
+      },
+      "fan-100 (later)": {
+        "records": 1,
+        "weighted": 1,
+        "current": 0
+      },
+      "fan-220 (later)": {
+        "records": 1,
+        "weighted": 1,
+        "current": 0
+      },
+      "fan-95 (later)": {
+        "records": 1,
+        "weighted": 1,
+        "current": 0
+      }
+    }
+  }
+}

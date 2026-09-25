@@ -1,0 +1,456 @@
+{
+  "generatedAt": "2026-09-25T16:35:32.051Z",
+  "models": [
+    {
+      "modelId": "gpu-triple-fan-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        143.8,
+        59.6,
+        310.3
+      ],
+      "expectedMm": [
+        143,
+        59.6,
+        309.2
+      ]
+    },
+    {
+      "modelId": "gpu-dual-fan-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        138.8,
+        39.3,
+        247.3
+      ],
+      "expectedMm": [
+        138,
+        39.2,
+        246.2
+      ]
+    },
+    {
+      "modelId": "gpu-single-fan-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        133.8,
+        39.3,
+        186.3
+      ],
+      "expectedMm": [
+        133,
+        39.2,
+        185.2
+      ]
+    },
+    {
+      "modelId": "case-atx-mid-tower-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        235,
+        481.3,
+        466.9
+      ],
+      "expectedMm": [
+        235,
+        481,
+        465
+      ]
+    },
+    {
+      "modelId": "case-matx-tower-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        215,
+        398.3,
+        408.9
+      ],
+      "expectedMm": [
+        215,
+        398,
+        407
+      ]
+    },
+    {
+      "modelId": "case-atx-full-tower-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        268,
+        532.3,
+        533.9
+      ],
+      "expectedMm": [
+        268,
+        532,
+        532
+      ]
+    },
+    {
+      "modelId": "case-itx-tower-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        205,
+        295.3,
+        327.9
+      ],
+      "expectedMm": [
+        205,
+        295,
+        326
+      ]
+    },
+    {
+      "modelId": "mb-atx-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        44.5,
+        305,
+        247.3
+      ],
+      "expectedMm": [
+        47,
+        305,
+        247
+      ]
+    },
+    {
+      "modelId": "mb-matx-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        44.5,
+        244,
+        247.3
+      ],
+      "expectedMm": [
+        47,
+        244,
+        247
+      ]
+    },
+    {
+      "modelId": "mb-itx-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        44.5,
+        171,
+        173.3
+      ],
+      "expectedMm": [
+        47,
+        170,
+        173
+      ]
+    },
+    {
+      "modelId": "mb-eatx-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        44.5,
+        305,
+        333.3
+      ],
+      "expectedMm": [
+        47,
+        305,
+        333
+      ]
+    },
+    {
+      "modelId": "cooler-single-tower-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        156,
+        122,
+        77.5
+      ],
+      "expectedMm": [
+        155,
+        122,
+        77.5
+      ]
+    },
+    {
+      "modelId": "cooler-dual-tower-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        159,
+        122,
+        147.5
+      ],
+      "expectedMm": [
+        158,
+        122,
+        147.5
+      ]
+    },
+    {
+      "modelId": "cooler-low-profile-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        47,
+        93.6,
+        93.6
+      ],
+      "expectedMm": [
+        47,
+        92,
+        92
+      ]
+    },
+    {
+      "modelId": "aio-radiator-120-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        126,
+        61.5,
+        160
+      ],
+      "expectedMm": [
+        126,
+        61.5,
+        160
+      ]
+    },
+    {
+      "modelId": "aio-radiator-240-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        126,
+        61.5,
+        280
+      ],
+      "expectedMm": [
+        126,
+        61.5,
+        280
+      ]
+    },
+    {
+      "modelId": "aio-radiator-280-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        146,
+        61.5,
+        320
+      ],
+      "expectedMm": [
+        146,
+        61.5,
+        320
+      ]
+    },
+    {
+      "modelId": "aio-radiator-360-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        126,
+        61.5,
+        400
+      ],
+      "expectedMm": [
+        126,
+        61.5,
+        400
+      ]
+    },
+    {
+      "modelId": "aio-pump-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        46.7,
+        68,
+        77
+      ],
+      "expectedMm": [
+        47,
+        68,
+        79
+      ]
+    },
+    {
+      "modelId": "ram-heatsink-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        34,
+        133.3,
+        7.3
+      ],
+      "expectedMm": [
+        34,
+        133.4,
+        7
+      ]
+    },
+    {
+      "modelId": "ram-rgb-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        44,
+        133.3,
+        7.3
+      ],
+      "expectedMm": [
+        44,
+        133.4,
+        7
+      ]
+    },
+    {
+      "modelId": "ram-standard-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        31.3,
+        133.3,
+        3.3
+      ],
+      "expectedMm": [
+        31.3,
+        133.4,
+        3
+      ]
+    },
+    {
+      "modelId": "psu-atx-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        150.6,
+        87.3,
+        156.1
+      ],
+      "expectedMm": [
+        150,
+        87.5,
+        154
+      ]
+    },
+    {
+      "modelId": "psu-sfx-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        125.6,
+        64.8,
+        106
+      ],
+      "expectedMm": [
+        125,
+        65,
+        104
+      ]
+    },
+    {
+      "modelId": "psu-sfx-l-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        125.6,
+        64.8,
+        136
+      ],
+      "expectedMm": [
+        125,
+        65,
+        134
+      ]
+    },
+    {
+      "modelId": "fan-120-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        121.6,
+        121.6,
+        25
+      ],
+      "expectedMm": [
+        120,
+        120,
+        25
+      ]
+    },
+    {
+      "modelId": "fan-140-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        141.6,
+        141.6,
+        25
+      ],
+      "expectedMm": [
+        140,
+        140,
+        25
+      ]
+    },
+    {
+      "modelId": "ssd-m2-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        2.3,
+        22,
+        80
+      ],
+      "expectedMm": [
+        2.3,
+        22,
+        80
+      ]
+    },
+    {
+      "modelId": "drive-25-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        69.8,
+        7.1,
+        102
+      ],
+      "expectedMm": [
+        69.9,
+        7,
+        102
+      ]
+    },
+    {
+      "modelId": "hdd-35-v1",
+      "ok": true,
+      "problems": [],
+      "measuredMm": [
+        101.6,
+        26.2,
+        149
+      ],
+      "expectedMm": [
+        101.6,
+        26.1,
+        149
+      ]
+    }
+  ],
+  "parameterSweep": "ok"
+}

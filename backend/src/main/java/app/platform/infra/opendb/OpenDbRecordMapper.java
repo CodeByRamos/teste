@@ -14,6 +14,7 @@ import app.platform.hardware.PcCase;
 import app.platform.hardware.PowerSupply;
 import app.platform.hardware.SourceRef;
 import app.platform.hardware.Storage;
+import app.platform.hardware.VisualTraits;
 import tools.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public final class OpenDbRecordMapper {
     public static final String SOURCE = "buildcores-opendb";
 
     /** Bump when mapping or validation rules change: the same upstream commit is then re-ingested. */
-    public static final String VERSION = "opendb-mapper-v4";
+    public static final String VERSION = "opendb-mapper-v5";
 
     /** OpenDB category directory → domain category. */
     public static final Map<String, ComponentCategory> DIRECTORIES = Map.of(
@@ -86,7 +87,43 @@ public final class OpenDbRecordMapper {
         SourceRef source = new SourceRef(SOURCE, externalId);
         Integer year = reader.integerInRange("metadata.releaseYear", 1990, 2030, false);
         return new ComponentInfo(source.internalId(), source, category, name,
-                reader.text("metadata.manufacturer"), reader.text("metadata.series"), reader.text("metadata.variant"), year, null);
+                reader.text("metadata.manufacturer"), reader.text("metadata.series"), reader.text("metadata.variant"), year, null,
+                visual(reader, category));
+    }
+
+    /** Appearance data for 3D models. Never critical: missing values only make the model use typical proportions. */
+    private static VisualTraits visual(FieldReader r, ComponentCategory category) {
+        List<String> colors = new ArrayList<>(r.texts("color"));
+        String lighting = r.texts("lighting").stream().findFirst().orElse(null);
+        return switch (category) {
+            case GPU -> {
+                String cooling = r.text("cooling");
+                yield new VisualTraits(colors, lighting, cooling, gpuFans(cooling, r.integer("fan_quantity")), r.integerInRange("fan_size", 40, 140, false),
+                        null, null, null, null, null, null);
+            }
+            case CPU_COOLER -> new VisualTraits(colors, lighting, null, r.integerInRange("fan_quantity", 0, 6, false),
+                    r.integerInRange("fan_size", 40, 140, false), null, null, null, null, null, null);
+            case MEMORY -> new VisualTraits(colors, lighting, null, null, null, r.bool("heat_spreader"), r.bool("rgb"),
+                    r.decimalInRange("height", 25, 70, false), null, null, null);
+            case CASE -> new VisualTraits(colors, lighting, null, null, null, null, null,
+                    r.decimalInRange("dimensions_mm.height", 150, 800, false), r.decimalInRange("dimensions_mm.width", 90, 400, false),
+                    r.decimalInRange("dimensions_mm.depth", 150, 800, false), r.bool("power_supply_shroud"));
+            default -> new VisualTraits(colors, lighting, null, null, null, null, null, null, null, null, null);
+        };
+    }
+
+    private static final Pattern FANS = Pattern.compile("(\\d)\\s*fan", Pattern.CASE_INSENSITIVE);
+
+    /** "2 Fans" → 2. Blower, passive and liquid designs have no count (null). */
+    private static Integer gpuFans(String cooling, Integer declared) {
+        if (cooling != null) {
+            var matcher = FANS.matcher(cooling);
+            if (matcher.find()) {
+                return Integer.valueOf(matcher.group(1));
+            }
+            return null;
+        }
+        return declared;
     }
 
     private static Cpu cpu(FieldReader r, ComponentInfo info) {
@@ -306,7 +343,7 @@ public final class OpenDbRecordMapper {
     private static HardwareComponent withQuality(HardwareComponent component, FieldReader reader) {
         ComponentInfo base = component.info();
         ComponentInfo info = new ComponentInfo(base.id(), base.source(), base.category(), base.name(), base.manufacturer(),
-                base.series(), base.variant(), base.releaseYear(), new DataQuality(reader.qualityScore(), reader.issues()));
+                base.series(), base.variant(), base.releaseYear(), new DataQuality(reader.qualityScore(), reader.issues()), base.visual());
         return switch (component) {
             case Cpu c -> new Cpu(info, c.socket(), c.microarchitecture(), c.cores(), c.performanceCores(), c.efficiencyCores(),
                     c.threads(), c.baseClockGhz(), c.boostClockGhz(), c.efficiencyBoostClockGhz(), c.l3CacheMb(), c.tdpWatts(),

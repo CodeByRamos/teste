@@ -16,7 +16,8 @@ class ArchitectureTest {
 
     private static final String[] DOMAIN = {
             "app.platform.hardware..", "app.platform.compatibility..", "app.platform.recommendation..",
-            "app.platform.pricing..", "app.platform.catalog..", "app.platform.intake..", "app.platform.builds.."};
+            "app.platform.pricing..", "app.platform.catalog..", "app.platform.intake..", "app.platform.builds..",
+            "app.platform.visualization.."};
 
     @ArchTest
     static final ArchRule domainDoesNotDependOnFrameworks = noClasses().that().resideInAnyPackage(DOMAIN)

@@ -6,6 +6,7 @@ import type { Alternative, BuildItem, BuildView as Build, Category } from "@/lib
 import { CompatibilityPanel } from "./compatibility-panel";
 import { ChevronIcon, ExternalIcon, InfoIcon, SparkIcon } from "./icons";
 import { PcDiagram } from "./pc-diagram";
+import { Build3d } from "./pc3d/build-3d";
 import { Notice, StatusBadge } from "./ui";
 
 export function BuildView({
@@ -24,6 +25,7 @@ export function BuildView({
   busy?: boolean;
 }) {
   const [selected, setSelected] = useState<Category | null>(null);
+  const [view, setView] = useState<"diagram" | "3d">("diagram");
   const [expanded, setExpanded] = useState<Set<Category>>(new Set());
   const { totals } = build;
   const stockCooler = !build.items.some((item) => item.category === "CPU_COOLER");
@@ -104,17 +106,38 @@ export function BuildView({
       <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(260px,340px)_1fr]">
         {/* Visual */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="mx-auto max-w-[260px] rounded-2xl border border-border bg-surface p-4 lg:max-w-none">
-            <PcDiagram
-              items={build.items}
-              findings={build.compatibility.findings}
-              selected={selected}
-              onSelect={select}
-              stockCooler={stockCooler}
-            />
+          <div className="mb-3 flex gap-1 rounded-xl bg-surface-muted p-1 text-sm" role="tablist" aria-label="Visualização">
+            {(["diagram", "3d"] as const).map((mode) => (
+              <button
+                key={mode}
+                role="tab"
+                aria-selected={view === mode}
+                onClick={() => setView(mode)}
+                className={`flex-1 rounded-lg px-3 py-1.5 font-medium transition-colors ${view === mode ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
+              >
+                {mode === "diagram" ? "Diagrama" : "3D"}
+              </button>
+            ))}
           </div>
+          {view === "diagram" ? (
+            <div className="mx-auto max-w-[260px] rounded-2xl border border-border bg-surface p-4 lg:max-w-none">
+              <PcDiagram
+                items={build.items}
+                findings={build.compatibility.findings}
+                selected={selected}
+                onSelect={select}
+                stockCooler={stockCooler}
+              />
+            </div>
+          ) : (
+            <div className="h-[380px] overflow-hidden rounded-2xl border border-border bg-surface">
+              <Build3d items={build.items} selected={selected} onSelect={select} />
+            </div>
+          )}
           <p className="mt-3 text-xs leading-relaxed text-subtle">
-            Visualização esquemática: toque em uma peça para ver a explicação. A visualização em 3D está em estudo.
+            {view === "diagram"
+              ? "Visualização esquemática: toque em uma peça para ver a explicação."
+              : "Modelo 3D montado com as medidas de cada peça (quando a base de dados informa). Arraste para girar e clique numa peça."}
           </p>
           {build.requirements.length > 0 && (
             <div className="mt-6">

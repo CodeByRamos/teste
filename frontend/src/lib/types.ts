@@ -77,6 +77,18 @@ export interface BuildItem {
   explanation: { whatItIs: string; whyItMatters: string; reason: string };
   specs: Spec[];
   alternatives: Alternative[];
+  /** 3D models that draw this part (resolved by the backend); an AIO has a radiator and a pump. */
+  models?: ModelSpecDto[];
+}
+
+export interface ModelSpecDto {
+  modelId: string;
+  family: string;
+  params: Record<string, unknown>;
+  color: string | null;
+  rgb: boolean;
+  confidence: "measured" | "estimated";
+  assumptions: string[];
 }
 
 export interface Finding {

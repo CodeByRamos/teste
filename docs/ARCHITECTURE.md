@@ -93,6 +93,14 @@ Núcleos × frequência superestima placas NVIDIA a partir da série RTX 30 (nú
 por arquitetura (`PerformanceEstimator`) aproxima as gerações; ganhos são exibidos arredondados ("cerca de 2,5×").
 Continua sendo estimativa até existir a tabela de benchmarks com fonte.
 
+### D10 — Modelos 3D próprios e paramétricos
+
+Um modelo base por família (30 no total), gerado por código a partir de `layout.ts`. O mesmo módulo adapta o
+modelo às medidas reais de cada componente em tempo de execução, então um GLB representa centenas de SKUs. O
+backend (`ModelResolver`) associa componente → família → parâmetros a partir dos dados estruturados. O 3D é
+opcional: o diagrama 2D continua sendo o padrão e funciona sem WebGL. Detalhes em
+[`docs/3d/MODEL_LIBRARY.md`](3d/MODEL_LIBRARY.md).
+
 ## Segurança
 
 - Validação de entrada com Bean Validation; erros em ProblemDetail sem detalhes internos.
@@ -109,4 +117,4 @@ Continua sendo estimativa até existir a tabela de benchmarks com fonte.
 3. Autenticação (Amazon Cognito) e configurações por usuário.
 4. Planejamento futuro ("o que comprar agora pensando nos próximos anos") sobre o `UpgradeAdvisor`.
 5. Camada de IA usando os motores como ferramentas (interpretar e explicar, nunca decidir compatibilidade).
-6. Prova de conceito do renderer 3D.
+6. Biblioteca 3D: famílias planejadas (GPU blower/híbrida, gabinetes SFF/HTPC, radiador 420) e fans do OpenDB (CaseFan).

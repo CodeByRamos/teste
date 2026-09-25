@@ -10,6 +10,7 @@ compatível, justificada e fácil de entender.
 
 ```
 backend/    API em Java 25 + Spring Boot 4 (motores, adapter do OpenDB, PostgreSQL)
+3d/         gerador da biblioteca de modelos 3D paramétricos (GLB)
 frontend/   Web em Next.js 16 + React 19 + Tailwind 4 (só apresentação)
 scripts/    fetch-opendb.sh — baixa uma versão fixa do BuildCores OpenDB
 data/       snapshots do OpenDB (não versionados)
@@ -32,7 +33,8 @@ cd backend && ./mvnw spring-boot:test-run
 cd frontend && npm install && npm run dev
 ```
 
-Testes: `cd backend && ./mvnw test` (51 testes, incluindo ponta a ponta com PostgreSQL real)
+Testes: `cd backend && ./mvnw test` (56 testes, incluindo ponta a ponta com PostgreSQL real),
+`cd 3d && node src/validate.ts` (modelos 3D)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 
 ## O que já funciona
@@ -44,6 +46,9 @@ e `cd frontend && npm run lint && npx tsc --noEmit`.
 - **Tenho um PC**: verificação de compatibilidade das peças informadas.
 - **Quero melhorar meu PC**: diagnóstico do PC atual (bom / suficiente / fraco / gargalo) e o upgrade de maior ganho
   dentro do orçamento, com tudo o que precisa mudar junto (fonte, gabinete, placa-mãe, memória, cooler) e o que continua.
+- **Visualização 3D**: cada configuração pode ser vista em 3D, montada com modelos paramétricos adaptados às medidas
+  reais de cada peça; clicar numa peça abre a explicação dela. Cena de teste com verificação de colisões em
+  `/laboratorio-3d`. Biblioteca e pipeline em [`3d/`](3d/README.md).
 - **Salvar configurações**: link permanente com o que foi mostrado no momento.
 - **Créditos**: atribuição ODC-By, versão dos dados e completude por categoria.
 
@@ -56,7 +61,7 @@ e `cd frontend && npm run lint && npx tsc --noEmit`.
 | Requisitos de jogos | Sem base de requisitos por jogo; usamos perfis de uso (competitivo / pesado + resolução). |
 | BIOS | Sem dados de BIOS no OpenDB; casos conhecidos (ex.: Ryzen 5000 em B450) geram "atenção". |
 | Contas de usuário | Ainda não há login; configurações salvas são acessadas pelo link (ID aleatório). |
-| 3D | Diagrama esquemático interativo. O renderer da BuildCores depende de API paga e não permite clique por peça (ver docs). |
+| 3D | Biblioteca própria de 30 modelos paramétricos (~98% dos componentes); medidas ausentes nos dados viram valores típicos, avisados. Ver [`docs/3d/MODEL_LIBRARY.md`](docs/3d/MODEL_LIBRARY.md). |
 
 ## Dados e licença
 

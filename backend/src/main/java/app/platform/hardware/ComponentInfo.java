@@ -12,5 +12,10 @@ public record ComponentInfo(
         String series,
         String variant,
         Integer releaseYear,
-        DataQuality quality) {
+        DataQuality quality,
+        VisualTraits visual) {
+
+    public ComponentInfo {
+        visual = visual == null ? VisualTraits.NONE : visual;
+    }
 }
