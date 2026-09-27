@@ -12,13 +12,15 @@ import java.util.UUID;
  * @param useCases           everything they want to do; {@code primaryUse} breaks ties when budget is tight
  * @param resolution         only relevant for games; {@code null} means Full HD
  * @param ownedComponentIds  parts they already have and want to reuse (cost nothing)
+ * @param planUpgrades       they want to upgrade part by part later: prefer current platforms and headroom
  */
 public record BuildRequest(
         BigDecimal budgetBrl,
         Set<UseCase> useCases,
         UseCase primaryUse,
         TargetResolution resolution,
-        List<UUID> ownedComponentIds) {
+        List<UUID> ownedComponentIds,
+        boolean planUpgrades) {
 
     public static final BigDecimal MIN_BUDGET = new BigDecimal("1500");
     public static final BigDecimal MAX_BUDGET = new BigDecimal("100000");
@@ -31,6 +33,15 @@ public record BuildRequest(
         }
         resolution = resolution == null ? TargetResolution.FULL_HD : resolution;
         ownedComponentIds = ownedComponentIds == null ? List.of() : List.copyOf(ownedComponentIds);
+    }
+
+    public BuildRequest(BigDecimal budgetBrl, Set<UseCase> useCases, UseCase primaryUse, TargetResolution resolution,
+                        List<UUID> ownedComponentIds) {
+        this(budgetBrl, useCases, primaryUse, resolution, ownedComponentIds, false);
+    }
+
+    public BuildRequest withPlanUpgrades(boolean value) {
+        return new BuildRequest(budgetBrl, useCases, primaryUse, resolution, ownedComponentIds, value);
     }
 
     public boolean includesGaming() {

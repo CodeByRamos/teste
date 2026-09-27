@@ -12,6 +12,7 @@ import java.util.List;
  * @param enoughPerformance performance tier (0–1) beyond which more speed brings no real benefit for these uses;
  *                          lets the engine leave budget unspent instead of buying unneeded power
  * @param reasons plain-language statements explaining how needs became requirements
+ * @param planUpgrades prefer platforms that still receive new processors, current memory and power supply headroom
  */
 public record RequirementProfile(
         boolean needsDedicatedGpu,
@@ -26,10 +27,18 @@ public record RequirementProfile(
         int targetStorageGb,
         int minVramGb,
         double enoughPerformance,
-        List<String> reasons) {
+        List<String> reasons,
+        boolean planUpgrades) {
 
     public RequirementProfile {
         reasons = List.copyOf(reasons);
+    }
+
+    public RequirementProfile(boolean needsDedicatedGpu, boolean gamingPriority, double gpuWeight, double cpuMultiThreadWeight,
+                              double cpuGamingWeight, int minCpuThreads, int minRamGb, int targetRamGb, int minStorageGb,
+                              int targetStorageGb, int minVramGb, double enoughPerformance, List<String> reasons) {
+        this(needsDedicatedGpu, gamingPriority, gpuWeight, cpuMultiThreadWeight, cpuGamingWeight, minCpuThreads, minRamGb,
+                targetRamGb, minStorageGb, targetStorageGb, minVramGb, enoughPerformance, reasons, false);
     }
 
     /** Games are the main use (or the only ranking available), so GPU/CPU balance for games matters most. */

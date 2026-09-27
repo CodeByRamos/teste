@@ -11,6 +11,7 @@ import app.platform.hardware.ComponentCategory;
 import app.platform.hardware.Cpu;
 import app.platform.hardware.CpuCooler;
 import app.platform.hardware.Gpu;
+import app.platform.hardware.Hardware;
 import app.platform.hardware.HardwareComponent;
 import app.platform.hardware.Memory;
 import app.platform.hardware.Motherboard;
@@ -55,6 +56,8 @@ public final class RecommendationEngine {
 
     /** Coolers must be at least this tall for CPUs above the matching power level (heuristic v1). */
     private static final int HIGH_POWER_WATTS = 150;
+    /** Extra power supply capacity when the person plans to upgrade: room for a stronger graphics card (heuristic v1). */
+    static final int UPGRADE_PSU_HEADROOM_WATTS = 150;
     private static final int HIGH_POWER_COOLER_HEIGHT_MM = 150;
     private static final int MID_POWER_WATTS = 100;
     private static final int MID_POWER_COOLER_HEIGHT_MM = 125;
@@ -109,7 +112,37 @@ public final class RecommendationEngine {
             notes.add("As peças que você já tem têm um problema de compatibilidade — veja os detalhes abaixo.");
         }
         notes.addAll(explainDecisions(chosen, request, profile, ownedIds));
+        if (request.planUpgrades() && withinBudget) {
+            upgradePlanTradeOff(catalog, request, profile, chosen.parts()).ifPresent(notes::add);
+        }
         return new Recommendation(chosen.parts(), ownedIds, profile, chosen.cost(), withinBudget, notes);
+    }
+
+    /**
+     * Planning for upgrades may cost performance today (newer platform, power supply headroom). States how much, by
+     * comparing with what the same budget buys without that preference.
+     */
+    private Optional<String> upgradePlanTradeOff(Catalog catalog, BuildRequest request, RequirementProfile profile, BuildParts chosen) {
+        BuildParts baseline;
+        try {
+            baseline = recommend(catalog, request.withPlanUpgrades(false)).parts();
+        } catch (NoFeasibleBuildException e) {
+            return Optional.empty();
+        }
+        boolean graphics = profile.gamingFocused() && chosen.gpu() != null && baseline.gpu() != null;
+        Double now = graphics ? PerformanceEstimator.gpuScore(chosen.gpu()) : PerformanceEstimator.cpuMultiThreadScore(chosen.cpu());
+        Double without = graphics ? PerformanceEstimator.gpuScore(baseline.gpu()) : PerformanceEstimator.cpuMultiThreadScore(baseline.cpu());
+        if (now == null || without == null || now <= 0) {
+            return Optional.empty();
+        }
+        double ratio = without / now;
+        if (ratio < 1.05) {
+            return Optional.of("Neste orçamento, preparar o PC para upgrades não custou desempenho hoje.");
+        }
+        String metric = graphics ? "desempenho gráfico" : "desempenho com vários programas";
+        String gain = FutureOutlookAnalyzer.gainText(ratio).replace("desempenho", metric);
+        return Optional.of("Preparar para upgrades tem um custo: sem essa preferência, o mesmo orçamento daria " + gain
+                + " hoje, numa plataforma com menos espaço para evoluir. Desmarque a opção no questionário para comparar.");
     }
 
     private Attempt search(Pools pools, BuildParts owned, Set<UUID> ownedIds, RequirementProfile profile,
@@ -120,7 +153,7 @@ public final class RecommendationEngine {
         Candidate best = null;
         Candidate cheapest = null;
         for (Priced<Cpu> cpu : cpuOptions) {
-            Platform platform = platform(pools, owned, cpu.part(), ramGb, storageGb);
+            Platform platform = platform(pools, owned, cpu.part(), ramGb, storageGb, profile.planUpgrades());
             if (platform == null) {
                 continue;
             }
@@ -129,7 +162,8 @@ public final class RecommendationEngine {
                 if (gpuPart == null && !Boolean.TRUE.equals(cpu.part().integratedGraphics())) {
                     continue;
                 }
-                Chassis chassis = chassis(pools, owned, cpu.part(), gpuPart, platform);
+                Chassis chassis = chassis(pools, owned, cpu.part(), gpuPart, platform,
+                        profile.planUpgrades() ? UPGRADE_PSU_HEADROOM_WATTS : 0);
                 if (chassis == null) {
                     continue;
                 }
@@ -163,6 +197,15 @@ public final class RecommendationEngine {
                             && Fit.cpuSupportsBoardMemory(cpu.part(), board) != Fit.Verdict.NO)
                     .toList();
         }
+        if (profile.planUpgrades() && owned.motherboard() == null) {
+            // Platforms that still receive the newest processors leave room to upgrade the CPU alone later.
+            List<Priced<Cpu>> current = options.stream()
+                    .filter(cpu -> pools.timeline().isCurrentSocket(Hardware.normalizeSocket(cpu.part().socket())))
+                    .toList();
+            if (!current.isEmpty()) {
+                options = current;
+            }
+        }
         List<Priced<Cpu>> meetingThreads = options.stream()
                 .filter(cpu -> cpu.part().threads() >= profile.minCpuThreads())
                 .toList();
@@ -186,7 +229,7 @@ public final class RecommendationEngine {
         return options;
     }
 
-    private Platform platform(Pools pools, BuildParts owned, Cpu cpu, int ramGb, int storageGb) {
+    private Platform platform(Pools pools, BuildParts owned, Cpu cpu, int ramGb, int storageGb, boolean planUpgrades) {
         List<Priced<Motherboard>> boards = owned.motherboard() != null
                 ? List.of(new Priced<>(owned.motherboard(), BigDecimal.ZERO))
                 : pools.boards().stream()
@@ -195,29 +238,20 @@ public final class RecommendationEngine {
                                 && Fit.cpuSupportsBoardMemory(cpu, board.part()) == Fit.Verdict.YES)
                         .toList();
 
-        Priced<Motherboard> bestBoard = null;
-        Priced<Memory> bestMemory = null;
-        for (String ramType : List.of("DDR4", "DDR5")) {
-            Priced<Motherboard> board = boards.stream()
-                    .filter(candidate -> ramType.equals(candidate.part().ramType()))
-                    .findFirst().orElse(null);
-            if (board == null) {
-                continue;
-            }
-            Priced<Memory> memory = owned.memory() != null
-                    ? (ramType.equals(owned.memory().ramType()) ? new Priced<>(owned.memory(), BigDecimal.ZERO) : null)
-                    : cheapestMemory(pools, board.part(), ramGb);
-            if (memory == null) {
-                continue;
-            }
-            if (bestBoard == null || board.price().add(memory.price()).compareTo(bestBoard.price().add(bestMemory.price())) < 0) {
-                bestBoard = board;
-                bestMemory = memory;
-            }
+        BoardAndMemory chosen = null;
+        if (planUpgrades && owned.memory() == null) {
+            // Memory of the kind recent processors use can move to a future platform.
+            chosen = cheapestBoardAndMemory(pools, owned, boards, ramGb,
+                    List.of("DDR4", "DDR5").stream().filter(pools.timeline().recentMemoryTypes()::contains).toList());
         }
-        if (bestBoard == null) {
+        if (chosen == null) {
+            chosen = cheapestBoardAndMemory(pools, owned, boards, ramGb, List.of("DDR4", "DDR5"));
+        }
+        if (chosen == null) {
             return null;
         }
+        Priced<Motherboard> bestBoard = chosen.board();
+        Priced<Memory> bestMemory = chosen.memory();
 
         List<Priced<Storage>> storage;
         if (!owned.storage().isEmpty()) {
@@ -250,7 +284,31 @@ public final class RecommendationEngine {
         return new Platform(bestBoard, bestMemory, storage, cooler, cost);
     }
 
-    private Chassis chassis(Pools pools, BuildParts owned, Cpu cpu, Gpu gpu, Platform platform) {
+    /** Cheapest motherboard + memory kit for this CPU among the given memory types; {@code null} when none fits. */
+    private static BoardAndMemory cheapestBoardAndMemory(Pools pools, BuildParts owned, List<Priced<Motherboard>> boards, int ramGb,
+                                                         List<String> ramTypes) {
+        BoardAndMemory best = null;
+        for (String ramType : ramTypes) {
+            Priced<Motherboard> board = boards.stream()
+                    .filter(candidate -> ramType.equals(candidate.part().ramType()))
+                    .findFirst().orElse(null);
+            if (board == null) {
+                continue;
+            }
+            Priced<Memory> memory = owned.memory() != null
+                    ? (ramType.equals(owned.memory().ramType()) ? new Priced<>(owned.memory(), BigDecimal.ZERO) : null)
+                    : cheapestMemory(pools, board.part(), ramGb);
+            if (memory == null) {
+                continue;
+            }
+            if (best == null || board.price().add(memory.price()).compareTo(best.board().price().add(best.memory().price())) < 0) {
+                best = new BoardAndMemory(board, memory);
+            }
+        }
+        return best;
+    }
+
+    private Chassis chassis(Pools pools, BuildParts owned, Cpu cpu, Gpu gpu, Platform platform, int extraPsuWatts) {
         Motherboard board = platform.board().part();
         CpuCooler cooler = platform.cooler() == null ? null : platform.cooler().part();
 
@@ -267,7 +325,8 @@ public final class RecommendationEngine {
         Priced<PowerSupply> psu = owned.powerSupply() != null
                 ? new Priced<>(owned.powerSupply(), BigDecimal.ZERO)
                 : pools.psus().stream()
-                        .filter(candidate -> psuFits(candidate.part(), power, gpu, pcCase.part()))
+                        .filter(candidate -> psuFits(candidate.part(), power, gpu, pcCase.part())
+                                && candidate.part().wattage() >= power.recommendedPsuWatts() + extraPsuWatts)
                         .findFirst().orElse(null);
         if (psu == null) {
             return null;
@@ -658,7 +717,8 @@ public final class RecommendationEngine {
                 priced(catalog.all(ComponentCategory.STORAGE, Storage.class), CandidatePolicy::sataSsd, priceById),
                 ScoreRange.of(gpus.stream().mapToDouble(gpu -> PerformanceEstimator.gpuScore(gpu.part())).toArray()),
                 ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuMultiThreadScore(cpu.part())).toArray()),
-                ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuGamingScore(cpu.part())).toArray()));
+                ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuGamingScore(cpu.part())).toArray()),
+                FutureOutlookAnalyzer.PlatformTimeline.of(catalog));
         return pools;
     }
 
@@ -682,6 +742,9 @@ public final class RecommendationEngine {
 
     private record Platform(Priced<Motherboard> board, Priced<Memory> memory, List<Priced<Storage>> storage,
                             Priced<CpuCooler> cooler, BigDecimal cost) {
+    }
+
+    private record BoardAndMemory(Priced<Motherboard> board, Priced<Memory> memory) {
     }
 
     private record Chassis(Priced<PcCase> pcCase, Priced<PowerSupply> psu, BigDecimal cost) {
@@ -720,7 +783,8 @@ public final class RecommendationEngine {
     record Pools(Catalog catalog, Map<UUID, BigDecimal> priceById, List<Priced<Cpu>> cpus, List<Priced<Gpu>> gpus,
                          List<Priced<Motherboard>> boards, List<Priced<Memory>> memory, List<Priced<Storage>> drives,
                          List<Priced<PowerSupply>> psus, List<Priced<PcCase>> cases, List<Priced<CpuCooler>> coolers,
-                         List<Priced<Storage>> sataSsds, ScoreRange gpuRange, ScoreRange cpuMultiRange, ScoreRange cpuGamingRange) {
+                         List<Priced<Storage>> sataSsds, ScoreRange gpuRange, ScoreRange cpuMultiRange, ScoreRange cpuGamingRange,
+                         FutureOutlookAnalyzer.PlatformTimeline timeline) {
 
         BigDecimal price(HardwareComponent component) {
             return priceById.get(component.id());

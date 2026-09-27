@@ -26,7 +26,8 @@ final class ApiViews {
             Engines engines) {
     }
 
-    record NeedsView(BigDecimal budgetBrl, List<Labeled> useCases, Labeled primaryUse, Labeled resolution, List<UUID> ownedComponentIds) {
+    record NeedsView(BigDecimal budgetBrl, List<Labeled> useCases, Labeled primaryUse, Labeled resolution, List<UUID> ownedComponentIds,
+                     boolean planUpgrades) {
     }
 
     record Labeled(String value, String label) {
@@ -125,6 +126,7 @@ final class ApiViews {
             List<Labeled> useCases,
             Labeled resolution,
             boolean mentionsOwnedParts,
+            boolean planUpgrades,
             List<String> understood,
             List<String> questions) {
     }

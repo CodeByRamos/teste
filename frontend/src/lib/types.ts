@@ -33,6 +33,8 @@ export interface Needs {
   primaryUse?: UseCase | null;
   resolution?: Resolution | null;
   ownedComponentIds?: string[];
+  /** Prefer a platform that can be upgraded part by part later. */
+  planUpgrades?: boolean;
 }
 
 export interface Price {
@@ -126,6 +128,7 @@ export interface BuildView {
     primaryUse: Labeled | null;
     resolution: Labeled;
     ownedComponentIds: string[];
+    planUpgrades: boolean;
   } | null;
   requirements: string[];
   items: BuildItem[];
@@ -174,6 +177,7 @@ export interface Interpretation {
   useCases: Labeled[];
   resolution: Labeled | null;
   mentionsOwnedParts: boolean;
+  planUpgrades: boolean;
   understood: string[];
   questions: string[];
 }

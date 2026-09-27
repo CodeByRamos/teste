@@ -427,6 +427,12 @@ public final class FutureOutlookAnalyzer {
             return new PlatformTimeline(bySocket, newest, recentTypes);
         }
 
+        /** The socket is among those that received the newest processors in the catalog. */
+        boolean isCurrentSocket(String socket) {
+            Integer year = socket == null ? null : newestYearBySocket.get(socket);
+            return year != null && newestYear != null && year >= newestYear;
+        }
+
         String recentYearsText() {
             return (newestYear - 1) + " e " + newestYear;
         }

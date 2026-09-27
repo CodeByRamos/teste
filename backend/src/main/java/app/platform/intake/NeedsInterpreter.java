@@ -29,6 +29,7 @@ public final class NeedsInterpreter {
             Set<UseCase> useCases,
             TargetResolution resolution,
             boolean mentionsOwnedParts,
+            boolean planUpgrades,
             List<String> understood,
             List<String> questions) {
     }
@@ -61,6 +62,8 @@ public final class NeedsInterpreter {
 
     private static final Pattern GENERIC_GAMING = Pattern.compile("\\b(jog\\w*|games?|gamer)\\b");
     private static final Pattern OWNED_PARTS = Pattern.compile("\\b(ja tenho|tenho uma?|aproveitar|reaproveitar|minha placa|meu processador)\\b");
+    private static final Pattern PLAN_UPGRADES = Pattern.compile(
+            "\\b(upgrades?|melhorar (ele |o pc |aos poucos )?(depois|no futuro|com o tempo)|aos poucos|futuro|evoluir|trocar (pecas )?depois)\\b");
     private static final Pattern RES_4K = Pattern.compile("\\b(4k|2160p?)\\b");
     private static final Pattern RES_QHD = Pattern.compile("\\b(1440p?|2k|qhd)\\b");
     private static final Pattern RES_FHD = Pattern.compile("\\b(1080p?|full ?hd|fhd)\\b");
@@ -112,11 +115,16 @@ public final class NeedsInterpreter {
             understood.add("Resolução: " + resolution.label());
         }
 
+        boolean planUpgrades = PLAN_UPGRADES.matcher(folded).find();
+        if (planUpgrades) {
+            understood.add("Quer poder melhorar o PC depois, peça por peça");
+        }
+
         boolean owned = OWNED_PARTS.matcher(folded).find();
         if (owned) {
             questions.add("Quais peças você já tem e quer aproveitar? Você pode escolhê-las na próxima etapa.");
         }
-        return new Interpretation(budget, uses, resolution, owned, understood, questions);
+        return new Interpretation(budget, uses, resolution, owned, planUpgrades, understood, questions);
     }
 
     static BigDecimal budget(String folded) {

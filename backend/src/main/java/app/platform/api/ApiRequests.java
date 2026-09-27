@@ -28,11 +28,12 @@ final class ApiRequests {
             @NotEmpty @Size(max = 7) Set<@NotNull UseCase> useCases,
             UseCase primaryUse,
             TargetResolution resolution,
-            @Size(max = 12) List<@NotNull UUID> ownedComponentIds) {
+            @Size(max = 12) List<@NotNull UUID> ownedComponentIds,
+            Boolean planUpgrades) {
 
         BuildRequest toDomain() {
             return new BuildRequest(budgetBrl, useCases, primaryUse != null && useCases.contains(primaryUse) ? primaryUse : null,
-                    resolution, ownedComponentIds);
+                    resolution, ownedComponentIds, Boolean.TRUE.equals(planUpgrades));
         }
     }
 

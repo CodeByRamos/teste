@@ -96,8 +96,14 @@ public final class RequirementAnalyzer {
             }
         }
 
+        if (request.planUpgrades()) {
+            reasons.add("Você quer poder melhorar o PC aos poucos: preferimos uma plataforma que ainda recebe processadores novos, "
+                    + "a memória usada pelos lançamentos recentes e uma fonte com folga para uma placa de vídeo mais forte.");
+        }
+
         boolean gamingPriority = request.primaryUse() != null ? request.primaryUse().isGaming() : request.includesGaming();
         return new RequirementProfile(dedicatedGpu, gamingPriority, gpuWeight, multiWeight, gamingWeight, threads,
-                minRam, Math.max(minRam, targetRam), minStorage, Math.max(minStorage, targetStorage), vram, enough, reasons);
+                minRam, Math.max(minRam, targetRam), minStorage, Math.max(minStorage, targetStorage), vram, enough, reasons,
+                request.planUpgrades());
     }
 }

@@ -41,12 +41,14 @@ export function IntakeBox() {
     if (result.budgetBrl) params.set("orcamento", String(result.budgetBrl));
     if (result.useCases.length) params.set("usos", result.useCases.map((u) => u.value).join(","));
     if (result.resolution) params.set("resolucao", result.resolution.value);
+    if (result.planUpgrades) params.set("futuro", "1");
     const complete = result.budgetBrl && result.useCases.length && !result.mentionsOwnedParts;
     if (complete) {
       const needs = {
         budgetBrl: result.budgetBrl!,
         useCases: result.useCases.map((u) => u.value as UseCase),
         resolution: (result.resolution?.value as never) ?? null,
+        planUpgrades: result.planUpgrades,
       };
       router.push(`/montar/resultado?${needsToParams(needs)}`);
     } else {

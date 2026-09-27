@@ -22,6 +22,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
   const [budget, setBudget] = useState<number>(initial.budgetBrl ?? 5000);
   const [owned, setOwned] = useState<SearchResult[]>([]);
   const [hasParts, setHasParts] = useState<boolean | null>(null);
+  const [planUpgrades, setPlanUpgrades] = useState<boolean>(initial.planUpgrades ?? false);
 
   const playsGames = uses.some((use) => GAMING.includes(use));
   const steps: Step[] = playsGames ? ["uses", "resolution", "budget", "owned"] : ["uses", "budget", "owned"];
@@ -46,6 +47,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
       primaryUse: uses.length > 1 ? primary : null,
       resolution: playsGames ? resolution : null,
       ownedComponentIds: owned.map((part) => part.id),
+      planUpgrades,
     };
     router.push(`/montar/resultado?${needsToParams(needs)}`);
   }
@@ -207,6 +209,24 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
               </p>
             )}
           </div>
+          <label
+            className={`mt-4 flex cursor-pointer items-start gap-4 rounded-2xl border px-5 py-4 transition-colors ${planUpgrades ? "border-accent bg-accent-soft/60" : "border-border bg-surface hover:bg-surface-muted"}`}
+          >
+            <input type="checkbox" checked={planUpgrades} onChange={(event) => setPlanUpgrades(event.target.checked)} className="sr-only" />
+            <span
+              aria-hidden
+              className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${planUpgrades ? "border-accent bg-accent text-accent-foreground" : "border-border-strong bg-surface"}`}
+            >
+              {planUpgrades && <CheckIcon className="size-3.5" strokeWidth={3} />}
+            </span>
+            <span>
+              <span className="block font-medium">Quero poder melhorar depois</span>
+              <span className="block text-sm text-muted">
+                Preferimos uma plataforma que ainda recebe processadores novos e uma fonte com folga para uma placa de vídeo mais
+                forte. Pode sobrar um pouco menos para desempenho hoje.
+              </span>
+            </span>
+          </label>
         </div>
       )}
 

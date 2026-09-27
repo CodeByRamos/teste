@@ -72,6 +72,7 @@ class CatalogController {
                 result.useCases().stream().sorted().map(use -> new ApiViews.Labeled(use.name(), use.label())).toList(),
                 result.resolution() == null ? null : new ApiViews.Labeled(result.resolution().name(), result.resolution().label()),
                 result.mentionsOwnedParts(),
+                result.planUpgrades(),
                 result.understood(),
                 result.questions());
     }

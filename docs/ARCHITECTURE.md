@@ -112,6 +112,14 @@ dos processadores no catálogo (ex.: os lançados nos dois anos mais recentes us
 lançamentos futuros: tudo é fato do catálogo atual, com aviso na interface. Placas de vídeo são citadas pelo chip
 (`GeForce RTX 5070`), não por um SKU específico.
 
+### D12 — "Quero poder melhorar depois" como preferência explícita, com custo declarado
+
+Com `planUpgrades`, o motor só considera processadores de encaixes que ainda recebem os lançamentos mais recentes
+do catálogo, prefere o tipo de memória desses lançamentos e exige 150 W de folga na fonte além do recomendado. Isso
+pode custar desempenho hoje, então o motor também calcula a configuração sem a preferência e declara a diferença
+("sem essa preferência, o mesmo orçamento daria cerca de 2× o desempenho gráfico hoje"). A preferência vem do
+questionário ou do texto livre ("ir fazendo upgrade", "melhorar aos poucos").
+
 ## Segurança
 
 - Validação de entrada com Bean Validation; erros em ProblemDetail sem detalhes internos.
@@ -126,6 +134,5 @@ lançamentos futuros: tudo é fato do catálogo atual, com aviso na interface. P
 1. Provedor de preços real (lojas brasileiras / afiliados), casando produtos por EAN/GTIN.
 2. Tabela curada de desempenho (benchmarks com fonte citada) no lugar da estimativa por especificação.
 3. Autenticação (Amazon Cognito) e configurações por usuário.
-4. Usar o "Pensando no futuro" (D11) também na escolha: opção "priorizar upgrades futuros" no pedido.
-5. Camada de IA usando os motores como ferramentas (interpretar e explicar, nunca decidir compatibilidade).
-6. Biblioteca 3D: famílias planejadas (GPU blower/híbrida, gabinetes SFF/HTPC, radiador 420) e fans do OpenDB (CaseFan).
+4. Camada de IA usando os motores como ferramentas (interpretar e explicar, nunca decidir compatibilidade).
+5. Biblioteca 3D: famílias planejadas (GPU blower/híbrida, gabinetes SFF/HTPC, radiador 420) e fans do OpenDB (CaseFan).

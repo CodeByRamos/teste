@@ -52,7 +52,8 @@ final class ViewMapper {
                 request.useCases().stream().sorted().map(use -> new ApiViews.Labeled(use.name(), use.label())).toList(),
                 request.primaryUse() == null ? null : new ApiViews.Labeled(request.primaryUse().name(), request.primaryUse().label()),
                 new ApiViews.Labeled(request.resolution().name(), request.resolution().label()),
-                request.ownedComponentIds());
+                request.ownedComponentIds(),
+                request.planUpgrades());
     }
 
     static ApiViews.Component component(HardwareComponent component, CatalogVersion version) {

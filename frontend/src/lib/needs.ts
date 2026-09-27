@@ -27,6 +27,7 @@ export function needsToParams(needs: Needs) {
   if (needs.primaryUse) params.set("principal", needs.primaryUse);
   if (needs.resolution) params.set("resolucao", needs.resolution);
   if (needs.ownedComponentIds?.length) params.set("tenho", needs.ownedComponentIds.join(","));
+  if (needs.planUpgrades) params.set("futuro", "1");
   return params;
 }
 
@@ -45,6 +46,7 @@ export function partialNeedsFromParams(params: Params): Partial<Needs> {
     primaryUse: primary && uses.includes(primary) ? primary : undefined,
     resolution: resolution && RESOLUTIONS.includes(resolution) ? resolution : undefined,
     ownedComponentIds: owned.length ? owned : undefined,
+    planUpgrades: first(params.futuro) === "1" ? true : undefined,
   };
 }
 
@@ -56,5 +58,6 @@ export function completeNeeds(partial: Partial<Needs>): Needs | null {
     primaryUse: partial.primaryUse ?? null,
     resolution: partial.resolution ?? null,
     ownedComponentIds: partial.ownedComponentIds ?? [],
+    planUpgrades: partial.planUpgrades ?? false,
   };
 }
