@@ -11,7 +11,7 @@
   --surface-muted: #efeee9;
   --foreground: #1c1d20;
   --muted: #5d6169;
-  --subtle: #8a8e96;
+  --subtle: #666a72; /* 4.6:1 or more on every light background (WCAG AA for small text) */
   --border: #e3e1db;
   --border-strong: #cfccc4;
 

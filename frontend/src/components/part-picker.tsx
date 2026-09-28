@@ -103,7 +103,8 @@ export function PartPicker({
           />
         </div>
       </div>
-      <div className="max-h-80 overflow-y-auto" aria-live="polite">
+      {/* Focusable so keyboard users can scroll a long result list (WCAG 2.1.1). */}
+      <div className="max-h-80 overflow-y-auto" aria-live="polite" role="region" aria-label="Resultados da busca" tabIndex={0}>
         {error && <p className="p-4 text-sm text-bad">{error}</p>}
         {!error && searching && !loading && results.length === 0 && (
           <p className="p-4 text-sm text-muted">Nenhuma peça encontrada com esse nome.</p>
