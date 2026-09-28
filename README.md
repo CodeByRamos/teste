@@ -33,7 +33,7 @@ cd backend && ./mvnw spring-boot:test-run
 cd frontend && npm install && npm run dev
 ```
 
-Testes: `cd backend && ./mvnw test` (89 testes, incluindo ponta a ponta com PostgreSQL real),
+Testes: `cd backend && ./mvnw test` (98 testes, incluindo ponta a ponta com PostgreSQL real),
 `cd 3d && node src/validate.ts` (modelos 3D)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 
