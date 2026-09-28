@@ -29,7 +29,7 @@ test("wizard builds a compatible PC, explains it and saves it", async ({ page })
   await expect(page.getByRole("heading", { name: "Pensando no futuro" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "E se eu mudar o orçamento?" })).toBeVisible();
   // Fictitious prices are always labeled while no store feed is connected.
-  await expect(page.getByText(/Total estimado/)).toBeVisible();
+  await expect(page.getByText("Total estimado (preços fictícios)")).toBeVisible();
   await expectNoHorizontalScroll(page);
 
   // Plain-language explanation opens per part.
