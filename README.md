@@ -34,6 +34,8 @@ cd frontend && npm install && npm run dev
 ```
 
 Testes: `cd backend && ./mvnw test` (89 testes, incluindo ponta a ponta com PostgreSQL real),
+Testes de navegador (Playwright, desktop e celular, incluindo acessibilidade WCAG e cabeçalhos de segurança): com o site e a API
+rodando, `cd frontend && npm run e2e`. No CI eles rodam contra PostgreSQL, a API e o build de produção.
 `cd 3d && node src/validate.ts` (modelos 3D)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 

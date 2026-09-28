@@ -67,3 +67,80 @@ jobs:
       # The generator is deterministic: rebuilding must reproduce the committed GLBs and catalog byte for byte.
       - run: npm run build
       - run: git diff --exit-code -- ../frontend/public/3d-models ../docs/3d
+
+  e2e:
+    # Whole stack as deployed: PostgreSQL, the API jar and a production build of the site, driven by a real browser.
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+          POSTGRES_DB: app
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U app" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      FRONTEND_SHARED_SECRET: ci-e2e-secret
+      BACKEND_URL: http://localhost:8080
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build API
+        working-directory: backend
+        run: ./mvnw -B -ntp -q package -DskipTests
+      - name: Start API (OpenDB test fixture catalog)
+        working-directory: backend
+        env:
+          DATABASE_URL: jdbc:postgresql://localhost:5432/app
+          DATABASE_USERNAME: app
+          DATABASE_PASSWORD: app
+          OPENDB_SNAPSHOT_DIR: src/test/resources/opendb-fixture
+          OPENDB_INGEST_ON_STARTUP: "true"
+          EXAMPLE_PRICES: "true"
+        run: |
+          nohup java -jar target/platform-api-*.jar > ../api.log 2>&1 &
+          for i in $(seq 1 90); do
+            curl -sf http://localhost:8080/actuator/health/readiness | grep -q UP && exit 0
+            sleep 2
+          done
+          cat ../api.log; exit 1
+
+      - name: Build and start site
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          nohup npx next start -p 3000 > ../web.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:3000 > /dev/null && exit 0; sleep 2; done
+          cat ../web.log; exit 1
+
+      - name: Run browser tests
+        working-directory: frontend
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test
+
+      - name: Keep traces and logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: |
+            frontend/test-results
+            api.log
+            web.log
+          retention-days: 7
