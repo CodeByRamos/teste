@@ -49,71 +49,92 @@ const steps = [
   },
 ];
 
+// The tagline's second sentence is set in italic with the gradient, the brand's signature headline style.
+const [taglineLead, taglineRest] = (() => {
+  const end = brand.tagline.indexOf(". ");
+  return end < 0 ? [brand.tagline, ""] : [brand.tagline.slice(0, end + 1), brand.tagline.slice(end + 2)];
+})();
+
 export default function Home() {
   return (
     <>
-      <section className="mx-auto max-w-4xl px-4 pt-16 pb-12 sm:px-6 sm:pt-24">
-        <h1 className="text-center text-4xl font-semibold tracking-tight text-balance sm:text-6xl">{brand.tagline}</h1>
-        <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed text-muted text-pretty">{brand.description}</p>
-        <div className="mt-10">
-          <IntakeBox />
-        </div>
-      </section>
-
-      <section aria-labelledby="comecar" className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <h2 id="comecar" className="sr-only">
-          Por onde começar
-        </h2>
-        <ul className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-          {actions.map(({ href, title, description, Icon, available }) => {
-            const content = (
+      {/* Closed bands: a dotted hero, a plain band, then a sunken band down to the footer. */}
+      <div className="border-b border-border bg-band-raised texture-dots">
+        <section className="mx-auto max-w-4xl px-4 pt-16 pb-16 sm:px-6 sm:pt-24 sm:pb-20">
+          <h1 className="text-center text-4xl font-bold tracking-tight text-balance sm:text-6xl">
+            {taglineLead}
+            {taglineRest && (
               <>
-                <Icon className={`size-6 ${available ? "text-accent" : "text-subtle"}`} />
-                <span className="mt-4 flex items-center gap-2 font-semibold">
-                  {title}
-                  {!available && (
-                    <span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-muted">Em breve</span>
-                  )}
-                </span>
-                <span className="mt-1.5 text-sm leading-relaxed text-muted">{description}</span>
-                {available && (
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent">
-                    Começar <ArrowIcon className="size-4 transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                )}
+                {" "}
+                <em className="font-semibold text-gradient">{taglineRest}</em>
               </>
-            );
-            return (
-              <li key={title} className="bg-surface">
-                {href ? (
-                  <Link href={href} className="group flex h-full flex-col p-6 transition-colors hover:bg-accent-soft/40">
-                    {content}
-                  </Link>
-                ) : (
-                  <div className="flex h-full flex-col p-6" aria-disabled>
-                    {content}
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+            )}
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-center text-lg leading-relaxed text-muted text-pretty">{brand.description}</p>
+          <div className="mt-10">
+            <IntakeBox />
+          </div>
+        </section>
+      </div>
 
-      <section aria-labelledby="como-funciona" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 id="como-funciona" className="text-2xl font-semibold tracking-tight">
-          Como funciona
-        </h2>
-        <ol className="mt-8 grid gap-10 md:grid-cols-3">
-          {steps.map((step, index) => (
-            <li key={step.title}>
-              <span className="font-mono text-sm text-accent">0{index + 1}</span>
-              <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
-              <p className="mt-2 leading-relaxed text-muted">{step.text}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <div className="bg-background">
+        <section aria-labelledby="comecar" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <h2 id="comecar" className="sr-only">
+            Por onde começar
+          </h2>
+          <ul className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+            {actions.map(({ href, title, description, Icon, available }) => {
+              const content = (
+                <>
+                  <Icon className={`size-6 ${available ? "text-accent" : "text-subtle"}`} />
+                  <span className="mt-4 flex items-center gap-2 font-semibold">
+                    {title}
+                    {!available && (
+                      <span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-muted">Em breve</span>
+                    )}
+                  </span>
+                  <span className="mt-1.5 text-sm leading-relaxed text-muted">{description}</span>
+                  {available && (
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-accent">
+                      Começar <ArrowIcon className="size-4 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  )}
+                </>
+              );
+              return (
+                <li key={title} className="bg-surface">
+                  {href ? (
+                    <Link href={href} className="group flex h-full flex-col p-6 transition-colors hover:bg-accent-soft/40">
+                      {content}
+                    </Link>
+                  ) : (
+                    <div className="flex h-full flex-col p-6" aria-disabled>
+                      {content}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      </div>
+
+      <div className="-mb-24 border-t border-border bg-band-sunken">
+        <section aria-labelledby="como-funciona" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <h2 id="como-funciona" className="text-2xl font-semibold tracking-tight">
+            Como funciona
+          </h2>
+          <ol className="mt-8 grid gap-10 md:grid-cols-3 md:gap-0 md:divide-x md:divide-border">
+            {steps.map((step, index) => (
+              <li key={step.title} className="md:px-8 md:first:pl-0 md:last:pr-0">
+                <span className="font-display text-5xl font-bold text-gradient">0{index + 1}</span>
+                <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
+                <p className="mt-2 leading-relaxed text-muted">{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
     </>
   );
 }

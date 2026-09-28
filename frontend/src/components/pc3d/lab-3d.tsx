@@ -62,7 +62,7 @@ export function Lab3d({ extraBuilds = [] }: { extraBuilds?: { id: string; label:
                 setPresetId(p.id);
                 setSelected(null);
               }}
-              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${p.id === preset.id ? "border-accent bg-accent text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
+              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${p.id === preset.id ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
             >
               {p.label}
             </button>

@@ -138,7 +138,7 @@ export function UpgradeScreen({ options, initialIds }: { options: Options; initi
                   type="button"
                   aria-pressed={active}
                   onClick={() => setUses(active ? uses.filter((u) => u !== use.value) : [...uses, use.value])}
-                  className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${active ? "border-accent bg-accent text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
+                  className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${active ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
                 >
                   {use.label}
                 </button>

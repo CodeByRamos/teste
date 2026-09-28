@@ -68,7 +68,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
         {steps.map((s, index) => (
           <span
             key={s}
-            className={`h-1.5 flex-1 rounded-full transition-colors ${index <= stepIndex ? "bg-accent" : "bg-border"}`}
+            className={`h-1.5 flex-1 rounded-full transition-colors ${index <= stepIndex ? "bg-brand" : "bg-border"}`}
           />
         ))}
       </div>
@@ -91,7 +91,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
                   <input type="checkbox" checked={checked} onChange={() => toggleUse(use.value)} className="sr-only" />
                   <span
                     aria-hidden
-                    className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${checked ? "border-accent bg-accent text-accent-foreground" : "border-border-strong bg-surface"}`}
+                    className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${checked ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface"}`}
                   >
                     {checked && <CheckIcon className="size-3.5" strokeWidth={3} />}
                   </span>
@@ -114,7 +114,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
                     type="button"
                     aria-pressed={primary === use}
                     onClick={() => setPrimary(primary === use ? null : use)}
-                    className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${primary === use ? "border-accent bg-accent text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
+                    className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${primary === use ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
                   >
                     {options.useCases.find((u) => u.value === use)?.label}
                   </button>
@@ -215,7 +215,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
             <input type="checkbox" checked={planUpgrades} onChange={(event) => setPlanUpgrades(event.target.checked)} className="sr-only" />
             <span
               aria-hidden
-              className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${planUpgrades ? "border-accent bg-accent text-accent-foreground" : "border-border-strong bg-surface"}`}
+              className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${planUpgrades ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface"}`}
             >
               {planUpgrades && <CheckIcon className="size-3.5" strokeWidth={3} />}
             </span>

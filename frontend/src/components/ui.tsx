@@ -6,7 +6,7 @@ import { AlertIcon, CheckIcon, InfoIcon, XIcon } from "./icons";
 type Variant = "primary" | "secondary" | "ghost";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-accent text-accent-foreground hover:bg-accent-hover shadow-sm",
+  primary: "bg-brand text-accent-foreground hover:brightness-110 shadow-sm",
   secondary: "bg-surface text-foreground border border-border-strong hover:bg-surface-muted",
   ghost: "text-muted hover:text-foreground hover:bg-surface-muted",
 };

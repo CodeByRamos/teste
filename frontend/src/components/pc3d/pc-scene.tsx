@@ -1,8 +1,8 @@
 "use client";
 
 import { ContactShadows, Environment, OrbitControls, useGLTF } from "@react-three/drei";
-import { Canvas, useThree, type ThreeEvent } from "@react-three/fiber";
-import { Component, Suspense, useEffect, useMemo, type ReactNode } from "react";
+import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { Component, Suspense, useEffect, useMemo, useRef, type ReactNode } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import type { Assembly, Placement } from "@/lib/models3d/assembly";
@@ -34,6 +34,14 @@ export function PcScene({
   const center = caseBox ? caseBox.getCenter(new THREE.Vector3()) : new THREE.Vector3(0, 0.24, 0);
   const size = caseBox ? caseBox.getSize(new THREE.Vector3()) : new THREE.Vector3(0.24, 0.48, 0.46);
   const distance = Math.max(size.x, size.y, size.z) * 2.1;
+  const focusBox = useMemo(() => {
+    if (selectedKey === null) return null;
+    // Memory sticks are separate placements; frame all of them together.
+    const parts = assembly.placements.filter((p) =>
+      selectedKey.startsWith("memory") ? p.category === "MEMORY" : p.key === selectedKey,
+    );
+    return parts.length ? parts.reduce((box, p) => box.union(p.box), new THREE.Box3()) : null;
+  }, [assembly, selectedKey]);
 
   return (
     <Canvas
@@ -42,9 +50,9 @@ export function PcScene({
       camera={{ position: [center.x + distance * 0.95, center.y + distance * 0.35, center.z + distance * 0.55], fov: 35, near: 0.01, far: 20 }}
       onPointerMissed={() => onSelect(null)}
     >
-      <color attach="background" args={["#f4f3ef"]} />
+      <color attach="background" args={["#18181f"]} />
       <StudioEnvironment />
-      <hemisphereLight args={["#ffffff", "#d8d4cc", 0.6]} />
+      <hemisphereLight args={["#ffffff", "#3a3548", 0.75]} />
       <directionalLight position={[1.2, 1.6, 0.8]} intensity={1.8} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} />
       <directionalLight position={[-1, 0.8, -0.6]} intensity={0.6} />
       <Suspense fallback={null}>
@@ -63,10 +71,57 @@ export function PcScene({
         ))}
       </Suspense>
       <ContactShadows position={[center.x, 0, center.z]} scale={distance * 1.2} blur={2.4} opacity={0.35} far={1} />
-      <OrbitControls makeDefault target={center} enableDamping minDistance={0.25} maxDistance={3} />
+      <OrbitControls makeDefault target={center} enableDamping minDistance={0.1} maxDistance={3} />
+      <CameraFocus box={focusBox} overviewTarget={center} overviewDistance={distance} />
       {onStats && <StatsReporter onStats={onStats} />}
     </Canvas>
   );
+}
+
+/** Same angle as the opening view: from the open side of the case, slightly above and in front. */
+const VIEW_DIRECTION = new THREE.Vector3(0.95, 0.35, 0.55).normalize();
+
+/**
+ * Glides the camera to frame the selected part (or back to the whole PC when nothing is selected).
+ * Grabbing the scene with the mouse stops the glide, so orbiting always stays in the user's hands.
+ */
+function CameraFocus({ box, overviewTarget, overviewDistance }: { box: THREE.Box3 | null; overviewTarget: THREE.Vector3; overviewDistance: number }) {
+  const camera = useThree((state) => state.camera) as THREE.PerspectiveCamera;
+  const controls = useThree((state) => state.controls) as unknown as
+    | (THREE.EventDispatcher<{ start: object }> & { target: THREE.Vector3; update: () => void })
+    | null;
+  const goal = useRef<{ target: THREE.Vector3; position: THREE.Vector3 } | null>(null);
+
+  useEffect(() => {
+    const target = box ? box.getCenter(new THREE.Vector3()) : overviewTarget.clone();
+    let distance = overviewDistance;
+    if (box) {
+      // Distance at which the part's bounding sphere fills about half of the view.
+      const radius = box.getBoundingSphere(new THREE.Sphere()).radius;
+      distance = Math.max(0.16, (radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))) * 1.5);
+    }
+    goal.current = { target, position: target.clone().addScaledVector(VIEW_DIRECTION, distance) };
+  }, [box, overviewTarget, overviewDistance, camera]);
+
+  useEffect(() => {
+    if (!controls) return;
+    const stop = () => (goal.current = null);
+    controls.addEventListener("start", stop);
+    return () => controls.removeEventListener("start", stop);
+  }, [controls]);
+
+  useFrame((_, delta) => {
+    if (!goal.current || !controls) return;
+    const t = 1 - Math.exp(-delta * 5);
+    controls.target.lerp(goal.current.target, t);
+    camera.position.lerp(goal.current.position, t);
+    controls.update();
+    if (camera.position.distanceTo(goal.current.position) < 0.001 && controls.target.distanceTo(goal.current.target) < 0.001) {
+      goal.current = null;
+    }
+  });
+
+  return null;
 }
 
 function PlacedModel({
@@ -138,7 +193,7 @@ function LoadedModel({
       for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
         const standard = material as THREE.MeshStandardMaterial;
         if (!standard.emissive || (material.userData as { role?: string }).role === "rgb") continue;
-        standard.emissive.set(selected ? "#3552c7" : "#000000");
+        standard.emissive.set(selected ? "#9333ea" : "#000000");
         standard.emissiveIntensity = selected ? 0.35 : 0;
       }
     });

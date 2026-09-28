@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Krub } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { brand } from "@/config/brand";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
-const sans = Inter({ variable: "--font-sans-family", subsets: ["latin"] });
+// Headings in Inter, body copy in Krub.
+const sans = Krub({ variable: "--font-sans-family", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 const mono = JetBrains_Mono({ variable: "--font-mono-family", subsets: ["latin"] });
+const display = Inter({ variable: "--font-display-family", subsets: ["latin"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
   metadataBase: siteUrl(),
@@ -21,7 +23,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Rendered per request: the Content-Security-Policy nonce (src/proxy.ts) must be fresh on every page.
   await connection();
   return (
-    <html lang="pt-BR" className={`${sans.variable} ${mono.variable} h-full`}>
+    <html lang="pt-BR" className={`${sans.variable} ${mono.variable} ${display.variable} h-full`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#conteudo"

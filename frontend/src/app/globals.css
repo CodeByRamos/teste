@@ -2,30 +2,46 @@
 
 /*
  * Design tokens. Brand colors live only here: re-theming the product means editing this block.
- * Palette: warm light neutrals, one calm accent, and status colors that are always paired with
- * an icon and text (never color alone).
+ * Palette: graphite near-black surfaces in closed, flat sections, a violet → magenta gradient as the signature, and status
+ * colors that are always paired with an icon and text (never color alone). Every text/background pair
+ * below keeps 4.5:1 or more (WCAG AA for small text).
  */
 :root {
-  --background: #f7f6f3;
-  --surface: #ffffff;
-  --surface-muted: #efeee9;
-  --foreground: #1c1d20;
-  --muted: #5d6169;
-  --subtle: #666a72; /* 4.6:1 or more on every light background (WCAG AA for small text) */
-  --border: #e3e1db;
-  --border-strong: #cfccc4;
+  color-scheme: dark;
 
-  --accent: #3552c7;
-  --accent-hover: #2b44a8;
-  --accent-soft: #e8ecfb;
+  --background: #111116;
+  --surface: #18181f;
+  --surface-muted: #212129;
+  --foreground: #f2f1f7;
+  --muted: #b9b7c6;
+  --subtle: #9d9aad;
+  --border: #2a2a34;
+  --border-strong: #3d3b4b;
+
+  /* Solid accent for text, borders and outlines on dark surfaces. */
+  --accent: #c4a3ff;
+  --accent-hover: #d6bfff;
+  --accent-soft: #2d2347;
   --accent-foreground: #ffffff;
 
-  --ok: #23794c;
-  --ok-soft: #e4f3ea;
-  --warn: #9a6200;
-  --warn-soft: #fbf0db;
-  --bad: #b3361f;
-  --bad-soft: #fbe6e1;
+  /* Signature gradient for buttons and small marks. */
+  --gradient-brand: linear-gradient(135deg, #5b21b6 0%, #7e22ce 50%, #c026d3 100%);
+  --gradient-text: linear-gradient(100deg, #d8c8ff 0%, #f0a6ff 100%);
+
+  --ok: #6ee7a0;
+  --ok-soft: #16301f;
+  --warn: #fcd34d;
+  --warn-soft: #2f2610;
+  --bad: #ff8a8a;
+  --bad-soft: #3a1a20;
+
+  /* Fine dot mesh, like perforated metal: flat and uniform, never faded. */
+  --texture-dots: radial-gradient(rgb(255 255 255 / 0.075) 0.7px, transparent 0.9px);
+  --texture-dots-size: 4px 4px;
+
+  /* Closed page sections: each band has its own flat tone and hard edges. */
+  --band-raised: #17171e;
+  --band-sunken: #0c0c10;
 
   --radius: 14px;
 }
@@ -52,6 +68,23 @@
   --radius-card: var(--radius);
   --font-sans: var(--font-sans-family);
   --font-mono: var(--font-mono-family);
+  --font-display: var(--font-display-family);
+  --color-band-raised: var(--band-raised);
+  --color-band-sunken: var(--band-sunken);
+}
+
+/* Filled brand surfaces (buttons, selected states, the logo). */
+@utility bg-brand {
+  background-color: #7e22ce;
+  background-image: var(--gradient-brand);
+}
+
+/* Big numbers and highlighted words. */
+@utility text-gradient {
+  background-image: var(--gradient-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 html {
@@ -59,10 +92,26 @@ html {
 }
 
 body {
-  background: var(--background);
+  background: var(--texture-dots) var(--background);
+  background-size: var(--texture-dots-size);
   color: var(--foreground);
   font-family: var(--font-sans-family), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display-family), var(--font-sans-family), system-ui, sans-serif;
+}
+
+/* Everything clickable shows the hand cursor (Tailwind 4 leaves buttons on the default arrow). */
+button:not(:disabled),
+[role="button"],
+[role="tab"],
+summary,
+label:has(input:not(:disabled)) {
+  cursor: pointer;
 }
 
 :focus-visible {

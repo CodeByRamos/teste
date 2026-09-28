@@ -32,9 +32,15 @@ test("wizard builds a compatible PC, explains it and saves it", async ({ page })
   await expect(page.getByText("Total estimado (preços fictícios)")).toBeVisible();
   await expectNoHorizontalScroll(page);
 
-  // Plain-language explanation opens per part.
+  // Picking a part on the map opens its plain-language explanation.
+  await parts.nth(1).getByRole("button").click();
+  await expect(page.getByText("Por que escolhemos esta")).toBeVisible();
+
+  // The sheet shows the same parts as a list, each one opening its full explanation.
+  await page.getByRole("tab", { name: "Ficha" }).click();
+  await expect(page.getByRole("list", { name: "Mapa das peças" })).toBeHidden();
   await parts.first().getByRole("button").first().click();
-  await expect(page.getByText("O que é").first()).toBeVisible();
+  await expect(page.getByText("Para que serve").first()).toBeVisible();
 
   await page.getByRole("button", { name: "Salvar configuração" }).click();
   await expect(page).toHaveURL(/\/configuracao\/[0-9a-f-]{36}$/);
