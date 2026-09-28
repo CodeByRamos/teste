@@ -42,6 +42,8 @@ rodando, `cd frontend && npm run e2e`. No CI eles rodam contra PostgreSQL, a API
 
 ## O que já funciona
 
+- **Leitura do pedido com IA (opcional)**: com `ANTHROPIC_API_KEY`, o Claude ajuda a entender o texto livre
+  ("uns cinco mil pra jogar Valorant"), sempre como apoio às regras e sem decidir compatibilidade.
 - **Montar meu PC**: texto livre ou assistente (usos, prioridade, resolução, orçamento, peças que já tem)
   → configuração completa com explicação em camadas, especificações, alternativas e troca de peças.
 - **Motor de compatibilidade**: 11 pares verificados por regras, com três resultados (compatível, atenção,

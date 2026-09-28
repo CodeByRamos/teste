@@ -11,9 +11,10 @@ import java.util.List;
  * @param rateLimit per-client request budget for expensive endpoints
  * @param frontend  how the web frontend's server proves requests are relayed by it
  * @param admin     operator-only endpoints (price feed uploads)
+ * @param ai        optional language model that helps read free-text requests
  */
 @ConfigurationProperties("platform")
-public record PlatformProperties(OpenDb opendb, Pricing pricing, RateLimit rateLimit, Frontend frontend, Admin admin) {
+public record PlatformProperties(OpenDb opendb, Pricing pricing, RateLimit rateLimit, Frontend frontend, Admin admin, Ai ai) {
 
     public PlatformProperties {
         opendb = opendb == null ? new OpenDb(null, false) : opendb;
@@ -21,6 +22,7 @@ public record PlatformProperties(OpenDb opendb, Pricing pricing, RateLimit rateL
         rateLimit = rateLimit == null ? new RateLimit(60, List.of()) : rateLimit;
         frontend = frontend == null ? new Frontend(null) : frontend;
         admin = admin == null ? new Admin(null) : admin;
+        ai = ai == null ? new Ai(null, null, 0, null) : ai;
     }
 
     /** @param snapshotDir directory produced by scripts/fetch-opendb.sh; may be null in production if ingestion runs as a job */
@@ -88,6 +90,25 @@ public record PlatformProperties(OpenDb opendb, Pricing pricing, RateLimit rateL
     public record Frontend(String sharedSecret) {
         public Frontend {
             sharedSecret = sharedSecret == null || sharedSecret.isBlank() ? null : sharedSecret;
+        }
+    }
+
+    /**
+     * @param apiKey              ANTHROPIC_API_KEY; unset keeps the feature off (rules only)
+     * @param model               Claude model id
+     * @param maxRequestsPerMinute global cap on model calls, to bound cost
+     * @param timeout             per call; slower answers fall back to the rules
+     */
+    public record Ai(String apiKey, String model, int maxRequestsPerMinute, java.time.Duration timeout) {
+        public Ai {
+            apiKey = apiKey == null || apiKey.isBlank() ? null : apiKey;
+            model = model == null || model.isBlank() ? "claude-opus-5" : model;
+            maxRequestsPerMinute = maxRequestsPerMinute <= 0 ? 30 : maxRequestsPerMinute;
+            timeout = timeout == null ? java.time.Duration.ofSeconds(10) : timeout;
+        }
+
+        public boolean enabled() {
+            return apiKey != null;
         }
     }
 }

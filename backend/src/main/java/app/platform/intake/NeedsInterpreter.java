@@ -31,7 +31,8 @@ public final class NeedsInterpreter {
             boolean mentionsOwnedParts,
             boolean planUpgrades,
             List<String> understood,
-            List<String> questions) {
+            List<String> questions,
+            boolean modelAssisted) {
     }
 
     private static final String AMOUNT = "(\\d{1,3}(?:\\.\\d{3})+|\\d+(?:,\\d+)?)";
@@ -72,37 +73,65 @@ public final class NeedsInterpreter {
     private NeedsInterpreter() {
     }
 
-    public static Interpretation interpret(String text) {
-        String folded = fold(text == null ? "" : text);
-        List<String> understood = new ArrayList<>();
-        List<String> questions = new ArrayList<>();
+    /**
+     * What was recognized in the text, before it is described to the person.
+     *
+     * @param gamingGuessed games were mentioned without saying which kind, so heavy games were assumed
+     */
+    private record Facts(BigDecimal budget, Set<UseCase> uses, boolean gamingGuessed, boolean mentionsGta,
+                         TargetResolution resolution, boolean planUpgrades, boolean owned) {
+    }
 
-        BigDecimal budget = budget(folded);
-        if (budget != null) {
-            understood.add("Orçamento de até R$ " + String.format(Locale.of("pt", "BR"), "%,.0f", budget));
-        } else {
-            questions.add("Quanto você pretende investir, mais ou menos?");
+    /** Rules only: deterministic, no external service. */
+    public static Interpretation interpret(String text) {
+        return describe(facts(fold(text == null ? "" : text)), false);
+    }
+
+    /**
+     * Combines the rules with a language model's reading of the same text. The rules win where they found
+     * something; the model fills gaps. A model budget is only accepted when the text contains a number
+     * (in digits or words), so an invented amount never gets through. Everything shown to the person is
+     * still written here, from structured fields, never by the model.
+     */
+    public static Interpretation combine(String text, ModelReading reading) {
+        String folded = fold(text == null ? "" : text);
+        Facts rules = facts(folded);
+
+        BigDecimal budget = rules.budget();
+        if (budget == null && reading.budgetBrl() != null && mentionsANumber(folded)
+                && reading.budgetBrl().compareTo(new BigDecimal("500")) >= 0
+                && reading.budgetBrl().compareTo(new BigDecimal("200000")) <= 0) {
+            budget = reading.budgetBrl().setScale(0, java.math.RoundingMode.HALF_UP);
         }
 
+        Set<UseCase> uses = EnumSet.noneOf(UseCase.class);
+        uses.addAll(rules.uses());
+        boolean gamingGuessed = rules.gamingGuessed();
+        boolean modelKnowsTheGames = reading.useCases().stream().anyMatch(UseCase::isGaming);
+        if (gamingGuessed && modelKnowsTheGames) {
+            // The rules only guessed "heavy games"; the model read which kind the person meant.
+            uses.removeIf(UseCase::isGaming);
+            gamingGuessed = false;
+        }
+        uses.addAll(reading.useCases());
+
+        TargetResolution resolution = rules.resolution() != null ? rules.resolution() : reading.resolution();
+        return describe(new Facts(budget, uses, gamingGuessed, rules.mentionsGta(), resolution,
+                rules.planUpgrades() || reading.planUpgrades(), rules.owned() || reading.mentionsOwnedParts()), true);
+    }
+
+    private static Facts facts(String folded) {
         Set<UseCase> uses = EnumSet.noneOf(UseCase.class);
         USE_CASES.forEach((useCase, pattern) -> {
             if (pattern.matcher(folded).find()) {
                 uses.add(useCase);
             }
         });
+        boolean gamingGuessed = false;
         if (GENERIC_GAMING.matcher(folded).find() && uses.stream().noneMatch(UseCase::isGaming)) {
             uses.add(UseCase.GAMING_AAA);
-            questions.add("Que tipo de jogo você mais joga? Jogos competitivos (como Valorant) pedem menos que lançamentos pesados.");
+            gamingGuessed = true;
         }
-        uses.forEach(useCase -> understood.add("Uso: " + useCase.label().toLowerCase(Locale.ROOT)));
-        if (uses.isEmpty()) {
-            questions.add("O que você quer fazer com o computador? Por exemplo: jogar, programar, editar vídeos ou estudar.");
-        }
-
-        if (UNRELEASED_OR_UNSPECIFIED.matcher(folded).find()) {
-            understood.add("Ainda não há requisitos oficiais de GTA VI para PC na nossa base, então consideramos jogos pesados em geral");
-        }
-
         TargetResolution resolution = null;
         if (RES_4K.matcher(folded).find()) {
             resolution = TargetResolution.UHD_4K;
@@ -111,20 +140,49 @@ public final class NeedsInterpreter {
         } else if (RES_FHD.matcher(folded).find()) {
             resolution = TargetResolution.FULL_HD;
         }
-        if (resolution != null) {
-            understood.add("Resolução: " + resolution.label());
-        }
+        return new Facts(budget(folded), uses, gamingGuessed, UNRELEASED_OR_UNSPECIFIED.matcher(folded).find(), resolution,
+                PLAN_UPGRADES.matcher(folded).find(), OWNED_PARTS.matcher(folded).find());
+    }
 
-        boolean planUpgrades = PLAN_UPGRADES.matcher(folded).find();
-        if (planUpgrades) {
+    private static Interpretation describe(Facts facts, boolean modelAssisted) {
+        List<String> understood = new ArrayList<>();
+        List<String> questions = new ArrayList<>();
+        if (facts.budget() != null) {
+            understood.add("Orçamento de até R$ " + String.format(Locale.of("pt", "BR"), "%,.0f", facts.budget()));
+        } else {
+            questions.add("Quanto você pretende investir, mais ou menos?");
+        }
+        if (facts.gamingGuessed()) {
+            questions.add("Que tipo de jogo você mais joga? Jogos competitivos (como Valorant) pedem menos que lançamentos pesados.");
+        }
+        facts.uses().forEach(useCase -> understood.add("Uso: " + useCase.label().toLowerCase(Locale.ROOT)));
+        if (facts.uses().isEmpty()) {
+            questions.add("O que você quer fazer com o computador? Por exemplo: jogar, programar, editar vídeos ou estudar.");
+        }
+        if (facts.mentionsGta()) {
+            understood.add("Ainda não há requisitos oficiais de GTA VI para PC na nossa base, então consideramos jogos pesados em geral");
+        }
+        if (facts.resolution() != null) {
+            understood.add("Resolução: " + facts.resolution().label());
+        }
+        if (facts.planUpgrades()) {
             understood.add("Quer poder melhorar o PC depois, peça por peça");
         }
-
-        boolean owned = OWNED_PARTS.matcher(folded).find();
-        if (owned) {
+        if (facts.owned()) {
             questions.add("Quais peças você já tem e quer aproveitar? Você pode escolhê-las na próxima etapa.");
         }
-        return new Interpretation(budget, uses, resolution, owned, planUpgrades, understood, questions);
+        return new Interpretation(facts.budget(), facts.uses(), facts.resolution(), facts.owned(), facts.planUpgrades(),
+                understood, questions, modelAssisted);
+    }
+
+    /** Digits, or the words people use for amounts ("cinco mil", "quinhentos reais"). Not "um"/"uma": they are articles. */
+    private static final Pattern NUMBER = Pattern.compile(
+            "\\d|\\b(mil|cem|cento|duzentos|trezentos|quatrocentos|quinhentos|seiscentos|setecentos|oitocentos|novecentos"
+                    + "|reais|conto|contos|pila)\\b");
+
+    /** A budget needs a number in the text, written in digits or words. */
+    static boolean mentionsANumber(String folded) {
+        return NUMBER.matcher(folded).find();
     }
 
     static BigDecimal budget(String folded) {

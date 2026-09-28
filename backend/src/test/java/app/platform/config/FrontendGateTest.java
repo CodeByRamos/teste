@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FrontendGateTest {
 
     private static PlatformProperties properties(String secret) {
-        return new PlatformProperties(null, null, new PlatformProperties.RateLimit(2, List.of()), new PlatformProperties.Frontend(secret), null);
+        return new PlatformProperties(null, null, new PlatformProperties.RateLimit(2, List.of()), new PlatformProperties.Frontend(secret), null, null);
     }
 
     private static MockHttpServletRequest post(String secret, String clientAddress) {

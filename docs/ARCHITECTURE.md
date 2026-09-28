@@ -130,6 +130,19 @@ mediana das outras lojas ou quedas bruscas em relação ao preço anterior. Um f
 válidas é tratado como quebrado e não é aplicado. Preço real sempre vence o fictício para a mesma peça, e entre
 variantes do mesmo chip de GPU. Detalhes em [`docs/PRICING.md`](PRICING.md).
 
+### D14 — IA só para ler o pedido, com as regras sempre por baixo
+
+Com `ANTHROPIC_API_KEY` definida, o Claude (`claude-opus-5` por padrão, `ANTHROPIC_MODEL` para trocar) ajuda a ler o
+texto livre. A resposta é **saída estruturada** num schema fixo (valor, usos, resolução, duas flags): sem ferramentas e
+sem texto livre, então o que um visitante escreve não consegue disparar ações nem aparecer na tela. As regras
+determinísticas rodam sempre e vencem onde leram algo; a IA só preenche lacunas. Um orçamento vindo da IA só é aceito
+se o texto tiver um número (em dígitos ou por extenso), para barrar valores inventados. Toda frase exibida continua
+escrita pelo nosso código. Qualquer falha (recusa, erro, timeout de 10 s, limite global de 30 chamadas/min) cai
+silenciosamente nas regras, e a compatibilidade e a escolha de peças nunca dependem da IA. Na subida, o SDK é
+aquecido sem gastar tokens (geração de schema e uma consulta gratuita ao modelo, que também valida a chave).
+Quando a IA ajuda, a interface avisa. Em caso de recusa do modelo, o fallback são as regras locais, por isso não é
+usado o fallback de modelo do lado do servidor.
+
 ## Segurança
 
 - Validação de entrada com Bean Validation; erros em ProblemDetail sem detalhes internos.

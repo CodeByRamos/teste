@@ -6,6 +6,7 @@ import app.platform.hardware.ComponentCategory;
 import app.platform.hardware.HardwareComponent;
 import app.platform.infra.persistence.JdbcCatalogRepository;
 import app.platform.infra.pricing.feed.StoreOfferRepository;
+import app.platform.intake.IntakeService;
 import app.platform.intake.NeedsInterpreter;
 import app.platform.pricing.PriceService;
 import app.platform.recommendation.BuildRequest;
@@ -43,9 +44,11 @@ class CatalogController {
     private final JdbcCatalogRepository repository;
     private final JsonMapper json;
     private final StoreOfferRepository storeOffers;
+    private final IntakeService intake;
 
     CatalogController(CatalogHolder catalogs, PriceService prices, JdbcCatalogRepository repository, JsonMapper json,
-                      StoreOfferRepository storeOffers) {
+                      StoreOfferRepository storeOffers, IntakeService intake) {
+        this.intake = intake;
         this.catalogs = catalogs;
         this.prices = prices;
         this.repository = repository;
@@ -70,7 +73,7 @@ class CatalogController {
     /** Reads a free-text request. Deterministic: extracts only what it recognizes and asks about the rest. */
     @PostMapping("/intake/interpret")
     ApiViews.Interpretation interpret(@Valid @RequestBody ApiRequests.Interpret body) {
-        NeedsInterpreter.Interpretation result = NeedsInterpreter.interpret(body.text());
+        NeedsInterpreter.Interpretation result = intake.interpret(body.text());
         return new ApiViews.Interpretation(
                 result.budgetBrl(),
                 result.useCases().stream().sorted().map(use -> new ApiViews.Labeled(use.name(), use.label())).toList(),
@@ -78,7 +81,8 @@ class CatalogController {
                 result.mentionsOwnedParts(),
                 result.planUpgrades(),
                 result.understood(),
-                result.questions());
+                result.questions(),
+                result.modelAssisted());
     }
 
     /** Choices the questionnaire offers, so labels live in one place. */

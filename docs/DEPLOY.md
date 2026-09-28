@@ -29,6 +29,10 @@ openssl rand -base64 48
    | `FRONTEND_SHARED_SECRET` | o segredo do passo 1 |
    | `EXAMPLE_PRICES` | `true` (preços fictícios, rotulados, até existirem provedores reais) |
 
+   Opcional: `ANTHROPIC_API_KEY` (segredo) liga a leitura do texto livre com ajuda do Claude; sem ela, só as regras
+   (ver D14 em [`ARCHITECTURE.md`](ARCHITECTURE.md)). Custo estimado: alguns centavos por pedido interpretado (≈ R$ 0,05 a 0,10 com `claude-opus-5`), limitado a
+   30 chamadas por minuto.
+
    Opcional: `ADMIN_TOKEN` (segredo) habilita o envio manual de feeds de preço; os feeds automáticos são
    configurados como em [`PRICING.md`](PRICING.md).
 

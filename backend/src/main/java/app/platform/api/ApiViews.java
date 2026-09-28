@@ -135,7 +135,8 @@ final class ApiViews {
             boolean mentionsOwnedParts,
             boolean planUpgrades,
             List<String> understood,
-            List<String> questions) {
+            List<String> questions,
+            boolean modelAssisted) {
     }
 
     record Saved(UUID id) {

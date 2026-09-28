@@ -189,6 +189,8 @@ export interface Interpretation {
   planUpgrades: boolean;
   understood: string[];
   questions: string[];
+  /** A language model helped read the text (only structured facts; compatibility never depends on it). */
+  modelAssisted: boolean;
 }
 
 export interface Options {

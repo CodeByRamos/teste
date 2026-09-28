@@ -4,6 +4,10 @@ import app.platform.builds.BuildAssembler;
 import app.platform.builds.SavedBuildRepository;
 import app.platform.catalog.CatalogHolder;
 import app.platform.compatibility.CompatibilityEngine;
+import app.platform.intake.IntakeService;
+import app.platform.intake.NeedsReader;
+import app.platform.infra.ai.ClaudeNeedsReader;
+import app.platform.infra.ai.RequestBudget;
 import app.platform.infra.opendb.OpenDbIngestion;
 import app.platform.infra.persistence.JdbcCatalogRepository;
 import app.platform.infra.persistence.JdbcSavedBuildRepository;
@@ -16,6 +20,9 @@ import app.platform.pricing.PriceService;
 import app.platform.recommendation.BudgetExplorer;
 import app.platform.recommendation.RecommendationEngine;
 import app.platform.recommendation.UpgradeAdvisor;
+import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +41,8 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(PlatformProperties.class)
 public class PlatformConfiguration {
+
+    private static final Logger log = LoggerFactory.getLogger(PlatformConfiguration.class);
 
     /** JSON for stored documents. Kept separate from the HTTP mapper so API tuning cannot break stored data. */
     private static final JsonMapper STORAGE_JSON = JsonMapper.builder()
@@ -79,6 +88,27 @@ public class PlatformConfiguration {
     @Bean
     RecommendationEngine recommendationEngine(PriceService prices, CompatibilityEngine compatibility) {
         return new RecommendationEngine(prices, compatibility);
+    }
+
+    /** Language model help for free-text requests: only with ANTHROPIC_API_KEY set; otherwise the rules alone. */
+    @Bean
+    NeedsReader needsReader(PlatformProperties properties) {
+        PlatformProperties.Ai ai = properties.ai();
+        if (!ai.enabled()) {
+            log.info("AI interpretation off (no ANTHROPIC_API_KEY); free text is read by rules only");
+            return NeedsReader.NONE;
+        }
+        log.info("AI interpretation on with model {}, at most {} calls per minute", ai.model(), ai.maxRequestsPerMinute());
+        ClaudeNeedsReader reader = new ClaudeNeedsReader(
+                AnthropicOkHttpClient.builder().apiKey(ai.apiKey()).timeout(ai.timeout()).maxRetries(1).build(),
+                ai.model(), new RequestBudget(ai.maxRequestsPerMinute(), java.time.Clock.systemUTC()));
+        Thread.ofVirtual().name("ai-warmup").start(reader::warmUp);
+        return reader;
+    }
+
+    @Bean
+    IntakeService intakeService(NeedsReader reader) {
+        return new IntakeService(reader);
     }
 
     @Bean

@@ -129,6 +129,12 @@ export function IntakeBox() {
             ) : (
               <p className="text-sm text-muted">Ainda não identificamos detalhes no texto.</p>
             )}
+            {result.modelAssisted && (
+              <p className="mt-2 text-xs text-subtle">
+                Lido com ajuda de IA. Confira os pontos acima: a escolha das peças e a compatibilidade são calculadas por
+                regras, não pela IA.
+              </p>
+            )}
           </div>
           <div>
             {result.questions.length > 0 && (
