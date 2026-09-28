@@ -9,6 +9,7 @@ import app.platform.infra.opendb.OpenDbRecordMapper;
 import app.platform.infra.opendb.OpenDbSnapshot;
 import app.platform.pricing.Offer;
 import app.platform.recommendation.Alternative;
+import app.platform.recommendation.BudgetExplorer;
 import app.platform.recommendation.BuildRequest;
 import app.platform.recommendation.ComponentExplainer;
 import app.platform.recommendation.FutureOutlook;
@@ -106,6 +107,13 @@ final class ViewMapper {
         return new ApiViews.AlternativeView(
                 new ApiViews.ComponentSummary(component.id(), component.name(), component.category().name(), component.category().label()),
                 alternative.priceBrl(), alternative.priceDeltaBrl(), alternative.direction().name(), alternative.impact());
+    }
+
+    static ApiViews.BudgetOption budgetOption(BudgetExplorer.BudgetOption option) {
+        return new ApiViews.BudgetOption(option.budgetBrl(), option.totalBrl(), option.feasible(), option.performanceText(),
+                option.changes().stream().map(change -> new ApiViews.PartChangeView(change.category().name(),
+                        change.category().label(), change.from(), change.to())).toList(),
+                option.notWorthIt());
     }
 
     private static ApiViews.Future future(FutureOutlook outlook) {

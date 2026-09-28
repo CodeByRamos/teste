@@ -7,6 +7,7 @@ import { needsToParams } from "@/lib/needs";
 import { rememberSavedBuild } from "@/lib/saved-builds";
 import type { Alternative, BuildItem, BuildView as Build, Needs } from "@/lib/types";
 import { BuildView } from "./build-view";
+import { BudgetOptionsPanel } from "./budget-options-panel";
 import { Button, ButtonLink, Notice, Spinner } from "./ui";
 
 const LOADING_STEPS = [
@@ -117,6 +118,7 @@ export function RecommendationScreen({ needs }: { needs: Needs }) {
       build={build}
       busy={busy}
       onSwap={swap}
+      extra={swapped ? null : <BudgetOptionsPanel needs={needs} />}
       subtitle={swapped ? "Você trocou peças — preços e compatibilidade foram recalculados." : "Montado a partir do que você nos contou."}
       actions={
         <>

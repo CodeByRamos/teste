@@ -1,4 +1,5 @@
 import type {
+  BudgetOption,
   BuildView,
   Category,
   DataSources,
@@ -64,6 +65,9 @@ export const api = {
 
   recommend: (needs: Needs) =>
     request<BuildView>("/api/recommendations", { method: "POST", body: JSON.stringify(needs) }),
+
+  budgetOptions: (needs: Needs) =>
+    request<BudgetOption[]>("/api/recommendations/budget-options", { method: "POST", body: JSON.stringify(needs) }),
 
   evaluate: (componentIds: string[], ownedComponentIds: string[], needs?: Needs | null) =>
     request<BuildView>("/api/builds/evaluate", {

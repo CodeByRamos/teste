@@ -13,6 +13,7 @@ import app.platform.infra.pricing.feed.StoreFeedPriceProvider;
 import app.platform.infra.pricing.feed.StoreOfferRepository;
 import app.platform.pricing.PriceProvider;
 import app.platform.pricing.PriceService;
+import app.platform.recommendation.BudgetExplorer;
 import app.platform.recommendation.RecommendationEngine;
 import app.platform.recommendation.UpgradeAdvisor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -78,6 +79,11 @@ public class PlatformConfiguration {
     @Bean
     RecommendationEngine recommendationEngine(PriceService prices, CompatibilityEngine compatibility) {
         return new RecommendationEngine(prices, compatibility);
+    }
+
+    @Bean
+    BudgetExplorer budgetExplorer(RecommendationEngine recommendations) {
+        return new BudgetExplorer(recommendations);
     }
 
     @Bean

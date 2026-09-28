@@ -15,6 +15,7 @@ export function BuildView({
   title = "Seu PC",
   subtitle,
   actions,
+  extra,
   onSwap,
   busy = false,
 }: {
@@ -22,6 +23,8 @@ export function BuildView({
   title?: string;
   subtitle?: ReactNode;
   actions?: ReactNode;
+  /** Page-specific sections shown after the build analysis (e.g. budget comparison). */
+  extra?: ReactNode;
   onSwap?: (item: BuildItem, alternative: Alternative) => void;
   busy?: boolean;
 }) {
@@ -178,6 +181,8 @@ export function BuildView({
           <CompatibilityPanel compatibility={build.compatibility} />
 
           {build.future && <FuturePanel future={build.future} />}
+
+          {extra}
 
           {actions && <div className="flex flex-wrap gap-3">{actions}</div>}
 

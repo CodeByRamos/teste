@@ -40,6 +40,10 @@ public record BuildRequest(
         this(budgetBrl, useCases, primaryUse, resolution, ownedComponentIds, false);
     }
 
+    public BuildRequest withBudget(BigDecimal value) {
+        return new BuildRequest(value, useCases, primaryUse, resolution, ownedComponentIds, planUpgrades);
+    }
+
     public BuildRequest withPlanUpgrades(boolean value) {
         return new BuildRequest(budgetBrl, useCases, primaryUse, resolution, ownedComponentIds, value);
     }

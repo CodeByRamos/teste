@@ -1,6 +1,7 @@
 package app.platform.api;
 
 import app.platform.builds.BuildAssembler;
+import app.platform.recommendation.BudgetExplorer;
 import app.platform.builds.BuildResult;
 import app.platform.builds.SavedBuild;
 import app.platform.builds.SavedBuildRepository;
@@ -34,12 +35,21 @@ class BuildController {
     private final BuildAssembler assembler;
     private final SavedBuildRepository savedBuilds;
     private final JsonMapper json;
+    private final BudgetExplorer budgets;
 
-    BuildController(CatalogHolder catalogs, BuildAssembler assembler, SavedBuildRepository savedBuilds, JsonMapper json) {
+    BuildController(CatalogHolder catalogs, BuildAssembler assembler, SavedBuildRepository savedBuilds, JsonMapper json,
+                    BudgetExplorer budgets) {
         this.catalogs = catalogs;
         this.assembler = assembler;
         this.savedBuilds = savedBuilds;
         this.json = json;
+        this.budgets = budgets;
+    }
+
+    /** What a somewhat lower and higher budget would change. Loaded after the main recommendation. */
+    @PostMapping("/recommendations/budget-options")
+    List<ApiViews.BudgetOption> budgetOptions(@Valid @RequestBody ApiRequests.Needs needs) {
+        return budgets.explore(catalogs.current(), needs.toDomain()).stream().map(ViewMapper::budgetOption).toList();
     }
 
     /** Recommends a complete build for the person's needs. */

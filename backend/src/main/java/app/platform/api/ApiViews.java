@@ -94,6 +94,13 @@ final class ApiViews {
     record FutureAspect(String id, String title, String level, String headline, String explanation, String technicalDetail, List<String> involves) {
     }
 
+    record BudgetOption(BigDecimal budgetBrl, BigDecimal totalBrl, boolean feasible, String performanceText,
+                        List<PartChangeView> changes, boolean notWorthIt) {
+    }
+
+    record PartChangeView(String category, String categoryLabel, String from, String to) {
+    }
+
     record Power(int estimatedLoadWatts, int recommendedPsuWatts, boolean complete) {
     }
 

@@ -115,6 +115,15 @@ export interface FutureAspect {
   involves: Category[];
 }
 
+export interface BudgetOption {
+  budgetBrl: number;
+  totalBrl: number | null;
+  feasible: boolean;
+  performanceText: string | null;
+  changes: { category: Category; categoryLabel: string; from: string | null; to: string | null }[];
+  notWorthIt: boolean;
+}
+
 export interface FutureOutlook {
   summary: string;
   aspects: FutureAspect[];

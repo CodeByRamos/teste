@@ -33,7 +33,7 @@ cd backend && ./mvnw spring-boot:test-run
 cd frontend && npm install && npm run dev
 ```
 
-Testes: `cd backend && ./mvnw test` (85 testes, incluindo ponta a ponta com PostgreSQL real),
+Testes: `cd backend && ./mvnw test` (89 testes, incluindo ponta a ponta com PostgreSQL real),
 `cd 3d && node src/validate.ts` (modelos 3D)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 
@@ -46,6 +46,8 @@ e `cd frontend && npm run lint && npx tsc --noEmit`.
 - **Tenho um PC**: verificação de compatibilidade das peças informadas.
 - **Quero melhorar meu PC**: diagnóstico do PC atual (bom / suficiente / fraco / gargalo) e o upgrade de maior ganho
   dentro do orçamento, com tudo o que precisa mudar junto (fonte, gabinete, placa-mãe, memória, cooler) e o que continua.
+- **E se eu mudar o orçamento?**: no resultado, a mesma montagem com um valor menor e um maior, com o ganho ou a perda
+  de desempenho, as peças que mudam e um aviso quando gastar mais quase não ajuda.
 - **Quero poder melhorar depois**: opção no questionário (ou no texto livre) que prioriza plataforma atual, memória
   atual e folga na fonte, informando quanto desempenho isso custa hoje.
 - **Pensando no futuro**: em cada configuração, o que dá para melhorar depois sem trocar outras peças
