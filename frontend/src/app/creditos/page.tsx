@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Notice, PageHeader } from "@/components/ui";
 import { api } from "@/lib/api";
-import { dateTime } from "@/lib/format";
+import { dateTime, timeAgo } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Créditos e fontes de dados" };
 
@@ -80,13 +80,36 @@ export default async function CreditosPage() {
 
       <section className="mt-12 space-y-4 leading-relaxed">
         <h2 className="text-xl font-semibold">Preços</h2>
-        <Notice tone="warn">
-          {sources?.pricesDisclaimer ??
-            "Os preços desta versão são fictícios, usados apenas para demonstrar o funcionamento. Ainda não consultamos lojas reais."}
-        </Notice>
-        <p className="text-muted">
-          Preços e disponibilidade virão de lojas e parceiros brasileiros, em uma fonte separada das especificações técnicas.
-        </p>
+        {sources?.stores?.length ? (
+          <>
+            <p>Preços reais vêm dos catálogos de produtos que as próprias lojas publicam para parceiros:</p>
+            <ul className="divide-y divide-border rounded-2xl border border-border bg-surface text-sm">
+              {sources.stores.map((store) => (
+                <li key={store.storeId} className="flex flex-wrap items-baseline justify-between gap-2 px-4 py-3">
+                  <span className="font-medium">{store.storeName}</span>
+                  <span className="text-muted">
+                    {store.offers.toLocaleString("pt-BR")} peças · atualizado {timeAgo(store.latestObservation)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-muted">
+              Cada preço mostra a loja e quando foi visto. Só usamos ofertas identificadas pelo código de barras (EAN) ou pelo
+              código do fabricante com a mesma marca, com link para a própria loja, e descartamos preços fora do padrão.
+              Peças sem preço dessas lojas aparecem com preço fictício, sempre marcado como tal.
+            </p>
+          </>
+        ) : (
+          <>
+            <Notice tone="warn">
+              {sources?.pricesDisclaimer ??
+                "Os preços desta versão são fictícios, usados apenas para demonstrar o funcionamento. Ainda não consultamos lojas reais."}
+            </Notice>
+            <p className="text-muted">
+              Preços e disponibilidade virão de lojas e parceiros brasileiros, em uma fonte separada das especificações técnicas.
+            </p>
+          </>
+        )}
       </section>
 
       <section className="mt-12 space-y-4 leading-relaxed">

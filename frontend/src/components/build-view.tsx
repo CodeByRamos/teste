@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { brl, signedBrl } from "@/lib/format";
+import { brl, signedBrl, timeAgo } from "@/lib/format";
 import type { Alternative, BuildItem, BuildView as Build, Category } from "@/lib/types";
 import { CompatibilityPanel } from "./compatibility-panel";
 import { FuturePanel } from "./future-panel";
@@ -73,7 +73,7 @@ export function BuildView({
         <div className="md:text-right">
           {somethingToBuy && (
             <>
-              <p className="text-sm text-muted">{totals.pricesAreExamples ? "Total estimado (preços fictícios)" : "Total estimado"}</p>
+              <p className="text-sm text-muted">{totalLabel(totals.pricesAreExamples, build.items)}</p>
               <p className="text-4xl font-semibold tracking-tight tabular-nums">{brl(totals.totalBrl)}</p>
             </>
           )}
@@ -194,6 +194,13 @@ export function BuildView({
   );
 }
 
+/** Says plainly whether the total rests on real store prices, fictitious ones, or a mix. */
+function totalLabel(pricesAreExamples: boolean, items: BuildItem[]) {
+  if (!pricesAreExamples) return "Total estimado";
+  const anyReal = items.some((item) => item.price && !item.price.isExample && !item.owned);
+  return anyReal ? "Total estimado (inclui preços fictícios)" : "Total estimado (preços fictícios)";
+}
+
 function PartRow({
   item,
   expanded,
@@ -232,7 +239,11 @@ function PartRow({
           ) : item.price ? (
             <>
               <span className="block font-semibold tabular-nums">{brl(item.price.amountBrl)}</span>
-              {item.price.isExample && <span className="block text-xs text-subtle">fictício</span>}
+              {item.price.isExample ? (
+                <span className="block text-xs text-subtle">fictício</span>
+              ) : (
+                <span className="block text-xs text-subtle">{item.price.storeName}</span>
+              )}
             </>
           ) : (
             <span className="text-sm text-subtle">Sem preço</span>
@@ -242,6 +253,25 @@ function PartRow({
 
       {expanded && (
         <div id={panelId} className="space-y-5 px-5 pb-6 pl-13 sm:px-6 sm:pl-14">
+          {item.price && !item.price.isExample && item.price.url && (
+            <div className="rounded-xl border border-border bg-surface-muted/60 p-4">
+              <p className="text-sm font-medium">Onde comprar</p>
+              <p className="mt-1 text-sm text-muted">
+                {brl(item.price.amountBrl)} na {item.price.storeName}, preço visto {timeAgo(item.price.observedAt)}. Pode ter mudado
+                desde então: confira na loja antes de comprar.
+              </p>
+              <a
+                href={item.price.url}
+                target="_blank"
+                rel="sponsored nofollow noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-accent underline-offset-2 hover:underline"
+              >
+                Ver na {item.price.storeName}
+                <ExternalIcon className="size-3.5" />
+              </a>
+              <p className="mt-2 text-xs text-subtle">Alguns links são de parceiros: a loja pode nos pagar uma comissão, sem custo extra para você.</p>
+            </div>
+          )}
           <Layer title="O que é">{item.explanation.whatItIs}</Layer>
           <Layer title="Por que importa">{item.explanation.whyItMatters}</Layer>
           <div className="rounded-xl bg-accent-soft/60 p-4">

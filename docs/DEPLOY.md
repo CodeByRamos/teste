@@ -29,6 +29,9 @@ openssl rand -base64 48
    | `FRONTEND_SHARED_SECRET` | o segredo do passo 1 |
    | `EXAMPLE_PRICES` | `true` (preços fictícios, rotulados, até existirem provedores reais) |
 
+   Opcional: `ADMIN_TOKEN` (segredo) habilita o envio manual de feeds de preço; os feeds automáticos são
+   configurados como em [`PRICING.md`](PRICING.md).
+
 4. Aba **Settings → Networking → Generate Domain** para ter a URL pública (ex.: `https://api-xxxx.up.railway.app`).
 
 **Primeira subida:** a imagem já traz o snapshot fixado do OpenDB e o importa ao iniciar. A API só é marcada como

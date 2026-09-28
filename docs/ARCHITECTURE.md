@@ -120,6 +120,16 @@ pode custar desempenho hoje, então o motor também calcula a configuração sem
 ("sem essa preferência, o mesmo orçamento daria cerca de 2× o desempenho gráfico hoje"). A preferência vem do
 questionário ou do texto livre ("ir fazendo upgrade", "melhorar aos poucos").
 
+### D13 — Preços reais por feed de loja, validados antes de aparecer
+
+Preços reais vêm de feeds de produtos que as lojas publicam para parceiros (Awin, Lomadee, Amazon Creators API),
+nunca de scraping. O casamento com o catálogo usa o código de barras (EAN/UPC/GTIN com dígito verificador) e, na
+falta dele, MPN idêntico e único **com a mesma marca**. As regras de aceitação (`OfferValidation`, no domínio)
+exigem link HTTPS para um domínio da loja, faixa de preço plausível, data recente, e barram preços muito fora da
+mediana das outras lojas ou quedas bruscas em relação ao preço anterior. Um feed que derruba o número de ofertas
+válidas é tratado como quebrado e não é aplicado. Preço real sempre vence o fictício para a mesma peça, e entre
+variantes do mesmo chip de GPU. Detalhes em [`docs/PRICING.md`](PRICING.md).
+
 ## Segurança
 
 - Validação de entrada com Bean Validation; erros em ProblemDetail sem detalhes internos.
@@ -131,7 +141,7 @@ questionário ou do texto livre ("ir fazendo upgrade", "melhorar aos poucos").
 
 ## Próximos passos
 
-1. Provedor de preços real (lojas brasileiras / afiliados), casando produtos por EAN/GTIN.
+1. Conectar o primeiro feed real (cadastro de afiliado na Awin para a KaBuM!, ver [`PRICING.md`](PRICING.md)).
 2. Tabela curada de desempenho (benchmarks com fonte citada) no lugar da estimativa por especificação.
 3. Autenticação (Amazon Cognito) e configurações por usuário.
 4. Camada de IA usando os motores como ferramentas (interpretar e explicar, nunca decidir compatibilidade).

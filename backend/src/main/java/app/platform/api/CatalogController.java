@@ -5,6 +5,7 @@ import app.platform.catalog.CatalogHolder;
 import app.platform.hardware.ComponentCategory;
 import app.platform.hardware.HardwareComponent;
 import app.platform.infra.persistence.JdbcCatalogRepository;
+import app.platform.infra.pricing.feed.StoreOfferRepository;
 import app.platform.intake.NeedsInterpreter;
 import app.platform.pricing.PriceService;
 import app.platform.recommendation.BuildRequest;
@@ -41,12 +42,15 @@ class CatalogController {
     private final PriceService prices;
     private final JdbcCatalogRepository repository;
     private final JsonMapper json;
+    private final StoreOfferRepository storeOffers;
 
-    CatalogController(CatalogHolder catalogs, PriceService prices, JdbcCatalogRepository repository, JsonMapper json) {
+    CatalogController(CatalogHolder catalogs, PriceService prices, JdbcCatalogRepository repository, JsonMapper json,
+                      StoreOfferRepository storeOffers) {
         this.catalogs = catalogs;
         this.prices = prices;
         this.repository = repository;
         this.json = json;
+        this.storeOffers = storeOffers;
     }
 
     @GetMapping("/catalog/search")
@@ -98,6 +102,7 @@ class CatalogController {
                 + "Open Data Commons Attribution License (ODC-By) v1.0.");
         repository.latestQualitySummary().ifPresent(summary -> document.set("quality", json.readTree(summary)));
         document.put("pricesDisclaimer", ViewMapper.PRICE_DISCLAIMER);
+        document.set("stores", json.valueToTree(storeOffers.storeSummaries()));
         return json.writeValueAsString(document);
     }
 

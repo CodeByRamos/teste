@@ -14,4 +14,9 @@ public interface PriceProvider {
 
     /** Current offers for a component; empty when the provider does not sell or know it. */
     List<Offer> offersFor(HardwareComponent component);
+
+    /** Changes whenever this provider's prices change, so callers can refresh what they derived from them. */
+    default long version() {
+        return 0;
+    }
 }

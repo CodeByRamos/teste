@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -56,6 +57,10 @@ public final class Catalog {
     @SuppressWarnings("unchecked")
     public <T extends HardwareComponent> List<T> all(ComponentCategory category, Class<T> type) {
         return (List<T>) byCategory.get(category);
+    }
+
+    public Set<UUID> ids() {
+        return byId.keySet();
     }
 
     public int size() {

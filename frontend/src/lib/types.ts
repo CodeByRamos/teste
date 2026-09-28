@@ -195,6 +195,8 @@ export interface DataSources {
   components: number;
   attribution: string;
   pricesDisclaimer: string;
+  /** Stores with real prices from their product feeds; empty until a feed is imported. */
+  stores?: { storeId: string; storeName: string; offers: number; latestObservation: string }[];
   quality?: Record<
     string,
     { records: number; rejected: number; averageQuality: number; issues: Record<string, Record<string, number>> }

@@ -33,7 +33,7 @@ cd backend && ./mvnw spring-boot:test-run
 cd frontend && npm install && npm run dev
 ```
 
-Testes: `cd backend && ./mvnw test` (72 testes, incluindo ponta a ponta com PostgreSQL real),
+Testes: `cd backend && ./mvnw test` (85 testes, incluindo ponta a ponta com PostgreSQL real),
 `cd 3d && node src/validate.ts` (modelos 3D)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 
@@ -61,7 +61,7 @@ e `cd frontend && npm run lint && npx tsc --noEmit`.
 
 | Tema | Situação |
 |---|---|
-| Preços | **Fictícios** (`ExamplePriceProvider`), rotulados em toda a interface. Provedores reais (lojas brasileiras) são o próximo passo. |
+| Preços | Infraestrutura de preços reais pronta (feeds de lojas parceiras, [`docs/PRICING.md`](docs/PRICING.md)); até um feed ser conectado, os preços são **fictícios** e rotulados em toda a interface. |
 | Desempenho | Estimativa a partir de especificações (núcleos, frequência, cache) com calibração aproximada por arquitetura de GPU; não é benchmark. Os ganhos aparecem arredondados. |
 | Requisitos de jogos | Sem base de requisitos por jogo; usamos perfis de uso (competitivo / pesado + resolução). |
 | BIOS | Sem dados de BIOS no OpenDB; casos conhecidos (ex.: Ryzen 5000 em B450) geram "atenção". |

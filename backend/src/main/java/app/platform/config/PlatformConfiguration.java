@@ -8,6 +8,9 @@ import app.platform.infra.opendb.OpenDbIngestion;
 import app.platform.infra.persistence.JdbcCatalogRepository;
 import app.platform.infra.persistence.JdbcSavedBuildRepository;
 import app.platform.infra.pricing.ExamplePriceProvider;
+import app.platform.infra.pricing.feed.FeedImporter;
+import app.platform.infra.pricing.feed.StoreFeedPriceProvider;
+import app.platform.infra.pricing.feed.StoreOfferRepository;
 import app.platform.pricing.PriceProvider;
 import app.platform.pricing.PriceService;
 import app.platform.recommendation.RecommendationEngine;
@@ -47,8 +50,25 @@ public class PlatformConfiguration {
     }
 
     @Bean
-    PriceService priceService(PlatformProperties properties) {
+    StoreFeedPriceProvider storeFeedPriceProvider(PlatformProperties properties) {
+        return new StoreFeedPriceProvider(properties.pricing().maxOfferAge(), java.time.Clock.systemUTC());
+    }
+
+    @Bean
+    StoreOfferRepository storeOfferRepository(JdbcTemplate jdbc, TransactionTemplate transactions) {
+        return new StoreOfferRepository(jdbc, transactions, STORAGE_JSON);
+    }
+
+    @Bean
+    FeedImporter feedImporter(StoreOfferRepository repository, StoreFeedPriceProvider provider, CatalogHolder catalogs) {
+        return new FeedImporter(repository, provider, catalogs::current, java.time.Clock.systemUTC());
+    }
+
+    @Bean
+    PriceService priceService(PlatformProperties properties, StoreFeedPriceProvider storeFeeds) {
         List<PriceProvider> providers = new ArrayList<>();
+        // Real store offers first; example prices only fill in for components no store feed covers.
+        providers.add(storeFeeds);
         if (properties.pricing().examplePrices()) {
             providers.add(new ExamplePriceProvider());
         }

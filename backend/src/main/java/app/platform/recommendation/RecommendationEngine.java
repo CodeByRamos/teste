@@ -697,12 +697,14 @@ public final class RecommendationEngine {
     }
 
     Pools pools(Catalog catalog) {
+        // Rebuilt when the catalog is replaced or any price provider reports new prices (e.g. a store feed import).
+        long priceVersion = prices.version();
         Pools pools = cachedPools;
-        if (pools == null || pools.catalog() != catalog) {
+        if (pools == null || pools.catalog() != catalog || pools.priceVersion() != priceVersion) {
             synchronized (this) {
                 pools = cachedPools;
-                if (pools == null || pools.catalog() != catalog) {
-                    pools = buildPools(catalog);
+                if (pools == null || pools.catalog() != catalog || pools.priceVersion() != priceVersion) {
+                    pools = buildPools(catalog, priceVersion);
                     cachedPools = pools;
                 }
             }
@@ -710,14 +712,15 @@ public final class RecommendationEngine {
         return pools;
     }
 
-    private Pools buildPools(Catalog catalog) {
+    private Pools buildPools(Catalog catalog, long priceVersion) {
         Map<UUID, BigDecimal> priceById = new HashMap<>();
         List<Priced<Cpu>> cpus = priced(catalog.all(ComponentCategory.CPU, Cpu.class), CandidatePolicy::cpu, priceById);
         List<Priced<Gpu>> allGpus = priced(catalog.all(ComponentCategory.GPU, Gpu.class), CandidatePolicy::gpu, priceById);
         // Recommend at chip level: for each GPU chip keep the cheapest card (variants differ in cooler and clocks).
+        // Variants of one chip are equivalent, so a card with a real store price beats one with a fictitious price.
         Map<String, Priced<Gpu>> cheapestPerChip = new LinkedHashMap<>();
         for (Priced<Gpu> gpu : allGpus) {
-            cheapestPerChip.putIfAbsent(gpu.part().chipset(), gpu);
+            cheapestPerChip.merge(gpu.part().chipset(), gpu, (kept, candidate) -> !isReal(kept) && isReal(candidate) ? candidate : kept);
         }
         List<Priced<Gpu>> gpus = cheapestPerChip.values().stream()
                 .sorted(Comparator.comparingDouble((Priced<Gpu> gpu) -> PerformanceEstimator.gpuScore(gpu.part())))
@@ -734,8 +737,13 @@ public final class RecommendationEngine {
                 ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuMultiThreadScore(cpu.part())).toArray()),
                 ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuGamingScore(cpu.part())).toArray()),
                 FutureOutlookAnalyzer.PlatformTimeline.of(catalog),
-                new ConcurrentHashMap<>());
+                new ConcurrentHashMap<>(),
+                priceVersion);
         return pools;
+    }
+
+    private boolean isReal(Priced<?> priced) {
+        return prices.bestOffer(priced.part()).map(offer -> offer.kind() == Offer.Kind.REAL).orElse(false);
     }
 
     /** Eligible parts that have a price, sorted from cheapest. Parts without any offer cannot be budgeted. */
@@ -801,7 +809,8 @@ public final class RecommendationEngine {
                          List<Priced<PowerSupply>> psus, List<Priced<PcCase>> cases, List<Priced<CpuCooler>> coolers,
                          List<Priced<Storage>> sataSsds, ScoreRange gpuRange, ScoreRange cpuMultiRange, ScoreRange cpuGamingRange,
                          FutureOutlookAnalyzer.PlatformTimeline timeline,
-                         Map<List<Object>, List<Priced<Motherboard>>> boardsByCpuPlatform) {
+                         Map<List<Object>, List<Priced<Motherboard>>> boardsByCpuPlatform,
+                         long priceVersion) {
 
         BigDecimal price(HardwareComponent component) {
             return priceById.get(component.id());
