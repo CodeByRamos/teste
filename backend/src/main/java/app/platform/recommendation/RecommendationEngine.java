@@ -37,6 +37,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
@@ -152,6 +153,7 @@ public final class RecommendationEngine {
 
         Candidate best = null;
         Candidate cheapest = null;
+        ChassisMemo memo = ChassisMemo.create();
         for (Priced<Cpu> cpu : cpuOptions) {
             Platform platform = platform(pools, owned, cpu.part(), ramGb, storageGb, profile.planUpgrades());
             if (platform == null) {
@@ -163,7 +165,7 @@ public final class RecommendationEngine {
                     continue;
                 }
                 Chassis chassis = chassis(pools, owned, cpu.part(), gpuPart, platform,
-                        profile.planUpgrades() ? UPGRADE_PSU_HEADROOM_WATTS : 0);
+                        profile.planUpgrades() ? UPGRADE_PSU_HEADROOM_WATTS : 0, memo);
                 if (chassis == null) {
                     continue;
                 }
@@ -232,11 +234,7 @@ public final class RecommendationEngine {
     private Platform platform(Pools pools, BuildParts owned, Cpu cpu, int ramGb, int storageGb, boolean planUpgrades) {
         List<Priced<Motherboard>> boards = owned.motherboard() != null
                 ? List.of(new Priced<>(owned.motherboard(), BigDecimal.ZERO))
-                : pools.boards().stream()
-                        .filter(board -> Fit.socket(cpu, board.part()) == Fit.Verdict.YES
-                                && Fit.generationSupport(cpu, board.part()) == Fit.Verdict.YES
-                                && Fit.cpuSupportsBoardMemory(cpu, board.part()) == Fit.Verdict.YES)
-                        .toList();
+                : pools.boardsFor(cpu);
 
         BoardAndMemory chosen = null;
         if (planUpgrades && owned.memory() == null) {
@@ -308,30 +306,47 @@ public final class RecommendationEngine {
         return best;
     }
 
-    private Chassis chassis(Pools pools, BuildParts owned, Cpu cpu, Gpu gpu, Platform platform, int extraPsuWatts) {
+    private Chassis chassis(Pools pools, BuildParts owned, Cpu cpu, Gpu gpu, Platform platform, int extraPsuWatts,
+                            ChassisMemo memo) {
         Motherboard board = platform.board().part();
         CpuCooler cooler = platform.cooler() == null ? null : platform.cooler().part();
 
         Priced<PcCase> pcCase = owned.pcCase() != null
                 ? new Priced<>(owned.pcCase(), BigDecimal.ZERO)
-                : pools.cases().stream()
+                : memo.cases().computeIfAbsent(List.of(board.id(), idOf(gpu), idOf(cooler)), key -> pools.cases().stream()
                         .filter(candidate -> caseFits(candidate.part(), board, gpu, cooler))
-                        .findFirst().orElse(null);
+                        .findFirst()).orElse(null);
         if (pcCase == null) {
             return null;
         }
 
         PowerEstimate power = PowerEstimator.estimate(cpu, gpu, platform.storage().size());
+        int requiredWatts = power.recommendedPsuWatts() + extraPsuWatts;
         Priced<PowerSupply> psu = owned.powerSupply() != null
                 ? new Priced<>(owned.powerSupply(), BigDecimal.ZERO)
-                : pools.psus().stream()
+                : memo.psus().computeIfAbsent(List.of(requiredWatts, idOf(gpu), pcCase.part().id()), key -> pools.psus().stream()
                         .filter(candidate -> psuFits(candidate.part(), power, gpu, pcCase.part())
-                                && candidate.part().wattage() >= power.recommendedPsuWatts() + extraPsuWatts)
-                        .findFirst().orElse(null);
+                                && candidate.part().wattage() >= requiredWatts)
+                        .findFirst()).orElse(null);
         if (psu == null) {
             return null;
         }
         return new Chassis(pcCase, psu, pcCase.price().add(psu.price()));
+    }
+
+    private static Object idOf(HardwareComponent component) {
+        return component == null ? "none" : component.id();
+    }
+
+    /**
+     * Case and power supply choices depend only on a few parts (board, graphics card, cooler, required watts), while
+     * the search tries every CPU × GPU pair. Remembering them within one search avoids rescanning thousands of parts.
+     */
+    private record ChassisMemo(Map<List<Object>, Optional<Priced<PcCase>>> cases,
+                               Map<List<Object>, Optional<Priced<PowerSupply>>> psus) {
+        static ChassisMemo create() {
+            return new ChassisMemo(new HashMap<>(), new HashMap<>());
+        }
     }
 
     static boolean caseFits(PcCase pcCase, Motherboard board, Gpu gpu, CpuCooler cooler) {
@@ -718,7 +733,8 @@ public final class RecommendationEngine {
                 ScoreRange.of(gpus.stream().mapToDouble(gpu -> PerformanceEstimator.gpuScore(gpu.part())).toArray()),
                 ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuMultiThreadScore(cpu.part())).toArray()),
                 ScoreRange.of(cpus.stream().mapToDouble(cpu -> PerformanceEstimator.cpuGamingScore(cpu.part())).toArray()),
-                FutureOutlookAnalyzer.PlatformTimeline.of(catalog));
+                FutureOutlookAnalyzer.PlatformTimeline.of(catalog),
+                new ConcurrentHashMap<>());
         return pools;
     }
 
@@ -784,10 +800,24 @@ public final class RecommendationEngine {
                          List<Priced<Motherboard>> boards, List<Priced<Memory>> memory, List<Priced<Storage>> drives,
                          List<Priced<PowerSupply>> psus, List<Priced<PcCase>> cases, List<Priced<CpuCooler>> coolers,
                          List<Priced<Storage>> sataSsds, ScoreRange gpuRange, ScoreRange cpuMultiRange, ScoreRange cpuGamingRange,
-                         FutureOutlookAnalyzer.PlatformTimeline timeline) {
+                         FutureOutlookAnalyzer.PlatformTimeline timeline,
+                         Map<List<Object>, List<Priced<Motherboard>>> boardsByCpuPlatform) {
 
         BigDecimal price(HardwareComponent component) {
             return priceById.get(component.id());
+        }
+
+        /**
+         * Boards that run this CPU without a BIOS concern, cheapest first. Depends only on socket, architecture and
+         * memory types, which hundreds of CPUs share, so each combination is computed once per catalog.
+         */
+        List<Priced<Motherboard>> boardsFor(Cpu cpu) {
+            List<Object> key = Arrays.asList(Hardware.normalizeSocket(cpu.socket()), cpu.microarchitecture(), cpu.memoryTypes());
+            return boardsByCpuPlatform.computeIfAbsent(key, ignored -> boards.stream()
+                    .filter(board -> Fit.socket(cpu, board.part()) == Fit.Verdict.YES
+                            && Fit.generationSupport(cpu, board.part()) == Fit.Verdict.YES
+                            && Fit.cpuSupportsBoardMemory(cpu, board.part()) == Fit.Verdict.YES)
+                    .toList());
         }
     }
 }

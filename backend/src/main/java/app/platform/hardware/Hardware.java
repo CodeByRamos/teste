@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,11 @@ public final class Hardware {
      * Socket names that differ between categories in the source data but mean the same physical socket.
      * Keys are compared case-insensitively.
      */
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+    /** Bounded: socket strings come from catalog records, but nothing here should grow without limit. */
+    private static final int MAX_MEMOIZED_SOCKETS = 1_000;
+    private static final Map<String, String> NORMALIZED_SOCKETS = new ConcurrentHashMap<>();
+
     private static final Map<String, String> SOCKET_ALIASES = Map.of(
             "str4", "TR4",
             "lga 1151v2", "LGA 1151",
@@ -37,13 +43,24 @@ public final class Hardware {
         return values == null ? Set.of() : Collections.unmodifiableSortedSet(new TreeSet<>(values));
     }
 
-    /** Canonical socket name, or the trimmed input when no alias applies. */
+    /**
+     * Canonical socket name, or the trimmed input when no alias applies. The recommendation search calls this
+     * millions of times per request with a few dozen distinct values, so results are memoized.
+     */
     public static String normalizeSocket(String socket) {
         if (socket == null) {
             return null;
         }
-        String trimmed = socket.trim().replaceAll("\\s+", " ");
-        return SOCKET_ALIASES.getOrDefault(trimmed.toLowerCase(Locale.ROOT), trimmed);
+        String cached = NORMALIZED_SOCKETS.get(socket);
+        if (cached != null) {
+            return cached;
+        }
+        String trimmed = WHITESPACE.matcher(socket.trim()).replaceAll(" ");
+        String normalized = SOCKET_ALIASES.getOrDefault(trimmed.toLowerCase(Locale.ROOT), trimmed);
+        if (NORMALIZED_SOCKETS.size() < MAX_MEMOIZED_SOCKETS) {
+            NORMALIZED_SOCKETS.put(socket, normalized);
+        }
+        return normalized;
     }
 
     /** "4.0" → 4. Returns {@code null} when there is no number. */

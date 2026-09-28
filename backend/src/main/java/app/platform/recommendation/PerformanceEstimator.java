@@ -31,6 +31,7 @@ public final class PerformanceEstimator {
      * game performance; AMD and Intel generations differ as well. These factors bring core × clock onto a comparable
      * scale. They are coarse and will be replaced by a curated, source-cited benchmark table.
      */
+    private static final Map<String, Double> FACTOR_BY_CHIPSET = new java.util.concurrent.ConcurrentHashMap<>();
     private static final List<Map.Entry<Pattern, Double>> ARCHITECTURE_FACTORS = List.of(
             Map.entry(Pattern.compile("RTX (30|40|50)\\d0"), 0.6),
             Map.entry(Pattern.compile("RTX 20\\d0|GTX 16\\d0"), 1.0),
@@ -58,13 +59,24 @@ public final class PerformanceEstimator {
         if (throughput == null) {
             return null;
         }
-        String chipset = gpu.chipset() == null ? "" : gpu.chipset();
+        return throughput * architectureFactor(gpu.chipset() == null ? "" : gpu.chipset());
+    }
+
+    /** Memoized per chip name: the search scores thousands of card pairs built from a few hundred chips. */
+    private static double architectureFactor(String chipset) {
+        Double cached = FACTOR_BY_CHIPSET.get(chipset);
+        if (cached != null) {
+            return cached;
+        }
         double factor = ARCHITECTURE_FACTORS.stream()
                 .filter(entry -> entry.getKey().matcher(chipset).find())
                 .map(Map.Entry::getValue)
                 .findFirst()
                 .orElse(DEFAULT_ARCHITECTURE_FACTOR);
-        return throughput * factor;
+        if (FACTOR_BY_CHIPSET.size() < 10_000) {
+            FACTOR_BY_CHIPSET.put(chipset, factor);
+        }
+        return factor;
     }
 
     /** Throughput proxy for work that uses every core: compiling, exporting video, containers. */
