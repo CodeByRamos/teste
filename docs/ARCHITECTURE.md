@@ -136,7 +136,11 @@ variantes do mesmo chip de GPU. Detalhes em [`docs/PRICING.md`](PRICING.md).
 - Preços nunca aceitos do cliente; IDs de configurações salvas são UUID aleatórios.
 - Rate limit por cliente nas rotas POST; `X-Forwarded-For` só é aceito de proxies confiáveis configurados.
 - Segredos só por variáveis de ambiente; nenhuma credencial no frontend (o navegador fala apenas com o Next.js).
-- Cabeçalhos de segurança no frontend (`nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`).
+- Cabeçalhos de segurança no frontend (`nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS).
+- Content-Security-Policy com nonce por requisição (`src/proxy.ts`): scripts só da própria origem ou com o nonce
+  (`strict-dynamic`), sem `eval` em produção; `wasm-unsafe-eval` apenas para o decodificador dos modelos 3D. Testado em
+  build de produção: `<img onerror>`, links `javascript:` e recursos de outros domínios são bloqueados. Por isso todas
+  as páginas são renderizadas por requisição.
 - Textos vindos da base comunitária são tratados como dados, nunca como instruções (relevante para a futura IA).
 
 ## Próximos passos

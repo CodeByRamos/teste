@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Lab3d } from "@/components/pc3d/lab-3d";
 
-export const metadata: Metadata = { title: "Laboratório 3D" };
+export const metadata: Metadata = { title: "Laboratório 3D", robots: { index: false } };
 
 export default function Laboratorio3dPage() {
   return (

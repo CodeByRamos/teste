@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SavedBuildsList } from "@/components/saved-builds-list";
 import { PageHeader } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Minhas configurações" };
+export const metadata: Metadata = { title: "Minhas configurações", robots: { index: false } };
 
 export default function MinhasConfiguracoesPage() {
   return (

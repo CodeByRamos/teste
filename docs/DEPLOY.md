@@ -57,6 +57,7 @@ E `curl https://SUA-API.up.railway.app/api/options` deve responder **403**: a AP
    | `BACKEND_URL` | a URL pública da API no Railway, sem barra no final |
    | `FRONTEND_SHARED_SECRET` | o mesmo segredo do passo 1 |
    | `NEXT_PUBLIC_APP_NAME` | nome exibido no site (opcional; a marca ainda não foi definida) |
+   | `NEXT_PUBLIC_SITE_URL` | só com domínio próprio (ex.: `https://www.seudominio.com.br`); sem ele, usa o domínio do Vercel no sitemap e nas prévias de link |
 
 4. **Deploy.** Cada push na `main` publica de novo o site (Vercel) e a API (Railway).
 

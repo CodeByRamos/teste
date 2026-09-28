@@ -6,7 +6,7 @@ import { ButtonLink, Notice } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import { dateTime } from "@/lib/format";
 
-export const metadata: Metadata = { title: "Configuração salva" };
+export const metadata: Metadata = { title: "Configuração salva", robots: { index: false, follow: false } };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

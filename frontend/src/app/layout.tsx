@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { brand } from "@/config/brand";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const sans = Inter({ variable: "--font-sans-family", subsets: ["latin"] });
 const mono = JetBrains_Mono({ variable: "--font-mono-family", subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl(),
   title: { default: brand.name, template: `%s · ${brand.name}` },
   description: brand.description,
+  openGraph: { type: "website", locale: "pt_BR", siteName: brand.name, title: brand.name, description: brand.description },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Rendered per request: the Content-Security-Policy nonce (src/proxy.ts) must be fresh on every page.
+  await connection();
   return (
     <html lang="pt-BR" className={`${sans.variable} ${mono.variable} h-full`}>
       <body className="flex min-h-full flex-col">
