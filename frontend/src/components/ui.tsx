@@ -7,7 +7,7 @@ type Variant = "primary" | "secondary" | "ghost";
 
 const variants: Record<Variant, string> = {
   primary: "bg-brand text-accent-foreground hover:brightness-110 shadow-sm",
-  secondary: "bg-surface text-foreground border border-border-strong hover:bg-surface-muted",
+  secondary: "bg-accent-soft text-accent hover:brightness-125",
   ghost: "text-muted hover:text-foreground hover:bg-surface-muted",
 };
 
@@ -76,6 +76,24 @@ export function PageHeader({ eyebrow, title, children }: { eyebrow?: string; tit
       {eyebrow && <p className="mb-2 text-sm font-medium text-accent">{eyebrow}</p>}
       <h1 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{title}</h1>
       {children && <div className="mt-3 text-lg leading-relaxed text-muted">{children}</div>}
+    </div>
+  );
+}
+
+/**
+ * Disclosure body that slides open and closed (height and opacity) instead of popping in. While closed it stays
+ * in the page but is inert, so it can't be focused or read.
+ */
+export function Collapse({ open, id, className = "", children }: { open: boolean; id?: string; className?: string; children: ReactNode }) {
+  return (
+    <div
+      id={id}
+      inert={!open}
+      className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+    >
+      <div className="min-h-0 overflow-hidden">
+        <div className={className}>{children}</div>
+      </div>
     </div>
   );
 }

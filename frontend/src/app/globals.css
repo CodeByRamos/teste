@@ -2,9 +2,13 @@
 
 /*
  * Design tokens. Brand colors live only here: re-theming the product means editing this block.
- * Palette: graphite near-black surfaces in closed, flat sections, a violet → magenta gradient as the signature, and status
- * colors that are always paired with an icon and text (never color alone). Every text/background pair
- * below keeps 4.5:1 or more (WCAG AA for small text).
+ * Palette: graphite near-black surfaces in closed, flat sections and two color roles:
+ *   - violet: the brand. The violet → magenta gradient marks the one main action on each screen; flat violet
+ *     marks selection and chosen options; soft violet fills secondary actions; lilac is for text, borders,
+ *     hover and the keyboard focus ring;
+ *   - green / amber / red: status only, so they never read as brand color, and always paired with an icon and
+ *     text (never color alone).
+ * Every text/background pair below keeps 4.5:1 or more (WCAG AA for small text).
  */
 :root {
   color-scheme: dark;
@@ -23,6 +27,9 @@
   --accent-hover: #d6bfff;
   --accent-soft: #2d2347;
   --accent-foreground: #ffffff;
+
+  /* Primary brand color as a flat fill (icon tiles, selected parts), where the gradient would be too loud. */
+  --primary: #7e22ce;
 
   /* Signature gradient for buttons and small marks. */
   --gradient-brand: linear-gradient(135deg, #5b21b6 0%, #7e22ce 50%, #c026d3 100%);
@@ -59,6 +66,7 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
   --color-accent-foreground: var(--accent-foreground);
+  --color-primary: var(--primary);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
   --color-warn: var(--warn);
@@ -112,6 +120,137 @@ button:not(:disabled),
 summary,
 label:has(input:not(:disabled)) {
   cursor: pointer;
+}
+
+/*
+ * Parts of the PC diagram. Their colors are registered properties so they fade between states. At rest a part
+ * is drawn in neutral gray; on hover and while selected it is filled solid violet with light line work and its
+ * label becomes a solid violet pill.
+ * A status color (warning, incompatible) always wins over hover.
+ */
+@property --part-stroke {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #3d3b4b;
+}
+
+@property --part-fill {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --part-line {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #3d3b4b;
+}
+
+@property --label-fill {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #18181f;
+}
+
+@property --label-text {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f2f1f7;
+}
+
+.diagram-part {
+  /* Faces and their line work, the leader line with its marker, and the label pill. */
+  --part-stroke: var(--base-stroke);
+  --part-fill: var(--base-fill);
+  --part-line: var(--base-stroke);
+  --label-fill: var(--surface);
+  --label-text: var(--foreground);
+  transition:
+    --part-stroke 0.2s ease,
+    --part-fill 0.2s ease,
+    --part-line 0.2s ease,
+    --label-fill 0.2s ease,
+    --label-text 0.2s ease,
+    filter 0.2s ease,
+    translate 0.2s ease;
+}
+
+.diagram-part[data-interactive="true"] {
+  cursor: pointer;
+}
+
+/* Hover and selection: the part filled solid violet with light line work, and a violet label pill. */
+.diagram-part[data-interactive="true"]:not([data-status]):is(:hover, :focus-visible, [data-selected="true"]) {
+  --part-stroke: #f3e8ff;
+  --part-fill: var(--primary);
+  --part-line: var(--accent);
+  --label-fill: var(--primary);
+  --label-text: #ffffff;
+  filter: drop-shadow(0 0 6px rgb(147 51 234 / 0.35));
+}
+
+.diagram-part[data-interactive="true"]:not([data-status]):is(:hover, :focus-visible) {
+  translate: 0 -2px;
+}
+
+/* Hovering the selected part: a brighter violet and a stronger glow, so it still reads as clickable. */
+.diagram-part[data-interactive="true"][data-selected="true"]:not([data-status]):is(:hover, :focus-visible) {
+  --part-fill: #9333ea;
+  --label-fill: #9333ea;
+  filter: drop-shadow(0 0 9px rgb(147 51 234 / 0.5));
+}
+
+/* Isometric drawings used as icons: violet line work at rest, solid violet when active or hovered. */
+.iso-part {
+  --part-stroke: var(--accent);
+  --part-fill: var(--accent-soft);
+  transition:
+    --part-stroke 0.2s ease,
+    --part-fill 0.2s ease,
+    translate 0.2s ease,
+    filter 0.2s ease;
+}
+
+/* Hovering a card lifts its drawing a little further than the card, with a violet glow. */
+.group:hover .iso-part,
+.group:focus-visible .iso-part {
+  translate: 0 -2px;
+  filter: drop-shadow(0 4px 6px rgb(147 51 234 / 0.45));
+}
+
+.iso-part[data-active="true"],
+.group:hover .iso-part,
+.group:focus-visible .iso-part {
+  --part-stroke: #f3e8ff;
+  --part-fill: var(--primary);
+}
+
+/* The map's details panel slides in when a part is picked. */
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+/* Native disclosures (<details>) open smoothly where the browser can animate to "auto" height. */
+:root {
+  interpolate-size: allow-keywords;
+}
+
+details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    block-size 0.3s ease-out,
+    opacity 0.3s ease-out,
+    content-visibility 0.3s allow-discrete;
+}
+
+details[open]::details-content {
+  block-size: auto;
+  opacity: 1;
 }
 
 :focus-visible {

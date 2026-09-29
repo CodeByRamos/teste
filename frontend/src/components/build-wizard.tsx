@@ -91,7 +91,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
                   <input type="checkbox" checked={checked} onChange={() => toggleUse(use.value)} className="sr-only" />
                   <span
                     aria-hidden
-                    className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${checked ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface"}`}
+                    className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${checked ? "border-accent bg-primary text-accent-foreground" : "border-border-strong bg-surface"}`}
                   >
                     {checked && <CheckIcon className="size-3.5" strokeWidth={3} />}
                   </span>
@@ -114,7 +114,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
                     type="button"
                     aria-pressed={primary === use}
                     onClick={() => setPrimary(primary === use ? null : use)}
-                    className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${primary === use ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
+                    className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${primary === use ? "border-accent bg-primary text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
                   >
                     {options.useCases.find((u) => u.value === use)?.label}
                   </button>
@@ -197,7 +197,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
                   key={preset}
                   type="button"
                   onClick={() => setBudget(preset)}
-                  className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${budget === preset ? "border-accent bg-accent-soft text-accent" : "border-border-strong hover:bg-surface-muted"}`}
+                  className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${budget === preset ? "border-accent bg-primary font-semibold text-accent-foreground" : "border-border-strong hover:bg-surface-muted"}`}
                 >
                   {brlShort(preset)}
                 </button>
@@ -215,7 +215,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
             <input type="checkbox" checked={planUpgrades} onChange={(event) => setPlanUpgrades(event.target.checked)} className="sr-only" />
             <span
               aria-hidden
-              className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${planUpgrades ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface"}`}
+              className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border transition-colors ${planUpgrades ? "border-accent bg-primary text-accent-foreground" : "border-border-strong bg-surface"}`}
             >
               {planUpgrades && <CheckIcon className="size-3.5" strokeWidth={3} />}
             </span>
@@ -242,7 +242,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
                 setHasParts(false);
                 setOwned([]);
               }}
-              className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${hasParts === false ? "border-accent bg-accent-soft text-accent" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
+              className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${hasParts === false ? "border-accent bg-primary font-semibold text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
             >
               Não, vou comprar tudo
             </button>
@@ -250,7 +250,7 @@ export function BuildWizard({ options, initial }: { options: Options; initial: P
               type="button"
               aria-pressed={hasParts === true}
               onClick={() => setHasParts(true)}
-              className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${hasParts === true ? "border-accent bg-accent-soft text-accent" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
+              className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${hasParts === true ? "border-accent bg-primary font-semibold text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
             >
               Sim, tenho algumas peças
             </button>

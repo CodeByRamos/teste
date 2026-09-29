@@ -3,8 +3,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { brl } from "@/lib/format";
 import type { BuildItem, Category, Finding, Spec, Status } from "@/lib/types";
-import { PartIcon } from "./part-icons";
-import { statusOf } from "./pc-diagram";
+import { IsoPart, statusOf } from "./pc-diagram";
 import { StatusIcon } from "./ui";
 
 /**
@@ -213,10 +212,8 @@ function PartNode({
 }) {
   const name = item?.categoryLabel ?? NAMES[category];
   const iconTile = (
-    <span
-      className={`grid size-10 shrink-0 place-items-center rounded-lg ${selected ? "bg-brand text-accent-foreground" : "bg-accent-soft text-accent"}`}
-    >
-      <PartIcon category={category} className="size-5.5" />
+    <span className="grid size-12 shrink-0 place-items-center">
+      <IsoPart category={category} active={selected} className="size-12" />
     </span>
   );
   if (!item) {
@@ -225,9 +222,7 @@ function PartNode({
         data-node={category}
         className="flex h-full items-center gap-3 rounded-xl border border-dashed border-border-strong bg-surface/60 p-3 text-sm text-muted"
       >
-        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-surface-muted text-subtle">
-          <PartIcon category={category} className="size-5.5" />
-        </span>
+        <IsoPart category={category} className="size-12 shrink-0 opacity-50" />
         <span>
           <span className="block text-xs font-medium tracking-wide uppercase">{name}</span>
           {emptyText}
@@ -245,9 +240,7 @@ function PartNode({
       onClick={onSelect}
       aria-pressed={selected}
       aria-controls={selected ? "detalhes-peca" : undefined}
-      className={`flex h-full w-full flex-col rounded-xl border-2 p-3 text-left shadow-sm transition-colors hover:border-accent ${border} ${
-        selected ? "bg-accent-soft" : "bg-surface"
-      }`}
+      className={`group flex h-full w-full flex-col rounded-xl border-2 bg-surface p-3 text-left shadow-sm transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_28px_-10px_rgb(147_51_234/0.55)] focus-visible:-translate-y-0.5 ${border}`}
     >
       <span className="flex items-start gap-3">
         {iconTile}
@@ -256,13 +249,13 @@ function PartNode({
             <span className="text-xs font-semibold tracking-wide text-muted uppercase">{name}</span>
             {status && <StatusIcon status={status} className="size-3" />}
           </span>
-          <span className="mt-0.5 line-clamp-2 min-h-10 text-sm font-semibold text-pretty">{item.component.name}</span>
+          <span className="mt-0.5 line-clamp-2 h-10 overflow-hidden text-sm font-semibold text-pretty">{item.component.name}</span>
         </span>
       </span>
       {chips.length > 0 && (
         <span className="mt-2 mb-2 flex gap-1 overflow-hidden">
           {chips.map((chip) => (
-            <span key={chip} className="min-w-0 truncate rounded-md bg-surface-muted px-1.5 py-0.5 text-xs text-muted">
+            <span key={chip} className="min-w-0 truncate rounded-md bg-accent-soft px-1.5 py-0.5 text-xs text-accent">
               {chip}
             </span>
           ))}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { BuildView, Finding } from "@/lib/types";
 import { ChevronIcon } from "./icons";
-import { StatusBadge, StatusIcon } from "./ui";
+import { Collapse, StatusBadge, StatusIcon } from "./ui";
 
 function FindingRow({ finding }: { finding: Finding }) {
   return (
@@ -49,7 +49,13 @@ export function CompatibilityPanel({ compatibility }: { compatibility: BuildView
             <ChevronIcon className={`size-4 transition-transform ${showPassed ? "rotate-90" : ""}`} />
             {passed.length} verificações sem problemas
           </button>
-          {showPassed && <ul className="mt-1 divide-y divide-border">{passed.map((f) => <FindingRow key={f.ruleId + f.title} finding={f} />)}</ul>}
+          <Collapse open={showPassed}>
+            <ul className="mt-1 divide-y divide-border">
+              {passed.map((f) => (
+                <FindingRow key={f.ruleId + f.title} finding={f} />
+              ))}
+            </ul>
+          </Collapse>
         </div>
       )}
 

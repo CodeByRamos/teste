@@ -138,7 +138,7 @@ export function UpgradeScreen({ options, initialIds }: { options: Options; initi
                   type="button"
                   aria-pressed={active}
                   onClick={() => setUses(active ? uses.filter((u) => u !== use.value) : [...uses, use.value])}
-                  className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${active ? "border-accent bg-brand text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
+                  className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${active ? "border-accent bg-primary text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
                 >
                   {use.label}
                 </button>
@@ -155,7 +155,7 @@ export function UpgradeScreen({ options, initialIds }: { options: Options; initi
                     type="button"
                     aria-pressed={resolution === option.value}
                     onClick={() => setResolution(option.value as Resolution | null)}
-                    className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${resolution === option.value ? "border-accent bg-accent-soft text-accent" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
+                    className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${resolution === option.value ? "border-accent bg-primary font-semibold text-accent-foreground" : "border-border-strong bg-surface hover:bg-surface-muted"}`}
                   >
                     {option.label}
                   </button>
@@ -209,7 +209,7 @@ export function UpgradeScreen({ options, initialIds }: { options: Options; initi
                 key={value}
                 type="button"
                 onClick={() => setBudget(value)}
-                className={`rounded-full border px-3.5 py-1.5 text-sm ${budget === value ? "border-accent bg-accent-soft text-accent" : "border-border-strong hover:bg-surface-muted"}`}
+                className={`rounded-full border px-3.5 py-1.5 text-sm ${budget === value ? "border-accent bg-primary font-semibold text-accent-foreground" : "border-border-strong hover:bg-surface-muted"}`}
               >
                 {brlShort(value)}
               </button>

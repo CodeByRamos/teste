@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { FutureAspect, FutureLevel, FutureOutlook } from "@/lib/types";
 import { AlertIcon, ArrowIcon, CheckIcon, ChevronIcon } from "./icons";
+import { Collapse } from "./ui";
 
 const LEVELS: Record<FutureLevel, { label: string; className: string; Icon: typeof CheckIcon }> = {
   GOOD: { label: "Pode evoluir", className: "bg-ok-soft text-ok", Icon: CheckIcon },
@@ -35,7 +36,9 @@ function AspectRow({ aspect }: { aspect: FutureAspect }) {
             <ChevronIcon className={`size-3.5 transition-transform ${open ? "rotate-90" : ""}`} />
             Detalhes técnicos
           </button>
-          {open && <p className="mt-1 font-mono text-xs leading-relaxed text-subtle">{aspect.technicalDetail}</p>}
+          <Collapse open={open}>
+            <p className="mt-1 font-mono text-xs leading-relaxed text-subtle">{aspect.technicalDetail}</p>
+          </Collapse>
         </>
       )}
     </li>

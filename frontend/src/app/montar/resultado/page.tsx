@@ -12,7 +12,7 @@ export default async function ResultadoPage({ searchParams }: PageProps<"/montar
     redirect(`/montar?${new URLSearchParams(params as Record<string, string>)}`);
   }
   return (
-    <div className="mx-auto max-w-[1600px] px-4 py-10 sm:px-6 sm:py-14 lg:px-10">
+    <div className="mx-auto max-w-[1600px] px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-14 lg:px-10">
       <RecommendationScreen needs={needs} />
     </div>
   );

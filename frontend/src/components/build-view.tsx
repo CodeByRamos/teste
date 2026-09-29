@@ -5,12 +5,11 @@ import { brl, signedBrl, timeAgo } from "@/lib/format";
 import type { Alternative, BuildItem, BuildView as Build, Category } from "@/lib/types";
 import { CompatibilityPanel } from "./compatibility-panel";
 import { FuturePanel } from "./future-panel";
-import { CheckIcon, ChevronIcon, ExternalIcon, InfoIcon, SparkIcon, XIcon } from "./icons";
-import { PartIcon } from "./part-icons";
+import { ChevronIcon, ExternalIcon, InfoIcon, SparkIcon, XIcon } from "./icons";
 import { PartsMap } from "./parts-map";
-import { PcDiagram } from "./pc-diagram";
+import { IsoPart, PcDiagram } from "./pc-diagram";
 import { Build3d } from "./pc3d/build-3d";
-import { Notice, StatusBadge } from "./ui";
+import { Collapse, StatusBadge } from "./ui";
 
 export function BuildView({
   build,
@@ -44,11 +43,13 @@ export function BuildView({
   /** Picked on the diagram, the 3D view or the map: open the part's details and bring them into view. */
   function select(category: Category) {
     setSelected(category);
-    if (partsView === "sheet") setExpanded((current) => new Set(current).add(category));
-    requestAnimationFrame(() =>
-      document
-        .getElementById(partsView === "map" ? "detalhes-peca" : `peca-${category}`)
-        ?.scrollIntoView({ behavior: "smooth", block: partsView === "map" ? "nearest" : "center" }),
+    if (partsView === "sheet") setExpanded(new Set([category]));
+    setTimeout(
+      () =>
+        document
+          .getElementById(partsView === "map" ? "detalhes-peca" : `peca-${category}`)
+          ?.scrollIntoView({ behavior: "smooth", block: partsView === "map" ? "nearest" : "start" }),
+      partsView === "map" ? 0 : 320,
     );
   }
 
@@ -57,14 +58,17 @@ export function BuildView({
     else select(category);
   }
 
+  /**
+   * The sheet opens one part at a time: opening a part closes the one that was open, then brings the opened
+   * part to the top of the screen for reading (once the other part has finished closing, so the target is still).
+   */
   function toggleOnSheet(category: Category) {
-    setExpanded((current) => {
-      const next = new Set(current);
-      if (next.has(category)) next.delete(category);
-      else next.add(category);
-      return next;
-    });
+    const opening = !expanded.has(category);
+    setExpanded(opening ? new Set([category]) : new Set());
     setSelected(category);
+    if (opening) {
+      setTimeout(() => document.getElementById(`peca-${category}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 320);
+    }
   }
 
   return (
@@ -98,7 +102,7 @@ export function BuildView({
               <span className="flex items-center gap-2 text-sm text-muted">
                 <span className="h-1 w-20 overflow-hidden rounded-full bg-border" aria-hidden>
                   <span
-                    className={`block h-full rounded-full ${totals.withinBudget ? "bg-accent" : "bg-bad"}`}
+                    className={`block h-full rounded-full ${totals.withinBudget ? "bg-primary" : "bg-bad"}`}
                     style={{ width: `${budgetShare}%` }}
                   />
                 </span>
@@ -109,15 +113,6 @@ export function BuildView({
           </div>
         </div>
       </header>
-
-      {(!totals.allPriced || build.notes.length > 0) && (
-        <div className="mt-6 space-y-3">
-          {!totals.allPriced && <Notice tone="warn">Algumas peças ainda não têm preço disponível e não entram no total.</Notice>}
-          {build.notes.map((note) => (
-            <Notice key={note}>{note}</Notice>
-          ))}
-        </div>
-      )}
 
       <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(260px,340px)_1fr]">
         {/* Visual */}
@@ -146,11 +141,11 @@ export function BuildView({
               <Build3d items={build.items} selected={selected} onSelect={select} />
             </div>
           )}
-          <p className="mt-3 text-xs leading-relaxed text-subtle">
-            {view === "diagram"
-              ? "Visualização esquemática: toque em uma peça para ver a explicação."
-              : "Modelo 3D montado com as medidas de cada peça (quando a base de dados informa). Arraste para girar e clique numa peça."}
-          </p>
+          {view === "3d" && (
+            <p className="mt-3 text-xs leading-relaxed text-subtle">
+              Modelo 3D montado com as medidas de cada peça (quando a base de dados informa). Arraste para girar e clique numa peça.
+            </p>
+          )}
           {build.requirements.length > 0 && (
             <div className="mt-6">
               <p className="flex items-center gap-2 text-sm font-semibold">
@@ -159,6 +154,19 @@ export function BuildView({
               <ul className="mt-2 space-y-2 text-sm leading-relaxed text-muted">
                 {build.requirements.map((requirement) => (
                   <li key={requirement}>{requirement}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {(!totals.allPriced || build.notes.length > 0) && (
+            <div className="mt-6">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <InfoIcon className="size-4 text-accent" /> Observações
+              </p>
+              <ul className="mt-2 space-y-2 text-sm leading-relaxed text-muted">
+                {!totals.allPriced && <li>Algumas peças ainda não têm preço disponível e não entram no total.</li>}
+                {build.notes.map((note) => (
+                  <li key={note}>{note}</li>
                 ))}
               </ul>
             </div>
@@ -199,6 +207,7 @@ export function BuildView({
                 <PartsMap items={build.items} findings={build.compatibility.findings} selected={selected} onSelect={toggleOnMap} />
                 {selectedItem ? (
                   <PartDetails
+                    key={selectedItem.category}
                     item={selectedItem}
                     onClose={() => setSelected(null)}
                     onSwap={onSwap}
@@ -255,12 +264,10 @@ function PartDetails({
       id="detalhes-peca"
       role="region"
       aria-labelledby="detalhes-peca-titulo"
-      className="mt-4 scroll-mt-28 rounded-2xl border border-border bg-surface"
+      className="mt-4 scroll-mt-28 animate-[panel-in_0.3s_ease-out] rounded-2xl border border-border bg-surface"
     >
       <div className="flex items-start gap-4 border-b border-border px-5 py-4 sm:px-6">
-        <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
-          <PartIcon category={item.category} className="size-6.5" />
-        </span>
+        <IsoPart category={item.category} active className="size-14 shrink-0" />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium tracking-wide text-muted uppercase">{item.categoryLabel}</p>
           <h3 id="detalhes-peca-titulo" className="mt-0.5 font-semibold text-pretty">
@@ -315,18 +322,18 @@ function PartRow({
 }) {
   const panelId = `detalhes-${item.category}-${item.component.id}`;
   return (
-    <li id={`peca-${item.category}`} className={`scroll-mt-28 transition-colors ${selected ? "bg-accent-soft/40" : ""}`}>
+    <li id={`peca-${item.category}`} className="scroll-mt-6">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
         aria-controls={panelId}
-        className="flex w-full items-start gap-4 px-5 py-4 text-left sm:px-6"
+        className="group flex w-full items-start gap-4 px-5 py-4 text-left transition-colors hover:bg-accent-soft/30 sm:px-6"
       >
-        <ChevronIcon className={`mt-3 size-4 shrink-0 text-subtle transition-transform ${expanded ? "rotate-90" : ""}`} />
-        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
-          <PartIcon category={item.category} className="size-5.5" />
-        </span>
+        <ChevronIcon
+          className={`mt-3 size-4 shrink-0 text-subtle transition-[rotate,translate,color] duration-200 group-hover:text-accent ${expanded ? "rotate-90" : "group-hover:translate-x-0.5"}`}
+        />
+        <IsoPart category={item.category} active={selected} className="size-11 shrink-0" />
         <span className="min-w-0 flex-1">
           <span className="block text-xs font-medium tracking-wide text-muted uppercase">{item.categoryLabel}</span>
           <span className="mt-0.5 block font-semibold text-pretty">{item.component.name}</span>
@@ -345,28 +352,23 @@ function PartRow({
         </span>
       </button>
 
-      {expanded && (
-        <div id={panelId} className="px-5 pb-6 pl-13 sm:px-6 sm:pl-14">
-          <PartBody item={item} full onSwap={onSwap} performanceDisclaimer={performanceDisclaimer} />
-        </div>
-      )}
+      <Collapse open={expanded} id={panelId} className="px-5 pb-6 pl-13 sm:px-6 sm:pl-14">
+        <PartBody item={item} onSwap={onSwap} performanceDisclaimer={performanceDisclaimer} />
+      </Collapse>
     </li>
   );
 }
 
 /**
- * What we know about a part, in short sections: its specs first, then why we picked it, what it is for and
- * other options. The data source stays collapsed for whoever wants it.
- * The map's panel already shows what the part is for in its header, so only the sheet repeats it here.
+ * What we know about a part, in short sections: its specs first, then why we picked it and other options.
+ * The data source stays collapsed for whoever wants it.
  */
 function PartBody({
   item,
-  full = false,
   onSwap,
   performanceDisclaimer,
 }: {
   item: BuildItem;
-  full?: boolean;
   onSwap?: (item: BuildItem, alternative: Alternative) => void;
   performanceDisclaimer: string;
 }) {
@@ -404,19 +406,16 @@ function PartBody({
         </div>
       )}
 
-      {full && (
-        <div className="grid gap-3 sm:grid-cols-2">
-          <InfoCard title="Para que serve">{item.explanation.whatItIs}</InfoCard>
-          <InfoCard title="Por que importa">{item.explanation.whyItMatters}</InfoCard>
+      <div className="flex gap-3.5 rounded-xl border border-border bg-surface-muted/40 p-4">
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+          <SparkIcon className="size-4.5" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold tracking-wide text-muted uppercase">
+            {item.owned ? "Sobre a sua peça" : "Por que escolhemos esta"}
+          </p>
+          <p className="mt-1 leading-relaxed">{item.explanation.reason}</p>
         </div>
-      )}
-
-      <div className="rounded-xl border-l-4 border-accent bg-accent-soft/60 px-4 py-3">
-        <p className="flex items-center gap-1.5 text-sm font-semibold text-accent">
-          <CheckIcon className="size-4" strokeWidth={2.5} />
-          {item.owned ? "Sobre a sua peça" : "Por que escolhemos esta"}
-        </p>
-        <p className="mt-1 leading-relaxed">{item.explanation.reason}</p>
       </div>
 
       {item.alternatives.length > 0 && (
@@ -442,7 +441,7 @@ function PartBody({
                     <button
                       type="button"
                       onClick={() => onSwap(item, alternative)}
-                      className="shrink-0 self-start rounded-lg border border-border-strong px-3 py-1.5 text-sm font-medium hover:bg-surface-muted sm:self-center"
+                      className="shrink-0 self-start rounded-lg bg-accent-soft px-3 py-1.5 text-sm font-semibold text-accent transition-[filter] hover:brightness-125 sm:self-center"
                     >
                       Trocar
                     </button>
@@ -505,15 +504,6 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function InfoCard({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="rounded-xl border border-border px-4 py-3">
-      <p className="text-xs font-semibold tracking-wide text-muted uppercase">{title}</p>
-      <p className="mt-1 text-sm leading-relaxed">{children}</p>
-    </div>
-  );
-}
-
 /** Segmented switch between two ways of showing the same thing. */
 function ViewTabs<T extends string>({
   label,
@@ -534,7 +524,7 @@ function ViewTabs<T extends string>({
           role="tab"
           aria-selected={value === option.value}
           onClick={() => onChange(option.value)}
-          className={`flex-1 rounded-lg px-3 py-1.5 font-medium transition-colors ${value === option.value ? "bg-accent-soft text-foreground ring-1 ring-accent/40" : "text-muted hover:text-foreground"}`}
+          className={`flex-1 rounded-lg px-3 py-1.5 font-medium transition-colors ${value === option.value ? "bg-primary font-semibold text-accent-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
         >
           {option.label}
         </button>

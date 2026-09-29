@@ -40,7 +40,7 @@ test("wizard builds a compatible PC, explains it and saves it", async ({ page })
   await page.getByRole("tab", { name: "Ficha" }).click();
   await expect(page.getByRole("list", { name: "Mapa das peças" })).toBeHidden();
   await parts.first().getByRole("button").first().click();
-  await expect(page.getByText("Para que serve").first()).toBeVisible();
+  await expect(page.getByText("Especificações").first()).toBeVisible();
 
   await page.getByRole("button", { name: "Salvar configuração" }).click();
   await expect(page).toHaveURL(/\/configuracao\/[0-9a-f-]{36}$/);

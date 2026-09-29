@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { brand } from "@/config/brand";
+import { AutoHideHeader } from "./auto-hide-header";
 
 const links = [
   { href: "/montar", label: "Montar PC" },
@@ -10,8 +11,8 @@ const links = [
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75 sticky top-0 z-40">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
+    <AutoHideHeader className="sticky top-0 z-40 border-b border-border bg-background">
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
           <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-brand text-accent-foreground">
             <svg viewBox="0 0 24 24" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -40,6 +41,6 @@ export function SiteHeader() {
           Montar PC
         </Link>
       </div>
-    </header>
+    </AutoHideHeader>
   );
 }
