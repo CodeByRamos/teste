@@ -24,28 +24,26 @@ function OptionCard({ option, needs }: { option: BudgetOption; needs: Needs }) {
   return (
     <div className="inner-card flex flex-col rounded-2xl p-5">
       <div className="flex items-center gap-3">
-        <span aria-hidden className="shrink-0 text-accent drop-shadow-[0_0_8px_rgb(168_85_247/0.5)]">
+        <span aria-hidden className="shrink-0 text-accent">
           {higher ? <RocketIcon className="size-9" strokeWidth={1.6} /> : <PiggyIcon className="size-9" strokeWidth={1.6} />}
         </span>
         <div>
-          <p className="text-xs font-semibold tracking-wide text-accent uppercase">
-            {higher ? `Com ${brlShort(difference)} a mais` : `Com ${brlShort(difference)} a menos`}
-          </p>
-          <p className="text-sm text-muted">{higher ? "Mais desempenho" : "Mais economia"}</p>
+          <p className="font-semibold">{higher ? "Mais desempenho" : "Mais economia"}</p>
+          <p className="text-sm text-muted">{higher ? `Com ${brlShort(difference)} a mais` : `Com ${brlShort(difference)} a menos`}</p>
         </div>
       </div>
 
-      <dl className="mt-3 grid grid-cols-2 gap-3 text-center">
-        <div className="rounded-lg border border-border px-2 py-3">
-          <dt className="text-[11px] font-semibold tracking-wide text-accent uppercase">Orçamento</dt>
-          <dd className="mt-1 text-base font-semibold whitespace-nowrap tabular-nums sm:text-lg">
-            <Price amount={option.budgetBrl} />
+      <dl className="mt-5 flex items-end gap-8">
+        <div>
+          <dt className="text-sm text-muted">Total</dt>
+          <dd className="font-display text-3xl font-bold tracking-tight whitespace-nowrap tabular-nums">
+            {option.totalBrl != null ? <Price amount={option.totalBrl} /> : "-"}
           </dd>
         </div>
-        <div className="rounded-lg border border-border px-2 py-3">
-          <dt className="text-[11px] font-semibold tracking-wide text-accent uppercase">Total</dt>
-          <dd className="mt-1 text-base font-semibold whitespace-nowrap tabular-nums sm:text-lg">
-            {option.totalBrl != null ? <Price amount={option.totalBrl} /> : "—"}
+        <div>
+          <dt className="text-sm text-muted">Orçamento</dt>
+          <dd className="mt-0.5 text-lg font-semibold whitespace-nowrap tabular-nums">
+            <Price amount={option.budgetBrl} />
           </dd>
         </div>
       </dl>
@@ -67,7 +65,7 @@ function OptionCard({ option, needs }: { option: BudgetOption; needs: Needs }) {
 
           {option.changes.length > 0 ? (
             <>
-              <p className="mt-4 text-xs font-semibold tracking-wide text-accent uppercase">O que muda</p>
+              <p className="mt-5 text-sm font-medium text-muted">O que muda</p>
               <ul className="mt-1">
                 {option.changes.slice(0, MAX_CHANGES).map((change) => (
                   <li key={change.category} className="flex items-center gap-3 border-b border-border py-2.5">
@@ -134,7 +132,7 @@ export function BudgetOptionsPanel({ needs }: { needs: Needs }) {
   if (failed) return null;
 
   return (
-    <section aria-labelledby="budget-title" className="panel rounded-2xl p-5 sm:p-6">
+    <section id="orcamento" aria-labelledby="budget-title" className="reveal panel scroll-mt-6 rounded-2xl p-5 sm:p-6">
       <h2 id="budget-title" className="text-lg font-semibold">
         E se eu mudar o orçamento?
       </h2>

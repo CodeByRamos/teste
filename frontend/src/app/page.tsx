@@ -76,7 +76,7 @@ export default function Home() {
         {/* Darkens the footage so the headline and the input read clearly, fading into the page below. */}
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_55%_45%_at_50%_42%,rgb(23_23_30/0.55),transparent),linear-gradient(to_bottom,rgb(23_23_30/0.78),rgb(23_23_30/0.7)_45%,rgb(23_23_30/0.94))]"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_55%_45%_at_50%_42%,rgb(26_24_30/0.55),transparent),linear-gradient(to_bottom,rgb(26_24_30/0.78),rgb(26_24_30/0.7)_45%,rgb(26_24_30/0.94))]"
         />
         <section className="mx-auto max-w-4xl px-4 pt-20 pb-20 sm:px-6 sm:pt-28 sm:pb-24">
           <h1 className="text-center text-4xl font-bold tracking-tight text-balance sm:text-6xl">
@@ -108,7 +108,7 @@ export default function Home() {
                   <span className="mt-4 flex items-center gap-2 font-semibold">
                     {title}
                     {!available && (
-                      <span className="rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-muted">Em breve</span>
+                      <span className="text-xs font-medium text-subtle">(em breve)</span>
                     )}
                   </span>
                   <span className="mt-1.5 text-sm leading-relaxed text-muted">{description}</span>

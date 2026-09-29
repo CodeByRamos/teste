@@ -5,8 +5,9 @@ import { brl, signedBrl, timeAgo } from "@/lib/format";
 import type { Alternative, BuildItem, BuildView as Build, Category } from "@/lib/types";
 import { CompatibilityPanel } from "./compatibility-panel";
 import { FuturePanel } from "./future-panel";
-import { BoltIcon, ChevronIcon, ExternalIcon, InfoIcon, XIcon } from "./icons";
+import { ArrowIcon, BoltIcon, ChevronIcon, ExternalIcon, InfoIcon, XIcon } from "./icons";
 import { PartsMap } from "./parts-map";
+import { SetupReview } from "./setup-review";
 import { BudgetPlanner } from "./budget-planner";
 import { IsoPart, PcDiagram } from "./pc-diagram";
 import { Build3d } from "./pc3d/build-3d";
@@ -38,9 +39,17 @@ export function BuildView({
   const budgetShare = totals.budgetBrl ? Math.min(100, (totals.totalBrl / totals.budgetBrl) * 100) : null;
   const somethingToBuy = build.items.some((item) => !item.owned);
 
-  const [partsView, setPartsView] = useState<"sheet" | "map">("map");
+  const [partsView, setPartsView] = useState<"sheet" | "map" | "about">("map");
+  /** The result reads in two pages: 1) the parts and whether they work together, 2) the money. */
+  const [page, setPage] = useState<1 | 2>(1);
+
+  function goToPage(next: 1 | 2) {
+    setPage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
   const [expanded, setExpanded] = useState<Set<Category>>(new Set());
   const selectedItem = build.items.find((item) => item.category === selected);
+  const signature = buildSignature(build.items) ?? title;
 
   /** Picked on the diagram, the 3D view or the map: open the part's details and bring them into view. */
   function select(category: Category) {
@@ -48,9 +57,10 @@ export function BuildView({
     if (partsView === "sheet") setExpanded(new Set([category]));
     setTimeout(
       () =>
-        document
-          .getElementById(partsView === "map" ? "detalhes-peca" : `peca-${category}`)
-          ?.scrollIntoView({ behavior: "smooth", block: partsView === "map" ? "nearest" : "start" }),
+        document.getElementById(partsView === "map" ? "detalhes-peca" : `peca-${category}`)?.scrollIntoView({
+          behavior: "smooth",
+          block: partsView === "map" ? "nearest" : "start",
+        }),
       partsView === "map" ? 0 : 320,
     );
   }
@@ -85,19 +95,18 @@ export function BuildView({
       {/* Summary: plain text on the page, no panel. */}
       <header className="flex flex-col gap-6 border-b border-border pb-8 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
-          {subtitle && <div className="mt-1.5 text-muted">{subtitle}</div>}
-          {build.needs && (
-            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted" aria-label="Seu pedido">
-              {build.needs.useCases.map((use) => (
-                <li key={use.value}>
-                  {use.label}
-                  {build.needs?.primaryUse?.value === use.value && <span className="text-accent"> · prioridade</span>}
-                </li>
-              ))}
-              {build.needs.useCases.some((use) => use.value.startsWith("GAMING")) && <li>{build.needs.resolution.label}</li>}
-            </ul>
-          )}
+          <p className="text-sm text-muted">
+            <span className="font-semibold text-accent">{title}</span>
+            {build.needs && (
+              <>
+                {" "}
+                para {build.needs.useCases.map((use) => use.label.toLowerCase()).join(", ")}
+                {build.needs.useCases.some((use) => use.value.startsWith("GAMING")) && <> em {build.needs.resolution.label}</>}
+              </>
+            )}
+          </p>
+          <h1 className="mt-2 max-w-[22ch] text-3xl leading-[1.1] font-bold tracking-tight text-balance sm:text-5xl">{signature}</h1>
+          {subtitle && <div className="mt-3 text-sm text-subtle">{subtitle}</div>}
         </div>
         <div className="md:text-right">
           {somethingToBuy && (
@@ -122,6 +131,7 @@ export function BuildView({
             )}
             <StatusBadge status={build.compatibility.overall} />
           </div>
+          {actions && <div className="mt-4 flex flex-wrap items-center gap-2 md:justify-end">{actions}</div>}
         </div>
       </header>
 
@@ -158,98 +168,137 @@ export function BuildView({
               Modelo 3D montado com as medidas de cada peça (quando a base de dados informa). Arraste para girar e clique numa peça.
             </p>
           )}
-          {(!totals.allPriced || build.notes.length > 0) && (
-            <div className="mt-6">
-              <p className="flex items-center gap-2 text-sm font-semibold">
-                <InfoIcon className="size-4 text-accent" /> Observações
-              </p>
-              <ul className="mt-2 space-y-2 text-sm leading-relaxed text-muted">
-                {!totals.allPriced && <li>Algumas peças ainda não têm preço disponível e não entram no total.</li>}
-                {build.notes.map((note) => (
-                  <li key={note}>{note}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <SectionIndex
+            key={page}
+            sections={
+              page === 1
+                ? [
+                    { id: "pecas", label: "Peças" },
+                    { id: "compatibilidade", label: "Compatibilidade" },
+                    ...(build.future ? [{ id: "futuro", label: "Pensando no futuro" }] : []),
+                  ]
+                : [
+                    { id: "gastos", label: "Planner de gastos" },
+                    ...(extra
+                      ? [
+                          {
+                            id: "orcamento",
+                            label: "E se eu mudar o orçamento?",
+                          },
+                        ]
+                      : []),
+                  ]
+            }
+          />
         </aside>
 
         {/* Parts */}
         <div className="min-w-0 space-y-8">
-          <section aria-labelledby="pecas-title">
-            <h2 id="pecas-title" className="sr-only">
-              Peças
-            </h2>
-            <ViewTabs
-              label="Mostrar peças como"
-              options={[
-                { value: "sheet", label: "Ficha" },
-                { value: "map", label: "Mapa" },
-              ]}
-              value={partsView}
-              onChange={setPartsView}
-            />
-            {partsView === "sheet" ? (
-              <ul className="divide-y divide-border overflow-hidden panel rounded-2xl">
-                {build.items.map((item) => (
-                  <PartRow
-                    key={item.component.id}
-                    item={item}
-                    expanded={expanded.has(item.category)}
-                    selected={selected === item.category}
-                    onToggle={() => toggleOnSheet(item.category)}
-                    onHover={(on) => setHovered(on ? item.category : null)}
-                    onSwap={onSwap}
-                    performanceDisclaimer={build.disclaimers.performance}
-                  />
-                ))}
-              </ul>
-            ) : (
-              <>
-                <PartsMap
-                  items={build.items}
-                  findings={build.compatibility.findings}
-                  selected={selected}
-                  onSelect={toggleOnMap}
-                  onHover={setHovered}
+          {page === 1 && (
+            <>
+              <section id="pecas" aria-labelledby="pecas-title" className="scroll-mt-6">
+                <h2 id="pecas-title" className="sr-only">
+                  Peças
+                </h2>
+                <ViewTabs
+                  label="Mostrar peças como"
+                  options={[
+                    { value: "sheet", label: "Ficha" },
+                    { value: "map", label: "Mapa" },
+                    { value: "about", label: "Sobre o PC" },
+                  ]}
+                  value={partsView}
+                  onChange={setPartsView}
                 />
-                {selectedItem ? (
-                  <PartDetails
-                    key={selectedItem.category}
-                    item={selectedItem}
-                    onClose={() => setSelected(null)}
-                    onSwap={onSwap}
-                    performanceDisclaimer={build.disclaimers.performance}
-                  />
+                {partsView === "about" ? (
+                  <SetupReview build={build} />
+                ) : partsView === "sheet" ? (
+                  <ul className="divide-y divide-border overflow-hidden panel rounded-2xl">
+                    {build.items.map((item) => (
+                      <PartRow
+                        key={item.component.id}
+                        item={item}
+                        expanded={expanded.has(item.category)}
+                        selected={selected === item.category}
+                        onToggle={() => toggleOnSheet(item.category)}
+                        onHover={(on) => setHovered(on ? item.category : null)}
+                        onSwap={onSwap}
+                        performanceDisclaimer={build.disclaimers.performance}
+                      />
+                    ))}
+                  </ul>
                 ) : (
-                  <p className="mt-3 text-sm text-subtle">Toque numa peça do mapa para ver por que ela foi escolhida e suas especificações.</p>
+                  <>
+                    <PartsMap
+                      items={build.items}
+                      findings={build.compatibility.findings}
+                      selected={selected}
+                      onSelect={toggleOnMap}
+                      onHover={setHovered}
+                    />
+                    {selectedItem ? (
+                      <PartDetails
+                        key={selectedItem.category}
+                        item={selectedItem}
+                        onClose={() => setSelected(null)}
+                        onSwap={onSwap}
+                        performanceDisclaimer={build.disclaimers.performance}
+                      />
+                    ) : (
+                      <p className="mt-3 text-sm text-subtle">
+                        Toque numa peça do mapa para ver por que ela foi escolhida e suas especificações.
+                      </p>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </section>
+              </section>
 
-          <CompatibilityPanel compatibility={build.compatibility} />
-
-          {build.future && <FuturePanel future={build.future} />}
-
-          <section aria-labelledby="planner-title" className="panel rounded-2xl p-5 sm:p-6">
-            <h2 id="planner-title" className="text-lg font-semibold">
-              Planner de gastos
-            </h2>
-            <p className="mt-2 leading-relaxed text-muted">Para onde vai cada real do seu orçamento.</p>
-            <div className="mt-5">
-              <BudgetPlanner
-                items={build.items}
-                totals={totals}
-                selected={selected}
-                hovered={hovered}
-                onSelect={select}
+              <CompatibilityPanel
+                compatibility={build.compatibility}
+                psuWatts={
+                  Number.parseInt(
+                    build.items.find((item) => item.category === "POWER_SUPPLY")?.specs.find((s) => s.label === "Potência")?.value ?? "",
+                    10,
+                  ) || null
+                }
               />
-            </div>
-          </section>
 
-          {extra}
+              {build.future && <FuturePanel future={build.future} />}
 
-          {actions && <div className="flex flex-wrap gap-3">{actions}</div>}
+              <PageNav
+                current={1}
+                label="Gastos e orçamento"
+                hint="Para onde vai o dinheiro e o que muda com mais ou menos orçamento."
+                onClick={() => goToPage(2)}
+              />
+            </>
+          )}
+
+          {page === 2 && (
+            <>
+              <button
+                type="button"
+                onClick={() => goToPage(1)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-foreground"
+              >
+                <ArrowIcon className="size-4 rotate-180" /> Voltar às peças
+              </button>
+
+              <section id="gastos" aria-labelledby="planner-title" className="reveal panel scroll-mt-6 rounded-2xl p-5 sm:p-6">
+                <h2 id="planner-title" className="text-lg font-semibold">
+                  Planner de gastos
+                </h2>
+                <p className="mt-2 leading-relaxed text-muted">Para onde vai cada real do seu orçamento.</p>
+                <div className="mt-5">
+                  <BudgetPlanner items={build.items} totals={totals} selected={selected} hovered={hovered} onSelect={select} />
+                </div>
+              </section>
+
+              {extra}
+
+              <PageNav current={2} label="Peças e compatibilidade" onClick={() => goToPage(1)} />
+            </>
+          )}
 
           <p className="text-xs leading-relaxed text-subtle">
             Dados técnicos: {build.dataSource.name} (versão {build.dataSource.version.slice(0, 7)}), sob a{" "}
@@ -262,6 +311,18 @@ export function BuildView({
       </div>
     </div>
   );
+}
+
+/**
+ * The build named by the parts that define it: processor and graphics chip ("Ryzen 7 9850X3D + Radeon RX 7900 XT"),
+ * or the processor alone when there is no graphics card.
+ */
+function buildSignature(items: BuildItem[]): string | null {
+  const cpu = items.find((item) => item.category === "CPU")?.component.name.replace(/^(AMD|Intel)\s+/i, "");
+  const gpuItem = items.find((item) => item.category === "GPU");
+  const gpu = gpuItem?.specs.find((spec) => spec.label === "Chip" && spec.value !== "Não informado")?.value ?? gpuItem?.component.name;
+  if (cpu && gpu) return `${cpu} + ${gpu}`;
+  return cpu ?? gpu ?? null;
 }
 
 /** Says plainly whether the total rests on real store prices, fictitious ones, or a mix. */
@@ -300,7 +361,7 @@ function PartDetails({
         </div>
         <div className="shrink-0 text-right">
           {item.owned ? (
-            <span className="rounded-full bg-ok-soft px-2.5 py-1 text-xs font-semibold text-ok">Você já tem</span>
+            <span className="text-sm font-medium text-ok">Você já tem</span>
           ) : item.price ? (
             <>
               <span className="block font-semibold tabular-nums">
@@ -371,7 +432,7 @@ function PartRow({
         </span>
         <span className="shrink-0 text-right">
           {item.owned ? (
-            <span className="rounded-full bg-ok-soft px-2.5 py-1 text-xs font-semibold text-ok">Você já tem</span>
+            <span className="text-sm font-medium text-ok">Você já tem</span>
           ) : item.price ? (
             <>
               <span className="block font-semibold tabular-nums">
@@ -458,10 +519,11 @@ function PartBody({
                   key={alternative.component.id}
                   className="inner-card flex flex-col gap-3 rounded-xl p-3 sm:flex-row sm:items-center sm:gap-4"
                 >
-                  <span
-                    className={`w-fit shrink-0 rounded-full px-2.5 py-1 text-center text-xs font-semibold tabular-nums sm:w-44 ${cheaper ? "bg-ok-soft text-ok" : "bg-accent-soft text-accent"}`}
-                  >
-                    {cheaper ? "Mais barata" : "Mais forte"} · {signedBrl(alternative.priceDeltaBrl)}
+                  <span className="shrink-0 sm:w-36">
+                    <span className="block text-sm text-muted">{cheaper ? "Mais barata" : "Mais forte"}</span>
+                    <span className={`block font-semibold tabular-nums ${cheaper ? "text-ok" : "text-foreground"}`}>
+                      {signedBrl(alternative.priceDeltaBrl)}
+                    </span>
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-pretty">{alternative.component.name}</p>
@@ -514,7 +576,7 @@ function PartBody({
               {missingFields.map((issue) => (
                 <li key={issue.field + issue.kind}>
                   {issue.field}
-                  {issue.detail ? ` — ${issue.detail}` : ""}
+                  {issue.detail ? `: ${issue.detail}` : ""}
                 </li>
               ))}
             </ul>
@@ -529,16 +591,92 @@ function PartBody({
  * Pulls a trailing caveat out of the reason ("Ela não tem Wi-Fi: …", "Atenção: …") so it reads as a footnote
  * under the main argument instead of the end of the same paragraph.
  */
-function splitCaveat(reason: string): { headline: string; caveat: string | null } {
+function splitCaveat(reason: string): {
+  headline: string;
+  caveat: string | null;
+} {
   const match = reason.match(/^(.*?[.!])\s+((?:Ela|Ele|Não|Atenção|Observação|Obs\.)[^]*)$/);
   if (!match || !/\b(não|atenção|observação)\b/i.test(match[2])) return { headline: reason, caveat: null };
   return { headline: match[1], caveat: match[2] };
 }
 
+/**
+ * "Nesta página": links to the result's sections, marking the one currently in view. Lives in the sticky column,
+ * so it stays at hand on the long page.
+ */
+function SectionIndex({ sections }: { sections: { id: string; label: string }[] }) {
+  const [active, setActive] = useState(sections[0]?.id);
+  const ids = sections.map((section) => section.id).join();
+
+  useEffect(() => {
+    const visible = new Map<string, number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) visible.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+        const top = sections.find((section) => (visible.get(section.id) ?? 0) > 0);
+        if (top) setActive(top.id);
+      },
+      { rootMargin: "-20% 0px -55% 0px", threshold: [0, 0.01] },
+    );
+    for (const section of sections) {
+      const element = document.getElementById(section.id);
+      if (element) observer.observe(element);
+    }
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the ids, not on array identity
+  }, [ids]);
+
+  return (
+    <nav aria-label="Nesta página" className="mt-6 hidden lg:block">
+      <p className="text-sm font-medium text-muted">Nesta página</p>
+      <ul className="mt-2 border-l border-border">
+        {sections.map((section) => (
+          <li key={section.id}>
+            <a
+              href={`#${section.id}`}
+              aria-current={active === section.id ? "location" : undefined}
+              className={`-ml-px block border-l py-1.5 pl-3 text-sm transition-colors ${
+                active === section.id ? "border-accent font-medium text-foreground" : "border-transparent text-muted hover:text-foreground"
+              }`}
+            >
+              {section.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+/** Moves between the two pages of the result, with the step count so the reader knows where they are. */
+function PageNav({ current, label, hint, onClick }: { current: 1 | 2; label: string; hint?: string; onClick: () => void }) {
+  const forward = current === 1;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group flex w-full items-center gap-4 rounded-2xl border border-border p-5 text-left transition-colors hover:border-accent active:scale-[0.99] sm:p-6 ${
+        forward ? "" : "flex-row-reverse text-right"
+      }`}
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm text-muted">
+          {forward ? "Avançar" : "Voltar"} · página {forward ? 2 : 1} de 2
+        </span>
+        <span className="mt-1 block text-xl font-bold tracking-tight transition-colors group-hover:text-accent">{label}</span>
+        {hint && <span className="mt-1 block text-sm text-muted">{hint}</span>}
+      </span>
+      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-primary text-accent-foreground transition-transform group-hover:translate-x-0.5">
+        <ArrowIcon className={`size-5 ${forward ? "" : "rotate-180"}`} />
+      </span>
+    </button>
+  );
+}
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
-      <p className="mb-2 text-xs font-semibold tracking-wide text-accent uppercase">{title}</p>
+      <p className="mb-2 text-sm font-medium text-muted">{title}</p>
       {children}
     </div>
   );
@@ -557,14 +695,14 @@ function ViewTabs<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div className="mb-3 flex gap-1 rounded-xl bg-surface-muted p-1 text-sm" role="tablist" aria-label={label}>
+    <div className="mb-4 flex gap-6 border-b border-border text-sm" role="tablist" aria-label={label}>
       {options.map((option) => (
         <button
           key={option.value}
           role="tab"
           aria-selected={value === option.value}
           onClick={() => onChange(option.value)}
-          className={`flex-1 rounded-lg px-3 py-1.5 font-medium transition-colors ${value === option.value ? "bg-primary font-semibold text-accent-foreground shadow-sm" : "text-muted hover:text-foreground"}`}
+          className={`-mb-px border-b-2 pb-2.5 font-medium transition-colors ${value === option.value ? "border-accent text-foreground" : "border-transparent text-muted hover:text-foreground"}`}
         >
           {option.label}
         </button>

@@ -38,7 +38,7 @@ function DiagramPart({
 }) {
   const present = Boolean(item);
   const stroke =
-    status === "INCOMPATIBLE" ? "var(--bad)" : status === "WARNING" ? "var(--warn)" : "#5a576f";
+    status === "INCOMPATIBLE" ? "var(--bad)" : status === "WARNING" ? "var(--warn)" : "#61596e";
   const fill = present ? "var(--surface)" : "transparent";
   const onKey = (event: KeyboardEvent) => {
     if (present && (event.key === "Enter" || event.key === " ")) {

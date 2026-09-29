@@ -17,13 +17,13 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "radial-gradient(circle at 85% 0%, #3b1a78 0%, #1c1530 45%, #17171e 80%)",
-          color: "#f2f1f7",
+          background: "#141217",
+          color: "#f4f3f7",
         }}
       >
-        <div style={{ width: 88, height: 88, borderRadius: 22, background: "linear-gradient(135deg, #5b21b6 0%, #7e22ce 50%, #c026d3 100%)", marginBottom: 48, display: "flex" }} />
+        <div style={{ width: 88, height: 88, borderRadius: 22, background: "#7e22ce", marginBottom: 48, display: "flex" }} />
         <div style={{ fontSize: 76, fontWeight: 700, letterSpacing: -2, lineHeight: 1.05 }}>{brand.name}</div>
-        <div style={{ fontSize: 40, color: "#b9b7c6", marginTop: 24, lineHeight: 1.3, maxWidth: 900 }}>{brand.tagline}</div>
+        <div style={{ fontSize: 40, color: "#c0bac9", marginTop: 24, lineHeight: 1.3, maxWidth: 900 }}>{brand.tagline}</div>
       </div>
     ),
     size,

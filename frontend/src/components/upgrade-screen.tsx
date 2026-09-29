@@ -29,10 +29,10 @@ const FOCUS: { value: Category | null; label: string }[] = [
 ];
 
 const LEVEL: Record<AssessmentLevel, { label: string; className: string }> = {
-  GOOD: { label: "Bom", className: "bg-ok-soft text-ok" },
-  ENOUGH: { label: "Suficiente", className: "bg-accent-soft text-accent" },
-  WEAK: { label: "Fraco", className: "bg-warn-soft text-warn" },
-  BOTTLENECK: { label: "Gargalo", className: "bg-bad-soft text-bad" },
+  GOOD: { label: "Bom", className: "text-ok" },
+  ENOUGH: { label: "Suficiente", className: "text-accent" },
+  WEAK: { label: "Fraco", className: "text-warn" },
+  BOTTLENECK: { label: "Gargalo", className: "text-bad" },
 };
 
 export function UpgradeScreen({ options, initialIds }: { options: Options; initialIds: string[] }) {
@@ -252,7 +252,7 @@ function AdviceView({ advice, onBack }: { advice: UpgradeAdvice; onBack: () => v
         <ul className="mt-3 divide-y divide-border rounded-2xl border border-border bg-surface">
           {advice.assessment.map((item, index) => (
             <li key={item.category + index} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-start sm:gap-4">
-              <span className={`w-fit shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${LEVEL[item.level].className}`}>
+              <span className={`w-fit shrink-0 text-sm font-semibold ${LEVEL[item.level].className}`}>
                 {LEVEL[item.level].label}
               </span>
               <div className="min-w-0">
@@ -328,7 +328,7 @@ function PlanCard({ plan, featured = false, performance }: { plan: UpgradePlan; 
                     <p className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted uppercase">
                       {change.categoryLabel}
                       <span
-                        className={`rounded-full px-2 py-0.5 text-[11px] normal-case ${change.role === "MAIN" ? "bg-accent-soft text-accent" : "bg-warn-soft text-warn"}`}
+                        className={`text-[11px] normal-case ${change.role === "MAIN" ? "text-accent" : "text-warn"}`}
                       >
                         {change.role === "MAIN" ? "Principal" : "Necessário junto"}
                       </span>
@@ -366,7 +366,7 @@ function PlanCard({ plan, featured = false, performance }: { plan: UpgradePlan; 
               <p className="text-sm font-semibold">Continuam no seu PC</p>
               <ul className="mt-2 flex flex-wrap gap-2">
                 {plan.kept.map((part) => (
-                  <li key={part.id} className="inline-flex items-center gap-1.5 rounded-full bg-ok-soft px-3 py-1 text-sm text-ok">
+                  <li key={part.id} className="inline-flex items-center gap-1.5 text-sm text-ok">
                     <CheckIcon className="size-3.5" strokeWidth={2.5} />
                     {part.categoryLabel}
                   </li>

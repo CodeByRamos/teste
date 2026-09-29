@@ -249,7 +249,7 @@ function PartNode({
       onBlur={() => onHover(false)}
       aria-pressed={selected}
       aria-controls={selected ? "detalhes-peca" : undefined}
-      className={`group flex h-full w-full flex-col rounded-xl border bg-[color-mix(in_oklab,var(--background)_55%,black)] p-3 text-left shadow-sm transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_28px_-10px_rgb(147_51_234/0.55)] focus-visible:-translate-y-0.5 ${border}`}
+      className={`group flex h-full w-full flex-col rounded-xl border bg-[color-mix(in_oklab,var(--background)_55%,black)] p-3 text-left shadow-sm transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent focus-visible:-translate-y-0.5 ${border}`}
     >
       <span className="flex items-start gap-3">
         {iconTile}

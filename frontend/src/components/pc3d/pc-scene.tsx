@@ -53,9 +53,9 @@ export function PcScene({
       camera={{ position: [center.x + distance * 0.95, center.y + distance * 0.35, center.z + distance * 0.55], fov: 35, near: 0.01, far: 20 }}
       onPointerMissed={() => onSelect(null)}
     >
-      <color attach="background" args={["#1e1e27"]} />
+      <color attach="background" args={["#1a181e"]} />
       <StudioEnvironment />
-      <hemisphereLight args={["#ffffff", "#3a3548", 0.75]} />
+      <hemisphereLight args={["#ffffff", "#3a3346", 0.75]} />
       <directionalLight position={[1.2, 1.6, 0.8]} intensity={1.8} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} />
       <directionalLight position={[-1, 0.8, -0.6]} intensity={0.6} />
       <Suspense fallback={null}>
@@ -196,7 +196,7 @@ function LoadedModel({
       for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
         const standard = material as THREE.MeshStandardMaterial;
         if (!standard.emissive || (material.userData as { role?: string }).role === "rgb") continue;
-        standard.emissive.set(selected ? "#9333ea" : "#000000");
+        standard.emissive.set(selected ? "#9349d4" : "#000000");
         standard.emissiveIntensity = selected ? 0.35 : 0;
       }
     });

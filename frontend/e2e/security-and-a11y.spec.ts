@@ -28,6 +28,7 @@ for (const path of ["/", "/montar", "/verificar", "/melhorar", "/creditos", "/mo
   test(`no WCAG A/AA violations on ${path}`, async ({ page }) => {
     await page.goto(path);
     if (path.includes("resultado")) {
+      await page.getByRole("button", { name: /Avançar/ }).click();
       await expect(page.getByRole("heading", { name: "E se eu mudar o orçamento?" })).toBeVisible();
       await expect(page.getByLabel("Calculando alternativas")).toHaveCount(0);
     }

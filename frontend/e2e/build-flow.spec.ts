@@ -18,7 +18,7 @@ test("wizard builds a compatible PC, explains it and saves it", async ({ page })
   await page.getByRole("spinbutton", { name: "Orçamento" }).fill("30000");
   await page.getByRole("button", { name: "Continuar" }).click();
 
-  await page.getByRole("button", { name: "Não, vou comprar tudo" }).click();
+  await page.getByText("Não, vou comprar tudo").click();
   await page.getByRole("button", { name: "Montar meu PC" }).click();
 
   await expect(page).toHaveURL(/\/montar\/resultado\?orcamento=30000/);
@@ -26,8 +26,7 @@ test("wizard builds a compatible PC, explains it and saves it", async ({ page })
   await expect(parts.first()).toBeVisible();
   expect(await parts.count()).toBeGreaterThanOrEqual(7);
   await expect(page.getByRole("heading", { name: "Compatibilidade" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Pensando no futuro" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "E se eu mudar o orçamento?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pensando no futuro" })).toBeAttached();
   // Fictitious prices are always labeled while no store feed is connected.
   await expect(page.getByText("Total estimado (preços fictícios)")).toBeVisible();
   await expectNoHorizontalScroll(page);
@@ -41,6 +40,11 @@ test("wizard builds a compatible PC, explains it and saves it", async ({ page })
   await expect(page.getByRole("list", { name: "Mapa das peças" })).toBeHidden();
   await parts.first().getByRole("button").first().click();
   await expect(page.getByText("Especificações").first()).toBeVisible();
+
+  // Page 2: the money.
+  await page.getByRole("button", { name: /Avançar/ }).click();
+  await expect(page.getByRole("heading", { name: "Planner de gastos" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "E se eu mudar o orçamento?" })).toBeVisible();
 
   await page.getByRole("button", { name: "Salvar configuração" }).click();
   await expect(page).toHaveURL(/\/configuracao\/[0-9a-f-]{36}$/);

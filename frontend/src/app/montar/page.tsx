@@ -11,7 +11,7 @@ export default async function MontarPage({ searchParams }: PageProps<"/montar">)
   const options = await api.options().catch(() => null);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+    <div className="mx-auto max-w-6xl px-4 pt-8 pb-16 sm:px-6 sm:pt-12">
       {options ? (
         <BuildWizard options={options} initial={initial} />
       ) : (

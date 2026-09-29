@@ -4,8 +4,8 @@ import type { BuildItem, BuildView, Category } from "@/lib/types";
 import { IsoPart } from "./pc-diagram";
 import { Price } from "./ui";
 
-/** Violet shades for the parts, from the most to the least expensive. */
-const SHADES = ["#7e22ce", "#9333ea", "#a855f7", "#c084fc", "#6d28d9", "#d8b4fe", "#5b21b6", "#e9d5ff"];
+/** Shades of the brand violet (one hue, varied lightness) for the parts, from the most to the least expensive. */
+const SHADES = ["#7e22ce", "#9349d4", "#a76cda", "#ba8ee1", "#6a2e9e", "#ceb0e8", "#572a7e", "#dfcdee"];
 
 function cost(item: BuildItem) {
   return item.owned ? 0 : (item.price?.amountBrl ?? 0);
@@ -39,15 +39,32 @@ export function BudgetPlanner({
 
   return (
     <div>
-      <dl className="grid grid-cols-3 gap-3 text-center">
-        <Stat label="Orçamento">{budget != null ? <Price amount={budget} /> : "—"}</Stat>
-        <Stat label="Gasto" strong>
-          <Price amount={spent} />
-        </Stat>
-        <Stat label={left != null && left < 0 ? "Acima" : "Sobra"} tone={left != null && left < 0 ? "bad" : undefined}>
-          {left != null ? <Price amount={Math.abs(left)} /> : "—"}
-        </Stat>
-      </dl>
+      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+        <div>
+          <p className="text-sm text-muted">Gasto</p>
+          <p className="font-display text-4xl font-bold tracking-tight tabular-nums">
+            <Price amount={spent} />
+          </p>
+        </div>
+        <dl className="flex gap-8 text-sm">
+          {budget != null && (
+            <div>
+              <dt className="text-muted">Orçamento</dt>
+              <dd className="mt-0.5 text-lg font-semibold tabular-nums">
+                <Price amount={budget} />
+              </dd>
+            </div>
+          )}
+          {left != null && (
+            <div>
+              <dt className="text-muted">{left < 0 ? "Acima" : "Sobra"}</dt>
+              <dd className={`mt-0.5 text-lg font-semibold tabular-nums ${left < 0 ? "text-bad" : "text-ok"}`}>
+                <Price amount={Math.abs(left)} />
+              </dd>
+            </div>
+          )}
+        </dl>
+      </div>
 
       <div className="mt-4">
         <div className="flex h-3 overflow-hidden rounded-full bg-surface-muted" role="img" aria-label="Distribuição do orçamento entre as peças">
@@ -111,15 +128,6 @@ export function BudgetPlanner({
         </span>
       </div>
       {totals.pricesAreExamples && <p className="mt-1 text-right text-xs text-subtle">Preços fictícios</p>}
-    </div>
-  );
-}
-
-function Stat({ label, strong, tone, children }: { label: string; strong?: boolean; tone?: "bad"; children: React.ReactNode }) {
-  return (
-    <div className="rounded-lg border border-border px-2 py-3">
-      <dt className="text-[11px] font-semibold tracking-wide text-accent uppercase">{label}</dt>
-      <dd className={`mt-1 text-base font-semibold whitespace-nowrap tabular-nums sm:text-lg ${strong ? "text-foreground" : ""} ${tone === "bad" ? "text-bad" : ""}`}>{children}</dd>
     </div>
   );
 }

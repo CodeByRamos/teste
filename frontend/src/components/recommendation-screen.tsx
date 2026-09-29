@@ -119,7 +119,7 @@ export function RecommendationScreen({ needs }: { needs: Needs }) {
       busy={busy}
       onSwap={swap}
       extra={swapped ? null : <BudgetOptionsPanel needs={needs} />}
-      subtitle={swapped ? "Você trocou peças — preços e compatibilidade foram recalculados." : "Montado a partir do que você nos contou."}
+      subtitle={swapped ? "Você trocou peças. Preços e compatibilidade foram recalculados." : null}
       actions={
         <>
           <Button onClick={save} disabled={saving}>

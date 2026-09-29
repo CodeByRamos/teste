@@ -2,10 +2,9 @@
 
 /*
  * Design tokens. Brand colors live only here: re-theming the product means editing this block.
- * Palette: graphite near-black surfaces in closed, flat sections and two color roles:
- *   - violet: the brand. The violet → magenta gradient marks the one main action on each screen; flat violet
- *     marks selection and chosen options; soft violet fills secondary actions; lilac is for text, borders,
- *     hover and the keyboard focus ring;
+ * Palette: violet-tinted near-black surfaces in closed, flat sections and two color roles:
+ *   - violet: the brand. Flat violet marks the main action, selection and chosen options; soft violet fills
+ *     secondary actions; lilac (the same hue, lighter) is for text, borders, hover and the keyboard focus ring;
  *   - green / amber / red: status only, so they never read as brand color, and always paired with an icon and
  *     text (never color alone).
  * Every text/background pair below keeps 4.5:1 or more (WCAG AA for small text).
@@ -13,44 +12,45 @@
 :root {
   color-scheme: dark;
 
-  --background: #17171e;
-  --surface: #0e0d14;
-  --surface-muted: #1f1c2b;
-  --foreground: #f2f1f7;
-  --muted: #b9b7c6;
-  --subtle: #9d9aad;
-  --border: #2a2438;
-  --border-strong: #3c3452;
+  /*
+   * One hue family. Every neutral is a low-saturation tint of the brand violet (hue ~262), the accent is the brand
+   * hue itself (272) kept under 80% saturation, and the status colors are desaturated to sit beside it.
+   */
+  --background: #1a181e;
+  --surface: #0f0d12;
+  --surface-muted: #221d2a;
+  --foreground: #f4f3f7;
+  --muted: #c0bac9;
+  --subtle: #a19aac;
+  --border: #2b2537;
+  --border-strong: #413753;
 
-  /* Solid accent for text, borders and outlines on dark surfaces. */
-  --accent: #c4a3ff;
-  --accent-hover: #d6bfff;
-  --accent-soft: #2d2347;
+  /* Accent: the brand violet, lightened for text, borders and outlines on dark surfaces. */
+  --accent: #cea7f1;
+  --accent-hover: #ddc2f5;
+  --accent-soft: #342343;
   --accent-foreground: #ffffff;
 
-  /* Primary brand color as a flat fill (icon tiles, selected parts), where the gradient would be too loud. */
+  /* Brand violet as a flat fill: primary buttons, the logo, selected parts. */
   --primary: #7e22ce;
+  --primary-hover: #8c38d6;
 
-  /* Signature gradient for buttons and small marks. */
-  --gradient-brand: linear-gradient(135deg, #5b21b6 0%, #7e22ce 50%, #c026d3 100%);
-  --gradient-text: linear-gradient(100deg, #d8c8ff 0%, #f0a6ff 100%);
-
-  --ok: #6ee7a0;
-  --ok-soft: #16301f;
-  --warn: #fcd34d;
-  --warn-soft: #2f2610;
-  --bad: #ff8a8a;
-  --bad-soft: #3a1a20;
+  --ok: #73d3a0;
+  --ok-soft: #192e23;
+  --warn: #e6bb56;
+  --warn-soft: #2e2614;
+  --bad: #ea8986;
+  --bad-soft: #371b1a;
 
   /* Fine dot mesh, like perforated metal: flat and uniform, never faded. */
   --texture-dots: radial-gradient(rgb(255 255 255 / 0.075) 0.7px, transparent 0.9px);
   --texture-dots-size: 4px 4px;
   /* The page behind the dot mesh, a step darker than the plain --background bands. */
-  --page: #111117;
+  --page: #141217;
 
   /* Closed page sections: each band has its own flat tone and hard edges. */
-  --band-raised: #1c1c24;
-  --band-sunken: #121217;
+  --band-raised: #1f1c24;
+  --band-sunken: #141217;
 
   --radius: 6px;
 }
@@ -69,6 +69,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-accent-foreground: var(--accent-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
   --color-warn: var(--warn);
@@ -91,18 +92,14 @@
   --color-band-sunken: var(--band-sunken);
 }
 
-/* Filled brand surfaces (buttons, selected states, the logo). */
+/* Filled brand surfaces (buttons, the logo): one flat violet, no gradient. */
 @utility bg-brand {
-  background-color: #7e22ce;
-  background-image: var(--gradient-brand);
+  background-color: var(--primary);
 }
 
-/* Big numbers and highlighted words. */
+/* Highlighted words: the solid lilac accent (kept as a utility so the markup stays stable). */
 @utility text-gradient {
-  background-image: var(--gradient-text);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 
 html {
@@ -141,7 +138,7 @@ label:has(input:not(:disabled)) {
 @property --part-stroke {
   syntax: "<color>";
   inherits: true;
-  initial-value: #3d3b4b;
+  initial-value: #61596e;
 }
 
 @property --part-fill {
@@ -153,19 +150,19 @@ label:has(input:not(:disabled)) {
 @property --part-line {
   syntax: "<color>";
   inherits: true;
-  initial-value: #3d3b4b;
+  initial-value: #61596e;
 }
 
 @property --label-fill {
   syntax: "<color>";
   inherits: true;
-  initial-value: #18181f;
+  initial-value: #0f0d12;
 }
 
 @property --label-text {
   syntax: "<color>";
   inherits: true;
-  initial-value: #f2f1f7;
+  initial-value: #f4f3f7;
 }
 
 .diagram-part {
@@ -196,7 +193,6 @@ label:has(input:not(:disabled)) {
   --part-line: var(--accent);
   --label-fill: var(--primary);
   --label-text: #ffffff;
-  filter: drop-shadow(0 0 6px rgb(147 51 234 / 0.35));
 }
 
 .diagram-part[data-interactive="true"]:not([data-status]):is(:hover, :focus-visible, [data-hovered="true"]) {
@@ -205,9 +201,8 @@ label:has(input:not(:disabled)) {
 
 /* Hovering the selected part: a brighter violet and a stronger glow, so it still reads as clickable. */
 .diagram-part[data-interactive="true"][data-selected="true"]:not([data-status]):is(:hover, :focus-visible, [data-hovered="true"]) {
-  --part-fill: #9333ea;
-  --label-fill: #9333ea;
-  filter: drop-shadow(0 0 9px rgb(147 51 234 / 0.5));
+  --part-fill: #9349d4;
+  --label-fill: #9349d4;
 }
 
 /* Isometric drawings used as icons: violet line work at rest, solid violet when active or hovered. */
@@ -221,11 +216,10 @@ label:has(input:not(:disabled)) {
     filter 0.2s ease;
 }
 
-/* Hovering a card lifts its drawing a little further than the card, with a violet glow. */
+/* Hovering a card lifts its drawing a little further than the card. */
 .group:hover .iso-part,
 .group:focus-visible .iso-part {
   translate: 0 -2px;
-  filter: drop-shadow(0 4px 6px rgb(147 51 234 / 0.45));
 }
 
 .iso-part[data-active="true"],
@@ -273,14 +267,42 @@ details[open]::details-content {
 /* Panels and inner cards, in the style of the parts map: near-black, thin violet-tinted border. */
 @utility panel {
   background-color: var(--surface);
-  border: 1px solid rgb(196 163 255 / 0.18);
+  border: 1px solid rgb(206 167 241 / 0.18);
 }
 
 @utility inner-card {
-  border: 1px solid rgb(196 163 255 / 0.14);
+  border: 1px solid rgb(206 167 241 / 0.14);
   transition: border-color 0.2s ease;
   &:hover {
-    border-color: rgb(196 163 255 / 0.4);
+    border-color: rgb(206 167 241 / 0.4);
+  }
+}
+
+/* Result panels rise into place as they scroll into view (browsers with scroll-driven animations only). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
