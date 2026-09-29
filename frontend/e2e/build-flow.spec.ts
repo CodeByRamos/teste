@@ -43,7 +43,7 @@ test("wizard builds a compatible PC, explains it and saves it", async ({ page })
 
   // Page 2: the money.
   await page.getByRole("button", { name: /Avançar/ }).click();
-  await expect(page.getByRole("heading", { name: "Planner de gastos" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Planner de investimento" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "E se eu mudar o orçamento?" })).toBeVisible();
 
   await page.getByRole("button", { name: "Salvar configuração" }).click();

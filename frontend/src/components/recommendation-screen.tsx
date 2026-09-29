@@ -96,7 +96,7 @@ export function RecommendationScreen({ needs }: { needs: Needs }) {
         <div className="flex gap-3">
           <Button onClick={load}>Tentar de novo</Button>
           <ButtonLink href={`/montar?${needsToParams(needs)}`} variant="secondary">
-            Ajustar respostas
+            Ajustar preferências
           </ButtonLink>
         </div>
       </div>
@@ -131,7 +131,7 @@ export function RecommendationScreen({ needs }: { needs: Needs }) {
             </Button>
           )}
           <ButtonLink href={`/montar?${needsToParams(needs)}`} variant="ghost">
-            Ajustar respostas
+            Ajustar preferências
           </ButtonLink>
           {error && <p className="w-full text-sm text-bad">{error}</p>}
         </>

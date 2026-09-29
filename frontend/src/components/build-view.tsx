@@ -5,9 +5,10 @@ import { brl, signedBrl, timeAgo } from "@/lib/format";
 import type { Alternative, BuildItem, BuildView as Build, Category } from "@/lib/types";
 import { CompatibilityPanel } from "./compatibility-panel";
 import { FuturePanel } from "./future-panel";
-import { ArrowIcon, BoltIcon, ChevronIcon, ExternalIcon, InfoIcon, XIcon } from "./icons";
+import { ArrowIcon, DownloadIcon, BoltIcon, ChevronIcon, ExternalIcon, InfoIcon, XIcon } from "./icons";
 import { PartsMap } from "./parts-map";
 import { SetupReview } from "./setup-review";
+import { BestStores } from "./best-stores";
 import { BudgetPlanner } from "./budget-planner";
 import { IsoPart, PcDiagram } from "./pc-diagram";
 import { Build3d } from "./pc3d/build-3d";
@@ -55,13 +56,15 @@ export function BuildView({
   function select(category: Category) {
     setSelected(category);
     if (partsView === "sheet") setExpanded(new Set([category]));
+    // The map and "Sobre o PC" show the part in the details panel; the sheet opens its row.
+    const panel = partsView !== "sheet";
     setTimeout(
       () =>
-        document.getElementById(partsView === "map" ? "detalhes-peca" : `peca-${category}`)?.scrollIntoView({
+        document.getElementById(panel ? "detalhes-peca" : `peca-${category}`)?.scrollIntoView({
           behavior: "smooth",
-          block: partsView === "map" ? "nearest" : "start",
+          block: panel ? "nearest" : "center",
         }),
-      partsView === "map" ? 0 : 320,
+      panel ? 0 : 320,
     );
   }
 
@@ -79,21 +82,21 @@ export function BuildView({
 
   /**
    * The sheet opens one part at a time: opening a part closes the one that was open, then brings the opened
-   * part to the top of the screen for reading (once the other part has finished closing, so the target is still).
+   * part to the middle of the screen for reading (once the other part has finished closing, so the target is still).
    */
   function toggleOnSheet(category: Category) {
     const opening = !expanded.has(category);
     setExpanded(opening ? new Set([category]) : new Set());
     setSelected(category);
     if (opening) {
-      setTimeout(() => document.getElementById(`peca-${category}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 320);
+      setTimeout(() => document.getElementById(`peca-${category}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 320);
     }
   }
 
   return (
     <div className={busy ? "pointer-events-none opacity-60 transition-opacity" : "transition-opacity"} aria-busy={busy}>
       {/* Summary: plain text on the page, no panel. */}
-      <header className="flex flex-col gap-6 border-b border-border pb-8 md:flex-row md:items-end md:justify-between">
+      <header className="panel flex flex-col gap-6 rounded-2xl p-5 sm:p-6 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm text-muted">
             <span className="font-semibold text-accent">{title}</span>
@@ -120,13 +123,7 @@ export function BuildView({
           <div className="mt-2 flex flex-wrap items-center gap-3 md:justify-end">
             {totals.budgetBrl != null && budgetShare != null && (
               <span className="flex items-center gap-2 text-sm text-muted">
-                <span className="h-1 w-20 overflow-hidden rounded-full bg-border" aria-hidden>
-                  <span
-                    className={`block h-full rounded-full ${totals.withinBudget ? "bg-primary" : "bg-bad"}`}
-                    style={{ width: `${budgetShare}%` }}
-                  />
-                </span>
-                {totals.withinBudget ? "Dentro do" : "Acima do"} orçamento de {brl(totals.budgetBrl)}
+                <span className={totals.withinBudget ? "" : "text-bad"}>{totals.withinBudget ? "Dentro do" : "Acima do"} orçamento de {brl(totals.budgetBrl)}</span>
               </span>
             )}
             <StatusBadge status={build.compatibility.overall} />
@@ -135,9 +132,10 @@ export function BuildView({
         </div>
       </header>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(260px,340px)_1fr]">
+      <div className={`mt-8 grid gap-10 ${page === 1 ? "lg:grid-cols-[minmax(260px,340px)_1fr]" : ""}`}>
         {/* Visual */}
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        {/* The visual column belongs to page 1 (the parts); page 2 (the money) uses the full width. */}
+        <aside className={page === 1 ? "lg:sticky lg:top-24 lg:self-start" : "hidden"}>
           <ViewTabs
             label="Visualização"
             options={[
@@ -178,7 +176,8 @@ export function BuildView({
                     ...(build.future ? [{ id: "futuro", label: "Pensando no futuro" }] : []),
                   ]
                 : [
-                    { id: "gastos", label: "Planner de gastos" },
+                    { id: "gastos", label: "Planner de investimento" },
+                    { id: "lojas", label: "Melhores sites" },
                     ...(extra
                       ? [
                           {
@@ -211,7 +210,18 @@ export function BuildView({
                   onChange={setPartsView}
                 />
                 {partsView === "about" ? (
-                  <SetupReview build={build} />
+                  <>
+                    <SetupReview build={build} />
+                    {selectedItem && (
+                      <PartDetails
+                        key={selectedItem.category}
+                        item={selectedItem}
+                        onClose={() => setSelected(null)}
+                        onSwap={onSwap}
+                        performanceDisclaimer={build.disclaimers.performance}
+                      />
+                    )}
+                  </>
                 ) : partsView === "sheet" ? (
                   <ul className="divide-y divide-border overflow-hidden panel rounded-2xl">
                     {build.items.map((item) => (
@@ -285,14 +295,18 @@ export function BuildView({
               </button>
 
               <section id="gastos" aria-labelledby="planner-title" className="reveal panel scroll-mt-6 rounded-2xl p-5 sm:p-6">
-                <h2 id="planner-title" className="text-lg font-semibold">
-                  Planner de gastos
-                </h2>
-                <p className="mt-2 leading-relaxed text-muted">Para onde vai cada real do seu orçamento.</p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h2 id="planner-title" className="text-lg font-semibold">
+                    Planner de investimento
+                  </h2>
+                  <ExportButtons build={build} title={signature} />
+                </div>
                 <div className="mt-5">
                   <BudgetPlanner items={build.items} totals={totals} selected={selected} hovered={hovered} onSelect={select} />
                 </div>
               </section>
+
+              <BestStores items={build.items} />
 
               {extra}
 
@@ -517,8 +531,9 @@ function PartBody({
               return (
                 <li
                   key={alternative.component.id}
-                  className="inner-card flex flex-col gap-3 rounded-xl p-3 sm:flex-row sm:items-center sm:gap-4"
+                  className="group inner-card flex flex-col gap-3 rounded-xl p-3 sm:flex-row sm:items-center sm:gap-4"
                 >
+                  <IsoPart category={alternative.component.category} className="hidden size-10 shrink-0 sm:block" />
                   <span className="shrink-0 sm:w-36">
                     <span className="block text-sm text-muted">{cheaper ? "Mais barata" : "Mais forte"}</span>
                     <span className={`block font-semibold tabular-nums ${cheaper ? "text-ok" : "text-foreground"}`}>
@@ -645,6 +660,33 @@ function SectionIndex({ sections }: { sections: { id: string; label: string }[] 
         ))}
       </ul>
     </nav>
+  );
+}
+
+/** Downloads the budget as a PDF or an Excel workbook. The libraries load only when a button is pressed. */
+function ExportButtons({ build, title }: { build: Build; title: string }) {
+  const [busy, setBusy] = useState<"pdf" | "xlsx" | null>(null);
+  async function run(kind: "pdf" | "xlsx") {
+    setBusy(kind);
+    try {
+      const exporter = await import("@/lib/budget-export");
+      await (kind === "pdf" ? exporter.exportBudgetPdf(build, title) : exporter.exportBudgetXlsx(build, title));
+    } finally {
+      setBusy(null);
+    }
+  }
+  const style =
+    "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-sm font-medium text-muted transition-colors hover:bg-surface-muted hover:text-foreground active:scale-[0.98] disabled:opacity-60";
+  return (
+    <div className="flex items-center gap-1">
+      <span className="mr-1 text-sm text-subtle">Exportar:</span>
+      <button type="button" onClick={() => run("pdf")} disabled={busy !== null} className={style}>
+        <DownloadIcon className="size-3.5" /> {busy === "pdf" ? "Gerando…" : "PDF"}
+      </button>
+      <button type="button" onClick={() => run("xlsx")} disabled={busy !== null} className={style}>
+        <DownloadIcon className="size-3.5" /> {busy === "xlsx" ? "Gerando…" : "Excel"}
+      </button>
+    </div>
   );
 }
 

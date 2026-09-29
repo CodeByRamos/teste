@@ -49,10 +49,10 @@ function AspectRow({ aspect }: { aspect: FutureAspect }) {
 export function FuturePanel({ future }: { future: FutureOutlook }) {
   return (
     <section id="futuro" aria-labelledby="future-title" className="reveal scroll-mt-6 border-y border-border py-8">
-      <h2 id="future-title" className="sr-only">
+      <h2 id="future-title" className="text-2xl font-bold tracking-tight">
         Pensando no futuro
       </h2>
-      <ul className="divide-y divide-border">
+      <ul className="mt-4 divide-y divide-border">
         {future.aspects.map((aspect) => (
           <AspectRow key={aspect.id} aspect={aspect} />
         ))}

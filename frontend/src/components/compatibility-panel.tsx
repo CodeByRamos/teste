@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { BuildView, Finding, Status } from "@/lib/types";
-import { AlertIcon, CheckIcon, ChevronIcon, XIcon } from "./icons";
+import { AlertIcon, CheckIcon, ChevronIcon, PuzzleIcon, XIcon } from "./icons";
 import { Collapse } from "./ui";
 
 const STATUS_ICON: Record<Status, { Icon: typeof CheckIcon; color: string; border: string; label: string }> = {
@@ -86,17 +86,21 @@ export function CompatibilityPanel({ compatibility, psuWatts = null }: { compati
     <section id="compatibilidade" aria-labelledby="compat-title" className="reveal panel scroll-mt-6 overflow-hidden rounded-2xl">
       {/* Verdict band: the answer first, the energy budget beside it. */}
       <div className="grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,300px)] md:items-center">
-        <div>
-          <h2 id="compat-title" className="text-sm font-semibold text-muted">
-            Compatibilidade
-          </h2>
-          <p className="mt-2 flex items-start gap-2.5 leading-relaxed">
-            <Icon className={`mt-0.5 size-5 shrink-0 ${color}`} strokeWidth={2.5} aria-label={VERDICT[compatibility.overall]} role="img" />
-            <span>
-              {compatibility.overall === "OK" ? "" : `${compatibility.summary} `}
-              {passed.length} de {compatibility.findings.length} verificações sem problemas.
-            </span>
-          </p>
+        <div className="flex items-start gap-4">
+          <PuzzleIcon aria-hidden className="size-10 shrink-0 text-accent" strokeWidth={1.5} />
+          <div className="min-w-0">
+            <h2 id="compat-title" className="text-sm font-semibold text-muted">
+              Compatibilidade
+            </h2>
+            <p className="mt-2 flex items-start gap-2.5 leading-relaxed">
+              <Icon className={`mt-0.5 size-5 shrink-0 ${color}`} strokeWidth={2.5} aria-label={VERDICT[compatibility.overall]} role="img" />
+              <span>
+                {compatibility.overall === "OK"
+                  ? "Todas as peças são compatíveis."
+                  : `${compatibility.summary} ${passed.length} de ${compatibility.findings.length} verificações sem problemas.`}
+              </span>
+            </p>
+          </div>
         </div>
         <div className="md:border-l md:border-border md:pl-6">
           <PowerGauge load={compatibility.power.estimatedLoadWatts} recommended={compatibility.power.recommendedPsuWatts} psu={psuWatts} />

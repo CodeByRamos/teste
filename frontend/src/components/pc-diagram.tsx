@@ -224,10 +224,8 @@ const DRAWINGS: Record<Category, ReactNode> = {
   CASE: (
     <>
         <Box project={pcCase} w={64} d={36} h={112} grounded />
-        {/* Glass side with a fan behind it; front panel with power button and vents. */}
+        {/* Glass side; front panel with power button and vents. */}
         <path d={polygon(pcCase, [[8, 36, 10], [56, 36, 10], [56, 36, 102], [8, 36, 102]])} fill="url(#pcd-glass)" stroke="var(--part-stroke)" strokeWidth={0.8} />
-        <path d={circle(pcCase, "front", [32, 36, 70], 15)} fill="url(#pcd-well)" stroke="var(--part-stroke)" strokeWidth={0.8} />
-        <path d={circle(pcCase, "front", [32, 36, 70], 5)} {...DETAIL} />
         <path d={circle(pcCase, "side", [64, 18, 98], 3.5)} {...DETAIL} />
         {[70, 62, 54, 46, 38].map((z) => (
           <path key={z} d={polygon(pcCase, [[64, 8, z], [64, 28, z]], false)} {...DETAIL} />
@@ -333,17 +331,6 @@ export function IsoPart({ category, active = false, className = "" }: { category
   );
 }
 
-/** Callout positions: label center and the spot it points at. */
-const CALLOUTS: Record<Category, { at: [number, number]; to: [number, number] }> = {
-  CASE: { at: [265, 18], to: pcCase([24, 0, 112]) },
-  MEMORY: { at: [55, 18], to: ram([30, 0, 15]) },
-  CPU: { at: [160, 18], to: cpu([20, 20, 5]) },
-  CPU_COOLER: { at: [55, 266], to: cooler([18, 36, 4]) },
-  GPU: { at: [160, 266], to: gpu([47, 8, 2]) },
-  STORAGE: { at: [55, 424], to: storage([23, 30, 0]) },
-  POWER_SUPPLY: { at: [160, 424], to: psu([26, 40, 0]) },
-  MOTHERBOARD: { at: [265, 424], to: board([29, 52, 0]) },
-};
 
 const LABELS: Record<Category, string> = {
   CASE: "Gabinete",
@@ -356,6 +343,17 @@ const LABELS: Record<Category, string> = {
   MOTHERBOARD: "Placa-mãe",
 };
 
+/** Callout positions: label center and the spot it points at. */
+const CALLOUTS: Record<Category, { at: [number, number]; to: [number, number] }> = {
+  CASE: { at: [265, 18], to: pcCase([24, 0, 112]) },
+  MEMORY: { at: [55, 18], to: ram([30, 0, 15]) },
+  CPU: { at: [160, 18], to: cpu([20, 20, 5]) },
+  CPU_COOLER: { at: [55, 266], to: cooler([18, 36, 4]) },
+  GPU: { at: [160, 266], to: gpu([47, 8, 2]) },
+  STORAGE: { at: [55, 424], to: storage([23, 30, 0]) },
+  POWER_SUPPLY: { at: [160, 424], to: psu([26, 40, 0]) },
+  MOTHERBOARD: { at: [265, 424], to: board([29, 52, 0]) },
+};
 export function PcDiagram({
   items,
   findings,

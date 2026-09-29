@@ -41,7 +41,7 @@ export function BudgetPlanner({
     <div>
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
         <div>
-          <p className="text-sm text-muted">Gasto</p>
+          <p className="text-sm text-muted">Investimento</p>
           <p className="font-display text-4xl font-bold tracking-tight tabular-nums">
             <Price amount={spent} />
           </p>
