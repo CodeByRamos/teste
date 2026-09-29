@@ -69,6 +69,33 @@ export const SparkIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const BoltIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
+  </Icon>
+);
+
+/** Piggy bank: spending less. */
+export const PiggyIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M19 10.5c.8.3 1.5 1 1.5 2 0 .5-.2.9-.5 1.2" />
+    <path d="M5 11.5C5 8.5 8 6 12 6c1.2 0 2.3.2 3.3.6L18 5v3.2c.6.7 1 1.6 1 2.6v.7l1.5.5v2.5l-1.8.6c-.5.9-1.2 1.6-2.2 2.1V20h-2.5v-1.5a9 9 0 0 1-3 0V20H8.5v-2.3C6.4 16.6 5 14.2 5 11.5Z" />
+    <path d="M9.5 8.8c.8-.3 1.6-.4 2.5-.4" />
+    <circle cx="15.5" cy="10" r=".6" fill="currentColor" />
+    <path d="M5 11.5c-1.2 0-2-.8-2-2" />
+  </Icon>
+);
+
+/** Rocket: spending more for more performance. */
+export const RocketIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 15.5 8.5 12c1.8-5 5.2-8.3 11.5-9-.7 6.3-4 9.7-8 12.5Z" />
+    <circle cx="15" cy="9" r="1.6" />
+    <path d="M8.5 12 5 11.5l2.5-3.5 4 .2M12 15.5l.5 3.5 3.5-2.5-.2-4" />
+    <path d="M6.5 16.5c-1.2.3-2 1.5-2.5 3.5 2-.5 3.2-1.3 3.5-2.5" />
+  </Icon>
+);
+
 export const SearchIcon = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="11" cy="11" r="7" />

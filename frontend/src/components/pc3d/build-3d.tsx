@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { assemble } from "@/lib/models3d/assembly";
 import { categoryOfSlot, loadModelCatalog, toBuildModels } from "@/lib/models3d/from-build";
 import type { ModelCatalog } from "@/lib/models3d/spec";
@@ -12,8 +12,16 @@ const PcScene = dynamic(() => import("./pc-scene").then((m) => m.PcScene), {
   loading: () => <div className="grid h-full place-items-center text-sm text-muted">Carregando 3D…</div>,
 });
 
-/** The build drawn in 3D from the parametric model library. Clicking a part selects it in the list. */
-export function Build3d({ items, selected, onSelect }: { items: BuildItem[]; selected: Category | null; onSelect: (category: Category) => void }) {
+/** The build drawn in 3D. Memoized so hover highlights elsewhere on the page don't re-render the scene. */
+export const Build3d = memo(function Build3d({
+  items,
+  selected,
+  onSelect,
+}: {
+  items: BuildItem[];
+  selected: Category | null;
+  onSelect: (category: Category) => void;
+}) {
   const [catalog, setCatalog] = useState<ModelCatalog | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -46,4 +54,4 @@ export function Build3d({ items, selected, onSelect }: { items: BuildItem[]; sel
       }}
     />
   );
-}
+});

@@ -51,23 +51,74 @@ export function StatusIcon({ status, className = "size-4" }: { status: Status; c
   );
 }
 
-export function Notice({ tone = "info", children }: { tone?: "info" | "warn" | "bad"; children: ReactNode }) {
-  const tones = {
-    info: "bg-accent-soft text-foreground",
-    warn: "bg-warn-soft text-foreground",
-    bad: "bg-bad-soft text-foreground",
-  };
-  const iconTones = { info: "text-accent", warn: "text-warn", bad: "text-bad" };
+type CalloutTone = "accent" | "warn" | "bad";
+
+const calloutTones: Record<CalloutTone, { border: string; edge: string; ring: string; title: string }> = {
+  accent: {
+    border: "border-accent/30",
+    edge: "via-accent/70",
+    ring: "border-accent/40 bg-accent/10 text-accent shadow-[0_0_18px_-4px_rgb(168_85_247/0.6)]",
+    title: "text-accent",
+  },
+  warn: {
+    border: "border-warn/30",
+    edge: "via-warn/70",
+    ring: "border-warn/40 bg-warn/10 text-warn shadow-[0_0_18px_-4px_rgb(252_211_77/0.45)]",
+    title: "text-warn",
+  },
+  bad: {
+    border: "border-bad/30",
+    edge: "via-bad/70",
+    ring: "border-bad/40 bg-bad/10 text-bad shadow-[0_0_18px_-4px_rgb(255_138_138/0.45)]",
+    title: "text-bad",
+  },
+};
+
+/**
+ * The product's notice box: near-black card with a thin tinted border and a glowing top edge, an icon in a ringed
+ * circle, an optional small-caps title, the message and an optional footnote.
+ */
+export function Callout({
+  tone = "accent",
+  title,
+  icon,
+  footnote,
+  children,
+}: {
+  tone?: CalloutTone;
+  title?: ReactNode;
+  icon?: ReactNode;
+  footnote?: ReactNode;
+  children: ReactNode;
+}) {
+  const style = calloutTones[tone];
+  const Fallback = tone === "accent" ? InfoIcon : AlertIcon;
   return (
-    <div className={`flex gap-3 rounded-xl px-4 py-3 text-sm leading-relaxed ${tones[tone]}`} role="note">
-      {tone === "info" ? (
-        <InfoIcon className={`mt-0.5 size-4 shrink-0 ${iconTones[tone]}`} />
-      ) : (
-        <AlertIcon className={`mt-0.5 size-4 shrink-0 ${iconTones[tone]}`} />
-      )}
-      <div>{children}</div>
+    <div
+      className={`relative flex gap-4 overflow-hidden rounded-xl border ${style.border} bg-[color-mix(in_oklab,var(--background)_55%,black)] p-4 sm:p-5`}
+      role="note"
+    >
+      <span aria-hidden className={`pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent ${style.edge} to-transparent`} />
+      <span aria-hidden className={`grid size-10 shrink-0 place-items-center rounded-full border ${style.ring}`}>
+        {icon ?? <Fallback className="size-4.5" />}
+      </span>
+      <div className="min-w-0 flex-1 self-center">
+        {title && <p className={`text-xs font-semibold tracking-wide uppercase ${style.title}`}>{title}</p>}
+        <div className={`leading-relaxed text-foreground ${title ? "mt-1.5" : ""}`}>{children}</div>
+        {footnote && (
+          <p className="mt-3 flex items-start gap-1.5 text-sm text-subtle">
+            <InfoIcon className="mt-0.5 size-3.5 shrink-0" />
+            <span>{footnote}</span>
+          </p>
+        )}
+      </div>
     </div>
   );
+}
+
+/** Short notice in the Callout style: information (violet), warning (amber) or error (red). */
+export function Notice({ tone = "info", children }: { tone?: "info" | "warn" | "bad"; children: ReactNode }) {
+  return <Callout tone={tone === "info" ? "accent" : tone}>{children}</Callout>;
 }
 
 export function PageHeader({ eyebrow, title, children }: { eyebrow?: string; title: string; children?: ReactNode }) {
@@ -95,6 +146,16 @@ export function Collapse({ open, id, className = "", children }: { open: boolean
         <div className={className}>{children}</div>
       </div>
     </div>
+  );
+}
+
+/** Money with a violet "R$", as on the parts map. */
+export function Price({ amount }: { amount: number }) {
+  const value = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(amount).replace(/^R\$\s*/, "");
+  return (
+    <>
+      <span className="text-accent">R$</span> {value}
+    </>
   );
 }
 

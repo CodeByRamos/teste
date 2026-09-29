@@ -17,7 +17,7 @@ function AspectRow({ aspect }: { aspect: FutureAspect }) {
   return (
     <li className="py-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-muted">{aspect.title}</p>
+        <p className="text-xs font-semibold tracking-wide text-accent uppercase">{aspect.title}</p>
         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${level.className}`}>
           <level.Icon className="size-3.5" strokeWidth={2.5} />
           {level.label}
@@ -48,7 +48,7 @@ function AspectRow({ aspect }: { aspect: FutureAspect }) {
 /** "Thinking about the future": what can be upgraded later without replacing other parts. Content comes from the API. */
 export function FuturePanel({ future }: { future: FutureOutlook }) {
   return (
-    <section aria-labelledby="future-title" className="rounded-2xl border border-border bg-surface p-5 sm:p-6">
+    <section aria-labelledby="future-title" className="panel rounded-2xl p-5 sm:p-6">
       <h2 id="future-title" className="text-lg font-semibold">
         Pensando no futuro
       </h2>

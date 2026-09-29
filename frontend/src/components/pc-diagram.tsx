@@ -24,6 +24,7 @@ function DiagramPart({
   item,
   status,
   selected,
+  hovered,
   onSelect,
   children,
 }: {
@@ -31,6 +32,7 @@ function DiagramPart({
   item: BuildItem | undefined;
   status: Status | null;
   selected: boolean;
+  hovered: boolean;
   onSelect: () => void;
   children: ReactNode;
 }) {
@@ -55,6 +57,7 @@ function DiagramPart({
       className="diagram-part outline-none"
       data-interactive={present}
       data-selected={selected}
+      data-hovered={hovered}
       data-status={status ?? undefined}
       style={{ ["--base-stroke" as string]: stroke, ["--base-fill" as string]: fill }}
       strokeDasharray={present ? undefined : "4 4"}
@@ -93,7 +96,7 @@ function circle(project: Project, plane: "top" | "front" | "side", center: Point
   return polygon(project, points);
 }
 
-const FACE = { fill: "var(--part-fill)", stroke: "var(--part-stroke)", strokeWidth: 1, strokeLinejoin: "miter" } as const;
+const FACE = { fill: "var(--part-fill)", stroke: "var(--part-stroke)", strokeWidth: 0.8, strokeLinejoin: "miter" } as const;
 const DETAIL = { fill: "none", stroke: "var(--part-stroke)", strokeWidth: 0.8, strokeLinejoin: "miter" } as const;
 
 /**
@@ -166,7 +169,7 @@ function Callout({ label, at, to }: { label: string; at: [number, number]; to: [
       <path d={`M${lx} ${fromY}V${midY}H${tx}V${endY}`} fill="none" stroke="var(--part-line)" strokeWidth={0.9} />
       <circle cx={tx} cy={ty} r={3.8} fill="var(--surface)" stroke="var(--part-line)" strokeWidth={1} />
       <circle cx={tx} cy={ty} r={1.4} fill="var(--accent)" stroke="none" />
-      <rect x={lx - width / 2} y={ly - 10} width={width} height={20} rx={4} fill="var(--label-fill)" stroke="var(--part-line)" strokeWidth={0.9} />
+      <rect x={lx - width / 2} y={ly - 10} width={width} height={20} rx={2} fill="var(--label-fill)" stroke="var(--part-line)" strokeWidth={0.9} />
       <text x={lx} y={ly + 3.6} textAnchor="middle" fontSize={10} fontWeight={500} fill="var(--label-text)" stroke="none">
         {label}
       </text>
@@ -357,12 +360,15 @@ export function PcDiagram({
   items,
   findings,
   selected,
+  hovered = null,
   onSelect,
   stockCooler,
 }: {
   items: BuildItem[];
   findings: Finding[];
   selected: Category | null;
+  /** Part hovered in another view (map or sheet), shown here as if hovered. */
+  hovered?: Category | null;
   onSelect: (category: Category) => void;
   stockCooler: boolean;
 }) {
@@ -379,6 +385,7 @@ export function PcDiagram({
           item={byCategory.get(category)}
           status={statusOf(findings, category)}
           selected={selected === category}
+          hovered={hovered === category}
           onSelect={() => onSelect(category)}
         >
           {DRAWINGS[category]}

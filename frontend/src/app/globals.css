@@ -13,14 +13,14 @@
 :root {
   color-scheme: dark;
 
-  --background: #111116;
-  --surface: #18181f;
-  --surface-muted: #212129;
+  --background: #17171e;
+  --surface: #0e0d14;
+  --surface-muted: #1f1c2b;
   --foreground: #f2f1f7;
   --muted: #b9b7c6;
   --subtle: #9d9aad;
-  --border: #2a2a34;
-  --border-strong: #3d3b4b;
+  --border: #2a2438;
+  --border-strong: #3c3452;
 
   /* Solid accent for text, borders and outlines on dark surfaces. */
   --accent: #c4a3ff;
@@ -45,12 +45,14 @@
   /* Fine dot mesh, like perforated metal: flat and uniform, never faded. */
   --texture-dots: radial-gradient(rgb(255 255 255 / 0.075) 0.7px, transparent 0.9px);
   --texture-dots-size: 4px 4px;
+  /* The page behind the dot mesh, a step darker than the plain --background bands. */
+  --page: #111117;
 
   /* Closed page sections: each band has its own flat tone and hard edges. */
-  --band-raised: #17171e;
-  --band-sunken: #0c0c10;
+  --band-raised: #1c1c24;
+  --band-sunken: #121217;
 
-  --radius: 14px;
+  --radius: 6px;
 }
 
 @theme inline {
@@ -74,6 +76,14 @@
   --color-bad: var(--bad);
   --color-bad-soft: var(--bad-soft);
   --radius-card: var(--radius);
+  /* Sharp corners across the product: every rounded-* step is tighter than Tailwind's default. */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 5px;
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
   --font-sans: var(--font-sans-family);
   --font-mono: var(--font-mono-family);
   --font-display: var(--font-display-family);
@@ -96,11 +106,11 @@
 }
 
 html {
-  background: var(--background);
+  background: var(--page);
 }
 
 body {
-  background: var(--texture-dots) var(--background);
+  background: var(--texture-dots) var(--page);
   background-size: var(--texture-dots-size);
   color: var(--foreground);
   font-family: var(--font-sans-family), system-ui, sans-serif;
@@ -125,7 +135,7 @@ label:has(input:not(:disabled)) {
 /*
  * Parts of the PC diagram. Their colors are registered properties so they fade between states. At rest a part
  * is drawn in neutral gray; on hover and while selected it is filled solid violet with light line work and its
- * label becomes a solid violet pill.
+ * label becomes a solid violet pill. [data-hovered] mirrors a hover on the same part in the map or the sheet.
  * A status color (warning, incompatible) always wins over hover.
  */
 @property --part-stroke {
@@ -180,7 +190,7 @@ label:has(input:not(:disabled)) {
 }
 
 /* Hover and selection: the part filled solid violet with light line work, and a violet label pill. */
-.diagram-part[data-interactive="true"]:not([data-status]):is(:hover, :focus-visible, [data-selected="true"]) {
+.diagram-part[data-interactive="true"]:not([data-status]):is(:hover, :focus-visible, [data-hovered="true"], [data-selected="true"]) {
   --part-stroke: #f3e8ff;
   --part-fill: var(--primary);
   --part-line: var(--accent);
@@ -189,12 +199,12 @@ label:has(input:not(:disabled)) {
   filter: drop-shadow(0 0 6px rgb(147 51 234 / 0.35));
 }
 
-.diagram-part[data-interactive="true"]:not([data-status]):is(:hover, :focus-visible) {
+.diagram-part[data-interactive="true"]:not([data-status]):is(:hover, :focus-visible, [data-hovered="true"]) {
   translate: 0 -2px;
 }
 
 /* Hovering the selected part: a brighter violet and a stronger glow, so it still reads as clickable. */
-.diagram-part[data-interactive="true"][data-selected="true"]:not([data-status]):is(:hover, :focus-visible) {
+.diagram-part[data-interactive="true"][data-selected="true"]:not([data-status]):is(:hover, :focus-visible, [data-hovered="true"]) {
   --part-fill: #9333ea;
   --label-fill: #9333ea;
   filter: drop-shadow(0 0 9px rgb(147 51 234 / 0.5));
@@ -253,10 +263,31 @@ details[open]::details-content {
   opacity: 1;
 }
 
+/* The home banner video holds on its poster frame for people who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-video {
+    display: none;
+  }
+}
+
+/* Panels and inner cards, in the style of the parts map: near-black, thin violet-tinted border. */
+@utility panel {
+  background-color: var(--surface);
+  border: 1px solid rgb(196 163 255 / 0.18);
+}
+
+@utility inner-card {
+  border: 1px solid rgb(196 163 255 / 0.14);
+  transition: border-color 0.2s ease;
+  &:hover {
+    border-color: rgb(196 163 255 / 0.4);
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {

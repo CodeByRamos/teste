@@ -1,10 +1,9 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
-import { brl } from "@/lib/format";
 import type { BuildItem, Category, Finding, Spec, Status } from "@/lib/types";
 import { IsoPart, statusOf } from "./pc-diagram";
-import { StatusIcon } from "./ui";
+import { Price, StatusIcon } from "./ui";
 
 /**
  * Mind-map view of the build: the motherboard is the hub in the middle, the other parts line up three on each
@@ -114,11 +113,14 @@ export function PartsMap({
   findings,
   selected,
   onSelect,
+  onHover,
 }: {
   items: BuildItem[];
   findings: Finding[];
   selected: Category | null;
   onSelect: (category: Category) => void;
+  /** Called with the part under the pointer (or keyboard focus), and null when it leaves. */
+  onHover?: (category: Category | null) => void;
 }) {
   const byCategory = new Map(items.map((item) => [item.category, item]));
   const listRef = useRef<HTMLUListElement>(null);
@@ -163,7 +165,7 @@ export function PartsMap({
   return (
     <ul
       ref={listRef}
-      className="relative grid gap-3 rounded-2xl border-2 border-dashed border-border-strong bg-surface p-3 sm:p-5 md:auto-rows-fr md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] md:gap-x-12 md:gap-y-5 md:[grid-template-areas:'cpu_mb_gpu'_'cooler_mb_storage'_'memory_mb_psu'_'._case_.']"
+      className="relative grid gap-3 rounded-2xl border border-dashed border-border-strong bg-surface p-3 sm:p-5 md:auto-rows-fr md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] md:gap-x-12 md:gap-y-5 md:[grid-template-areas:'cpu_mb_gpu'_'cooler_mb_storage'_'memory_mb_psu'_'._case_.']"
       aria-label="Mapa das peças"
     >
       <svg className="pointer-events-none absolute inset-0 size-full overflow-visible" aria-hidden>
@@ -188,6 +190,7 @@ export function PartsMap({
             emptyText={node.category === "CPU_COOLER" && cpuHasCooler ? "Usa o que vem com o processador" : "Não incluído"}
             selected={selected === node.category}
             onSelect={() => onSelect(node.category)}
+            onHover={(on) => onHover?.(on ? node.category : null)}
           />
         </li>
       ))}
@@ -202,6 +205,7 @@ function PartNode({
   emptyText,
   selected,
   onSelect,
+  onHover,
 }: {
   category: Category;
   item: BuildItem | undefined;
@@ -209,6 +213,7 @@ function PartNode({
   emptyText: string;
   selected: boolean;
   onSelect: () => void;
+  onHover: (on: boolean) => void;
 }) {
   const name = item?.categoryLabel ?? NAMES[category];
   const iconTile = (
@@ -232,40 +237,55 @@ function PartNode({
   }
   const chips = keySpecs(item).map((s) => s.value);
   const border =
-    status === "INCOMPATIBLE" ? "border-bad" : status === "WARNING" ? "border-warn" : selected ? "border-accent" : "border-border";
+    status === "INCOMPATIBLE" ? "border-bad" : status === "WARNING" ? "border-warn" : selected ? "border-accent" : "border-accent/40";
   return (
     <button
       type="button"
       data-node={category}
       onClick={onSelect}
+      onPointerEnter={() => onHover(true)}
+      onPointerLeave={() => onHover(false)}
+      onFocus={() => onHover(true)}
+      onBlur={() => onHover(false)}
       aria-pressed={selected}
       aria-controls={selected ? "detalhes-peca" : undefined}
-      className={`group flex h-full w-full flex-col rounded-xl border-2 bg-surface p-3 text-left shadow-sm transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_28px_-10px_rgb(147_51_234/0.55)] focus-visible:-translate-y-0.5 ${border}`}
+      className={`group flex h-full w-full flex-col rounded-xl border bg-[color-mix(in_oklab,var(--background)_55%,black)] p-3 text-left shadow-sm transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_10px_28px_-10px_rgb(147_51_234/0.55)] focus-visible:-translate-y-0.5 ${border}`}
     >
       <span className="flex items-start gap-3">
         {iconTile}
         <span className="min-w-0 flex-1">
           <span className="flex items-start justify-between gap-2">
-            <span className="text-xs font-semibold tracking-wide text-muted uppercase">{name}</span>
+            <span className="text-xs font-semibold tracking-wide text-accent uppercase">{name}</span>
             {status && <StatusIcon status={status} className="size-3" />}
           </span>
-          <span className="mt-0.5 line-clamp-2 h-10 overflow-hidden text-sm font-semibold text-pretty">{item.component.name}</span>
+          <span className={`mt-0.5 line-clamp-2 h-10 overflow-hidden text-sm font-semibold text-pretty transition-colors group-hover:text-accent ${selected ? "text-accent" : ""}`}>
+            {item.component.name}
+          </span>
         </span>
       </span>
       {chips.length > 0 && (
         <span className="mt-2 mb-2 flex gap-1 overflow-hidden">
           {chips.map((chip) => (
-            <span key={chip} className="min-w-0 truncate rounded-md bg-accent-soft px-1.5 py-0.5 text-xs text-accent">
+            <span
+              key={chip}
+              className={`min-w-0 truncate rounded-md border px-1.5 py-0.5 text-xs transition-colors ${
+                selected
+                  ? "border-accent/50 bg-accent-soft text-accent"
+                  : "border-border-strong text-muted group-hover:border-accent/50 group-hover:bg-accent-soft group-hover:text-accent group-focus-visible:border-accent/50 group-focus-visible:bg-accent-soft group-focus-visible:text-accent"
+              }`}
+            >
               {chip}
             </span>
           ))}
         </span>
       )}
-      <span className="mt-auto flex items-center justify-end gap-2 border-t border-border pt-1.5 text-xs">
+      <span className="mt-auto flex items-center justify-end gap-2 border-t border-accent/15 pt-1.5 text-xs">
         {item.owned ? (
           <span className="font-semibold text-ok">Você já tem</span>
         ) : item.price ? (
-          <span className="font-semibold whitespace-nowrap tabular-nums">{brl(item.price.amountBrl)}</span>
+          <span className="font-semibold whitespace-nowrap tabular-nums">
+            <Price amount={item.price.amountBrl} />
+          </span>
         ) : (
           <span className="text-subtle">Sem preço</span>
         )}

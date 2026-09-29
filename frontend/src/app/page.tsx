@@ -58,9 +58,27 @@ const [taglineLead, taglineRest] = (() => {
 export default function Home() {
   return (
     <>
-      {/* Closed bands: a dotted hero, a plain band, then a sunken band down to the footer. */}
-      <div className="border-b border-border bg-band-raised texture-dots">
-        <section className="mx-auto max-w-4xl px-4 pt-16 pb-16 sm:px-6 sm:pt-24 sm:pb-20">
+      {/* Closed bands: a video hero, a plain band, then a sunken band down to the footer. */}
+      <div className="relative isolate overflow-hidden border-b border-border bg-band-raised bg-[url(/media/hero-poster.jpg)] bg-cover bg-center">
+        {/* Decorative background loop (muted, no controls). The poster stands in while it loads and for reduced motion. */}
+        <video
+          className="hero-video absolute inset-0 -z-20 size-full object-cover"
+          src="/media/hero.mp4"
+          poster="/media/hero-poster.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden
+          tabIndex={-1}
+        />
+        {/* Darkens the footage so the headline and the input read clearly, fading into the page below. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_55%_45%_at_50%_42%,rgb(23_23_30/0.55),transparent),linear-gradient(to_bottom,rgb(23_23_30/0.78),rgb(23_23_30/0.7)_45%,rgb(23_23_30/0.94))]"
+        />
+        <section className="mx-auto max-w-4xl px-4 pt-20 pb-20 sm:px-6 sm:pt-28 sm:pb-24">
           <h1 className="text-center text-4xl font-bold tracking-tight text-balance sm:text-6xl">
             {taglineLead}
             {taglineRest && (

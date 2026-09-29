@@ -30,10 +30,13 @@ export function PcScene({
   hideSidePanel: boolean;
   onStats?: (stats: SceneStats) => void;
 }) {
-  const caseBox = assembly.placements.find((p) => p.key === "case")?.box;
-  const center = caseBox ? caseBox.getCenter(new THREE.Vector3()) : new THREE.Vector3(0, 0.24, 0);
-  const size = caseBox ? caseBox.getSize(new THREE.Vector3()) : new THREE.Vector3(0.24, 0.48, 0.46);
-  const distance = Math.max(size.x, size.y, size.z) * 2.1;
+  // Stable per assembly: the camera only re-frames when the build or the selected part changes, never on a re-render.
+  const { center, distance } = useMemo(() => {
+    const caseBox = assembly.placements.find((p) => p.key === "case")?.box;
+    const center = caseBox ? caseBox.getCenter(new THREE.Vector3()) : new THREE.Vector3(0, 0.24, 0);
+    const size = caseBox ? caseBox.getSize(new THREE.Vector3()) : new THREE.Vector3(0.24, 0.48, 0.46);
+    return { center, distance: Math.max(size.x, size.y, size.z) * 2.1 };
+  }, [assembly]);
   const focusBox = useMemo(() => {
     if (selectedKey === null) return null;
     // Memory sticks are separate placements; frame all of them together.
@@ -50,7 +53,7 @@ export function PcScene({
       camera={{ position: [center.x + distance * 0.95, center.y + distance * 0.35, center.z + distance * 0.55], fov: 35, near: 0.01, far: 20 }}
       onPointerMissed={() => onSelect(null)}
     >
-      <color attach="background" args={["#18181f"]} />
+      <color attach="background" args={["#1e1e27"]} />
       <StudioEnvironment />
       <hemisphereLight args={["#ffffff", "#3a3548", 0.75]} />
       <directionalLight position={[1.2, 1.6, 0.8]} intensity={1.8} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} />
