@@ -144,3 +144,16 @@ jobs:
             api.log
             web.log
           retention-days: 7
+
+  docker-image:
+    # The same image Railway builds (backend/Dockerfile from the repository root): catches build-time failures,
+    # such as the snapshot download, before a deploy does.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build API image
+        run: docker build -f backend/Dockerfile -t platform-api:ci .
+      - name: Image contains the pinned OpenDB snapshot
+        run: |
+          docker run --rm --entrypoint sh platform-api:ci -c \
+            'cat /opt/opendb/CURRENT && ls /opt/opendb/$(cat /opt/opendb/CURRENT) && cat /opt/opendb/$(cat /opt/opendb/CURRENT)/SNAPSHOT.json'

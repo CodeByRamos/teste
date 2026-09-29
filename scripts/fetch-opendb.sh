@@ -30,14 +30,31 @@ done
 STAGING="$(mktemp -d)"
 trap 'rm -rf "$STAGING"' EXIT
 
+# No pipes between producers and early-exiting consumers: with `pipefail`, a consumer that stops reading
+# (head, sed q, tar finishing early) kills the producer with SIGPIPE and fails the build (exit 141).
+COMMITTED_AT=""
 if [[ -n "${OPENDB_LOCAL_REPO:-}" ]]; then
-  git -C "$OPENDB_LOCAL_REPO" archive --format=tar "$COMMIT" "${PATHS[@]}" | tar -x -C "$STAGING"
+  git -C "$OPENDB_LOCAL_REPO" archive --format=tar -o "$STAGING/snapshot.tar" "$COMMIT" "${PATHS[@]}"
+  tar -x -C "$STAGING" -f "$STAGING/snapshot.tar"
   COMMITTED_AT="$(git -C "$OPENDB_LOCAL_REPO" show -s --format=%cI "$COMMIT")"
 else
-  curl -fsSL "https://codeload.github.com/buildcores/buildcores-open-db/tar.gz/$COMMIT" \
-    | tar -xz -C "$STAGING" --strip-components=1 --wildcards "*/LICENSE.txt" $(printf '*/open-db/%s/* ' "${CATEGORIES[@]}")
-  COMMITTED_AT="$(curl -fsSL "https://api.github.com/repos/buildcores/buildcores-open-db/commits/$COMMIT" \
-    | sed -n 's/.*"date": *"\([^"]*\)".*/\1/p' | head -1)"
+  curl -fsSL --retry 3 --retry-delay 5 -o "$STAGING/snapshot.tar.gz" \
+    "https://codeload.github.com/buildcores/buildcores-open-db/tar.gz/$COMMIT"
+  tar -xz -C "$STAGING" -f "$STAGING/snapshot.tar.gz" --strip-components=1 --wildcards \
+    "*/LICENSE.txt" $(printf '*/open-db/%s/* ' "${CATEGORIES[@]}")
+  # Commit date is informational only. The GitHub API rate-limits anonymous calls (shared build machines hit it),
+  # so a failure here records "unknown" instead of failing the build.
+  if COMMIT_JSON="$(curl -fsSL --max-time 20 "https://api.github.com/repos/buildcores/buildcores-open-db/commits/$COMMIT")"; then
+    if [[ "$COMMIT_JSON" =~ \"date\":[[:space:]]*\"([^\"]+)\" ]]; then
+      COMMITTED_AT="${BASH_REMATCH[1]}"
+    fi
+  fi
+fi
+if [[ -n "$COMMITTED_AT" ]]; then
+  COMMITTED_AT_JSON="\"$COMMITTED_AT\""
+else
+  COMMITTED_AT_JSON="null"
+  echo "Commit date unavailable (GitHub API); recording it as unknown."
 fi
 
 mkdir -p "$TARGET"
@@ -51,10 +68,10 @@ cat > "$TARGET/SNAPSHOT.json" <<JSON
   "source": "buildcores-opendb",
   "repository": "$PUBLIC_REPO_URL",
   "commit": "$COMMIT",
-  "committedAt": "$COMMITTED_AT",
+  "committedAt": $COMMITTED_AT_JSON,
   "fetchedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "license": "ODC-By-1.0",
-  "categories": [$(printf '"%s",' "${CATEGORIES[@]}" | sed 's/,$//')]
+  "categories": [$(IFS=,; printf '"%s"' "${CATEGORIES[*]}" | sed 's/,/","/g')]
 }
 JSON
 
