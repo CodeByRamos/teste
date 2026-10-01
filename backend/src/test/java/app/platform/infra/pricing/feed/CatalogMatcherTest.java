@@ -3,6 +3,8 @@ package app.platform.infra.pricing.feed;
 import app.platform.Fixtures;
 import app.platform.hardware.CpuCooler;
 import app.platform.hardware.Gpu;
+import app.platform.hardware.Memory;
+import app.platform.hardware.Motherboard;
 import app.platform.pricing.Gtin;
 import org.junit.jupiter.api.Test;
 
@@ -55,5 +57,42 @@ class CatalogMatcherTest {
                 .hasValueSatisfying(match -> assertThat(match.method()).isEqualTo(CatalogMatcher.Method.MPN_IN_TITLE));
         // Part number only in the title, and the title does not say what it is: not enough evidence.
         assertThat(matcher.match(null, null, cooler.info().manufacturer(), "Thermalright PA140SE-BLACK")).isEmpty();
+    }
+
+    private final Motherboard board = Fixtures.one(Motherboard.class);
+    private final Memory memory = Fixtures.one(Memory.class);
+
+    /** "B650M" names a chipset shared by many boards; "B650MTOMAHAWK" names one board. */
+    private final CatalogMatcher titles = new CatalogMatcher(Map.of(), Map.of(
+            "B650M", Set.of(board.id(), gpu.id()),
+            "B650MTOMAHAWK", Set.of(board.id()),
+            "OTHERBOARD650", Set.of(gpu.id()),
+            "FF3D532G6000HC38ADC01", Set.of(memory.id()),
+            "16GB", Set.of(memory.id()),
+            "3200MHZ", Set.of(memory.id())), Fixtures.catalog());
+
+    @Test
+    void aSpecificCodeInTheTitleWinsOverAGenericOneSharedByManyProducts() {
+        assertThat(titles.match(null, null, "MSI", "Placa-Mãe MSI B650M Tomahawk, AMD AM5, DDR5 - B650M TOMAHAWK"))
+                .hasValueSatisfying(match -> assertThat(match.componentId()).isEqualTo(board.id()));
+        // Only the chipset: it fits several components, so it says nothing.
+        assertThat(titles.match(null, null, "MSI", "Placa-Mãe MSI Pro B650M, AMD AM5, DDR5")).isEmpty();
+        // Two codes that each identify a different component: ambiguous, no guess.
+        assertThat(titles.match(null, null, "MSI", "Placa-Mãe MSI B650M Tomahawk OTHERBOARD650")).isEmpty();
+    }
+
+    @Test
+    void capacitiesAndSpeedsNeverIdentifyAProduct() {
+        assertThat(titles.match(null, null, memory.info().manufacturer(), "Memória 16GB 3200MHz DDR4")).isEmpty();
+    }
+
+    @Test
+    void storeBrandNamesAreRecognizedAsTheCatalogMaker() {
+        // The catalog says TEAMGROUP; the store lists the T-Force line as the brand.
+        assertThat(titles.match(null, null, "T-Force", "Memória T-Force Delta RGB 32GB DDR5 - FF3D532G6000HC38ADC01"))
+                .hasValueSatisfying(match -> assertThat(match.componentId()).isEqualTo(memory.id()));
+        assertThat(CatalogMatcher.sameBrand("westerndigital", "sandisk")).isTrue();
+        assertThat(CatalogMatcher.sameBrand("adata", "xpg")).isTrue();
+        assertThat(CatalogMatcher.sameBrand("corsair", "xpg")).isFalse();
     }
 }

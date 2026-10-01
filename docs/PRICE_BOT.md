@@ -24,6 +24,11 @@ proteções. Para essas lojas o caminho é feed de afiliado ou acordo com a loja
    código do fabricante **no título** + marca. Trava de categoria: se o título diz o tipo do produto ("Ventoinha",
    "Placa de Vídeo"…) e ele não bate com a peça, não há casamento. No nível mais fraco o tipo tem de ser reconhecido.
    (Essa trava nasceu de um caso real: o registro de um water cooler no OpenDB trazia o código do kit de ventoinhas.)
+   No título, cada código é avaliado sozinho, do mais específico ao mais genérico: código que serve para várias peças
+   da marca ("B650M" é o chipset, não a placa) é ignorado; capacidade/velocidade/potência ("16GB", "3200MHz",
+   "750W") nunca identificam produto; se dois códigos apontam para peças diferentes, não há casamento. Marcas com mais
+   de um nome são reconhecidas (WD/SanDisk ↔ Western Digital, XPG ↔ ADATA, T-Force ↔ TEAMGROUP, AORUS ↔ Gigabyte,
+   HyperX/Fury ↔ Kingston).
 5. Validação antimanipulação (`OfferValidation`): HTTPS no domínio da loja, faixa plausível, comparação com outras
    lojas e com o preço anterior (queda brusca fica retida).
 6. Oferta (`store_offer`) e **histórico** (`price_observation`).

@@ -19,7 +19,8 @@ import java.util.UUID;
  *   <li>barcode (EAN/UPC/GTIN, check digit verified);</li>
  *   <li>manufacturer part number, unique in the catalog, with the same brand;</li>
  *   <li>a manufacturer part number found inside the listing title (stores such as KaBuM put it there instead of in
- *       structured data), unique among the title's candidates, with the same brand.</li>
+ *       structured data), with the same brand; codes shared by several components are ignored and every code
+ *       that identifies a component must point to the same one.</li>
  * </ol>
  */
 public final class CatalogMatcher {
@@ -69,12 +70,54 @@ public final class CatalogMatcher {
                 return Optional.empty();
             }
         }
-        Optional<UUID> byMpn = uniqueWithBrand(Set.of(nullToEmpty(normalizeMpn(mpn))), brand);
-        if (byMpn.isPresent()) {
-            return Optional.of(new Match(byMpn.get(), Method.MPN));
+        String structured = normalizeMpn(mpn);
+        if (structured != null) {
+            List<UUID> byMpn = withBrand(structured, brand);
+            if (byMpn.size() == 1) {
+                return Optional.of(new Match(byMpn.getFirst(), Method.MPN));
+            }
         }
-        return uniqueWithBrand(titleCandidates(title), brand).map(id -> new Match(id, Method.MPN_IN_TITLE));
+        return fromTitle(title, brand).map(id -> new Match(id, Method.MPN_IN_TITLE));
     }
+
+    /**
+     * Each title candidate is judged on its own, most specific first. A code that fits several components of the brand
+     * ("B650M" names a chipset, not a board) says nothing and is skipped, as is a shorter code inside a longer one that
+     * already identified the product. Every code that does identify a component must agree on the same one.
+     */
+    private Optional<UUID> fromTitle(String title, String brand) {
+        List<String> candidates = titleCandidates(title).stream()
+                .filter(candidate -> !GENERIC_TOKEN.matcher(candidate).matches())
+                .sorted(java.util.Comparator.comparingInt(String::length).reversed())
+                .toList();
+        List<String> identifying = new java.util.ArrayList<>();
+        Set<UUID> found = new HashSet<>();
+        for (String candidate : candidates) {
+            if (identifying.stream().anyMatch(longer -> longer.contains(candidate))) {
+                continue;
+            }
+            List<UUID> ids = withBrand(candidate, brand);
+            if (ids.size() == 1) {
+                identifying.add(candidate);
+                found.add(ids.getFirst());
+            }
+        }
+        return found.size() == 1 ? Optional.of(found.iterator().next()) : Optional.empty();
+    }
+
+    /** Capacities, speeds and wattages ("120GB", "3200MHZ", "750W") repeat across products and never identify one. */
+    private static final java.util.regex.Pattern GENERIC_TOKEN =
+            java.util.regex.Pattern.compile("\\d+(?:[.,]\\d+)?(?:GB|TB|MB|MHZ|GHZ|HZ|W|RPM|MM|CM|V)|DDR\\d.*|PCIE.*|GEN\\d.*");
+
+    /** Brands sold under more than one name: store listings use one, the catalog source another. */
+    private static final List<Set<String>> BRAND_ALIASES = List.of(
+            Set.of("westerndigital", "wd", "wdblack", "sandisk"),
+            Set.of("adata", "xpg"),
+            Set.of("teamgroup", "team", "tforce"),
+            Set.of("gigabyte", "aorus"),
+            Set.of("kingston", "kingstonfury", "hyperx"),
+            Set.of("coolermaster", "cm"),
+            Set.of("seasonic", "seasonicelectronics"));
 
     /** Product kinds as Brazilian stores name them at the start of a title; OTHER covers what the catalog does not carry. */
     private static final Map<String, String> KIND_WORDS = Map.ofEntries(
@@ -136,27 +179,29 @@ public final class CatalogMatcher {
         return candidates;
     }
 
-    private Optional<UUID> uniqueWithBrand(Set<String> mpns, String brand) {
+    /** Components in the catalog carrying this part number and made by the listing's brand; none without a brand. */
+    private List<UUID> withBrand(String mpn, String brand) {
         if (brand == null || brand.isBlank()) {
-            return Optional.empty();
+            return List.of();
         }
-        Set<UUID> found = new HashSet<>();
-        for (String mpn : mpns) {
-            if (!mpn.isEmpty()) {
-                found.addAll(inCatalog(mpnIndex.get(mpn)));
-            }
-        }
-        if (found.size() != 1) {
-            return Optional.empty();
-        }
-        UUID id = found.iterator().next();
         String wanted = foldBrand(brand);
-        boolean sameBrand = catalog.find(id)
-                .map(component -> component.info().manufacturer())
-                .map(CatalogMatcher::foldBrand)
-                .filter(maker -> !maker.isEmpty() && !wanted.isEmpty() && (maker.contains(wanted) || wanted.contains(maker)))
-                .isPresent();
-        return sameBrand ? Optional.of(id) : Optional.empty();
+        return inCatalog(mpnIndex.get(mpn)).stream()
+                .filter(id -> catalog.find(id)
+                        .map(component -> component.info().manufacturer())
+                        .map(CatalogMatcher::foldBrand)
+                        .filter(maker -> sameBrand(maker, wanted))
+                        .isPresent())
+                .toList();
+    }
+
+    static boolean sameBrand(String maker, String wanted) {
+        if (maker.isEmpty() || wanted.isEmpty()) {
+            return false;
+        }
+        if (maker.contains(wanted) || wanted.contains(maker)) {
+            return true;
+        }
+        return BRAND_ALIASES.stream().anyMatch(group -> group.contains(maker) && group.contains(wanted));
     }
 
     private List<UUID> inCatalog(Set<UUID> ids) {
@@ -174,9 +219,5 @@ public final class CatalogMatcher {
 
     private static String foldBrand(String brand) {
         return brand.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
-    }
-
-    private static String nullToEmpty(String value) {
-        return value == null ? "" : value;
     }
 }
