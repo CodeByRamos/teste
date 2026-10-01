@@ -55,8 +55,6 @@ public final class FeedImporter {
                           Map<String, Integer> rejections, boolean applied) {
     }
 
-    /** MPNs this short are too likely to collide across products to match on. */
-    static final int MIN_MPN_LENGTH = 5;
 
     private final StoreOfferRepository repository;
     private final StoreFeedPriceProvider provider;
@@ -84,9 +82,7 @@ public final class FeedImporter {
         }
         Map<FeedFormat.Column, Integer> positions = positions(header, feed.format().columns(feed.columns()));
 
-        Map<String, Set<UUID>> index = repository.gtinIndex();
-        Map<String, Set<UUID>> mpnIndex = repository.mpnIndex();
-        Catalog catalog = catalogs.get();
+        CatalogMatcher matcher = CatalogMatcher.load(repository, catalogs.get());
         List<StoredOffer> existing = repository.all();
         Map<UUID, BigDecimal> previous = new HashMap<>();
         Map<UUID, List<BigDecimal>> otherStores = new HashMap<>();
@@ -110,22 +106,16 @@ public final class FeedImporter {
                 count(rejections, "BAD_ROW");
                 continue;
             }
-            Optional<String> gtin = Gtin.normalize(cell(row, positions, FeedFormat.Column.GTIN));
-            List<UUID> components = gtin.map(code -> inCatalog(index.get(code), catalog)).orElse(List.of());
-            if (components.isEmpty()) {
-                // Second tier, for catalog parts without GTIN: exact MPN, unique in the catalog, same brand.
-                components = byMpnAndBrand(cell(row, positions, FeedFormat.Column.MPN),
-                        cell(row, positions, FeedFormat.Column.BRAND), mpnIndex, catalog);
-                if (components.isEmpty()) {
-                    continue; // not a PC part in our catalog: expected for most rows of a store feed
-                }
-                byMpn++;
+            Optional<CatalogMatcher.Match> match = matcher.match(cell(row, positions, FeedFormat.Column.GTIN),
+                    cell(row, positions, FeedFormat.Column.MPN), cell(row, positions, FeedFormat.Column.BRAND), null);
+            if (match.isEmpty()) {
+                continue; // not a PC part in our catalog (or ambiguous): expected for most rows of a store feed
             }
             matched++;
-            if (components.size() > 1) {
-                count(rejections, "AMBIGUOUS_GTIN");
-                continue;
+            if (match.get().method() != CatalogMatcher.Method.GTIN) {
+                byMpn++;
             }
+            List<UUID> components = List.of(match.get().componentId());
             String currency = cell(row, positions, FeedFormat.Column.CURRENCY);
             if (currency != null && !currency.isBlank() && !currency.strip().equalsIgnoreCase("BRL")) {
                 count(rejections, "WRONG_CURRENCY");
@@ -169,41 +159,6 @@ public final class FeedImporter {
         log.info("Price feed {}: {} rows, {} matched the catalog, {} accepted, rejected {}",
                 feed.id(), read, matched, accepted.size(), rejections);
         return summary;
-    }
-
-    private static List<UUID> inCatalog(Set<UUID> ids, Catalog catalog) {
-        return ids == null ? List.of() : ids.stream().filter(id -> catalog.find(id).isPresent()).toList();
-    }
-
-    private static List<UUID> byMpnAndBrand(String rawMpn, String brand, Map<String, Set<UUID>> mpnIndex, Catalog catalog) {
-        String mpn = normalizeMpn(rawMpn);
-        if (mpn == null || brand == null || brand.isBlank()) {
-            return List.of();
-        }
-        List<UUID> candidates = inCatalog(mpnIndex.get(mpn), catalog);
-        if (candidates.size() != 1) {
-            return List.of();
-        }
-        String feedBrand = foldBrand(brand);
-        boolean sameBrand = catalog.find(candidates.getFirst())
-                .map(component -> component.info().manufacturer())
-                .map(FeedImporter::foldBrand)
-                .filter(manufacturer -> !manufacturer.isEmpty() && (manufacturer.contains(feedBrand) || feedBrand.contains(manufacturer)))
-                .isPresent();
-        return sameBrand ? candidates : List.of();
-    }
-
-    /** Uppercase without spaces; {@code null} when too short to identify a product. */
-    static String normalizeMpn(String raw) {
-        if (raw == null) {
-            return null;
-        }
-        String mpn = raw.replaceAll("\\s+", "").toUpperCase(Locale.ROOT);
-        return mpn.length() >= MIN_MPN_LENGTH ? mpn : null;
-    }
-
-    private static String foldBrand(String brand) {
-        return brand.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
     }
 
     /** In stock beats unknown beats out of stock; then the lower price. */

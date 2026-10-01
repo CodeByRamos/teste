@@ -18,7 +18,7 @@ public record PlatformProperties(OpenDb opendb, Pricing pricing, RateLimit rateL
 
     public PlatformProperties {
         opendb = opendb == null ? new OpenDb(null, false) : opendb;
-        pricing = pricing == null ? new Pricing(false, null, null, null) : pricing;
+        pricing = pricing == null ? new Pricing(false, null, null, null, null, null, null) : pricing;
         rateLimit = rateLimit == null ? new RateLimit(60, List.of()) : rateLimit;
         frontend = frontend == null ? new Frontend(null) : frontend;
         admin = admin == null ? new Admin(null) : admin;
@@ -35,9 +35,13 @@ public record PlatformProperties(OpenDb opendb, Pricing pricing, RateLimit rateL
      * @param feedRefresh   how often feeds are downloaded again
      * @param maxOfferAge   offers older than this are not shown
      */
-    public record Pricing(boolean examplePrices, List<Feed> feeds, java.time.Duration feedRefresh, java.time.Duration maxOfferAge) {
+    public record Pricing(boolean examplePrices, List<Feed> feeds, java.time.Duration feedRefresh, java.time.Duration maxOfferAge,
+                          List<Crawler> crawlers, String botName, String botContact) {
         public Pricing {
             feeds = feeds == null ? List.of() : List.copyOf(feeds);
+            crawlers = crawlers == null ? List.of() : List.copyOf(crawlers);
+            botName = botName == null || botName.isBlank() ? "PCPriceBot" : botName.strip();
+            botContact = botContact == null || botContact.isBlank() ? null : botContact.strip();
             feedRefresh = feedRefresh == null ? java.time.Duration.ofHours(6) : feedRefresh;
             maxOfferAge = maxOfferAge == null ? java.time.Duration.ofHours(72) : maxOfferAge;
         }
@@ -61,6 +65,27 @@ public record PlatformProperties(OpenDb opendb, Pricing pricing, RateLimit rateL
             allowedDomains = allowedDomains == null ? List.of() : List.copyOf(allowedDomains);
             columns = columns == null ? java.util.Map.of() : java.util.Map.copyOf(columns);
             delimiter = delimiter == null || delimiter.isEmpty() ? "," : delimiter;
+        }
+    }
+
+    /**
+     * One store for the price bot (see docs/PRICE_BOT.md). Off unless {@code enabled}: check the store's terms first.
+     *
+     * @param id             stable id, also the offers' store id (e.g. "terabyte-bot")
+     * @param store          name shown to people
+     * @param sitemaps       entry sitemap URLs (HTTPS)
+     * @param sitemapFilter  regex for child sitemaps to follow (e.g. "hardware"); empty follows all
+     * @param productPattern regex for product page URLs (e.g. "/produto/")
+     * @param allowedDomains hosts the bot may request
+     * @param minDelay       minimum wait between requests (default 5 s; robots.txt Crawl-delay wins when longer)
+     */
+    public record Crawler(String id, String store, List<java.net.URI> sitemaps, String sitemapFilter, String productPattern,
+                          List<String> allowedDomains, java.time.Duration minDelay, boolean enabled) {
+        public Crawler {
+            sitemaps = sitemaps == null ? List.of() : List.copyOf(sitemaps);
+            allowedDomains = allowedDomains == null ? List.of() : List.copyOf(allowedDomains);
+            minDelay = minDelay == null || minDelay.compareTo(java.time.Duration.ofSeconds(2)) < 0
+                    ? java.time.Duration.ofSeconds(5) : minDelay;
         }
     }
 

@@ -4,6 +4,7 @@ import app.platform.catalog.CatalogVersion;
 import app.platform.compatibility.CompatibilityReport;
 import app.platform.hardware.HardwareComponent;
 import app.platform.pricing.Offer;
+import app.platform.pricing.PriceHistory;
 import app.platform.recommendation.Alternative;
 import app.platform.recommendation.BuildRequest;
 import app.platform.recommendation.ComponentExplainer;
@@ -40,15 +41,23 @@ public record BuildResult(
     }
 
     /** One part of the build. {@code offer} is {@code null} for owned parts and parts without a price. */
+    /**
+     * @param offer         the price used for the total (lowest purchasable)
+     * @param offers        every store's offer, lowest first, for comparison
+     * @param lowestRecent  lowest price seen in the last 30 days, when there is history
+     */
     public record Item(
             HardwareComponent component,
             boolean owned,
             Offer offer,
             ComponentExplainer.Explanation explanation,
-            List<Alternative> alternatives) {
+            List<Alternative> alternatives,
+            List<Offer> offers,
+            PriceHistory.LowestPrice lowestRecent) {
 
         public Item {
             alternatives = List.copyOf(alternatives);
+            offers = offers == null ? List.of() : List.copyOf(offers);
         }
     }
 }

@@ -43,7 +43,11 @@ final class ApiViews {
             List<Spec> specs,
             List<AlternativeView> alternatives,
             /* 3D models that draw this part (an AIO is radiator + pump); empty when none applies. */
-            List<ModelSpec> models) {
+            List<ModelSpec> models,
+            /* Every store's price for this part, lowest first (comparison); empty for owned parts. */
+            List<Price> offers,
+            /* Lowest price seen in the last 30 days, or null without history. */
+            LowestPrice lowest30Days) {
     }
 
     record Component(
@@ -67,6 +71,9 @@ final class ApiViews {
     }
 
     /** {@code url} is null unless a real store provided it. */
+    record LowestPrice(BigDecimal amountBrl, String storeName, Instant observedAt) {
+    }
+
     record Price(BigDecimal amountBrl, String kind, boolean isExample, String storeName, String url, Instant observedAt) {
     }
 

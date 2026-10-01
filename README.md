@@ -33,7 +33,7 @@ cd backend && ./mvnw spring-boot:test-run
 cd frontend && npm install && npm run dev
 ```
 
-Testes: `cd backend && ./mvnw test` (98 testes, incluindo ponta a ponta com PostgreSQL real),
+Testes: `cd backend && ./mvnw test` (114 testes, incluindo ponta a ponta com PostgreSQL real),
 `cd 3d && node src/validate.ts` (modelos 3D)
 e `cd frontend && npm run lint && npx tsc --noEmit`.
 
@@ -42,6 +42,8 @@ rodando, `cd frontend && npm run e2e`. No CI eles rodam contra PostgreSQL, a API
 
 ## O que já funciona
 
+- **Bot de preços**: robô próprio que lê preços nas páginas de produto das lojas (respeitando `robots.txt` e
+  bloqueios), compara entre lojas e guarda histórico; testado na KaBuM. Ver [`docs/PRICE_BOT.md`](docs/PRICE_BOT.md).
 - **Leitura do pedido com IA (opcional)**: com `ANTHROPIC_API_KEY`, o Claude ajuda a entender o texto livre
   ("uns cinco mil pra jogar Valorant"), sempre como apoio às regras e sem decidir compatibilidade.
 - **Montar meu PC**: texto livre ou assistente (usos, prioridade, resolução, orçamento, peças que já tem)

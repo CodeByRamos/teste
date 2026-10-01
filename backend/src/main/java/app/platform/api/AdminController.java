@@ -1,11 +1,14 @@
 package app.platform.api;
 
 import app.platform.config.PlatformProperties;
+import app.platform.config.PriceBot;
 import app.platform.config.PriceFeeds;
+import app.platform.infra.pricing.crawl.StoreCrawler;
 import app.platform.infra.pricing.feed.FeedImporter;
 import app.platform.infra.pricing.feed.FeedStreams;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.List;
 
 /**
  * Operator endpoints. Disabled (404) unless ADMIN_TOKEN is set; outside /api so the site never exposes them.
@@ -28,11 +32,25 @@ class AdminController {
 
     private final byte[] token;
     private final PriceFeeds feeds;
+    private final PriceBot bot;
 
-    AdminController(PlatformProperties properties, PriceFeeds feeds) {
+    AdminController(PlatformProperties properties, PriceFeeds feeds, PriceBot bot) {
         String configured = properties.admin().token();
         this.token = configured == null ? null : configured.getBytes(StandardCharsets.UTF_8);
         this.feeds = feeds;
+        this.bot = bot;
+    }
+
+    /** What the price bot is doing per store: pages by status, offers accepted/held back, pauses and last problem. */
+    @GetMapping("/price-bot")
+    ResponseEntity<List<StoreCrawler.Status>> priceBot(@RequestHeader(value = "X-Admin-Token", required = false) String presented) {
+        if (token == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (presented == null || !MessageDigest.isEqual(token, presented.getBytes(StandardCharsets.UTF_8))) {
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.ok(bot.status());
     }
 
     /** Imports an uploaded feed (CSV, optionally gzipped) for a configured store. */

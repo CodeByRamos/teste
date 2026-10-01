@@ -7,6 +7,7 @@ import app.platform.compatibility.CompatibilityReport;
 import app.platform.hardware.ComponentCategory;
 import app.platform.hardware.HardwareComponent;
 import app.platform.pricing.Offer;
+import app.platform.pricing.PriceHistory;
 import app.platform.pricing.PriceService;
 import app.platform.recommendation.Alternative;
 import app.platform.recommendation.BuildRequest;
@@ -35,12 +36,23 @@ public final class BuildAssembler {
     private final RecommendationEngine recommendations;
     private final CompatibilityEngine compatibility;
     private final PriceService prices;
+    private final PriceHistory history;
+    private final java.time.Clock clock;
+    /** Window for "lowest recent price" comparisons. */
+    static final java.time.Duration RECENT = java.time.Duration.ofDays(30);
     private final FutureOutlookAnalyzer future;
 
     public BuildAssembler(RecommendationEngine recommendations, CompatibilityEngine compatibility, PriceService prices) {
+        this(recommendations, compatibility, prices, PriceHistory.NONE, java.time.Clock.systemUTC());
+    }
+
+    public BuildAssembler(RecommendationEngine recommendations, CompatibilityEngine compatibility, PriceService prices,
+                          PriceHistory history, java.time.Clock clock) {
         this.recommendations = recommendations;
         this.compatibility = compatibility;
         this.prices = prices;
+        this.history = history;
+        this.clock = clock;
         this.future = new FutureOutlookAnalyzer(compatibility);
     }
 
@@ -89,7 +101,9 @@ public final class BuildAssembler {
             }
             items.add(new BuildResult.Item(component, owned, offer,
                     ComponentExplainer.explain(component, parts, profile, request, owned, engineChoice),
-                    alternatives.getOrDefault(component.category(), List.of())));
+                    alternatives.getOrDefault(component.category(), List.of()),
+                    owned ? List.of() : prices.offersFor(component),
+                    owned ? null : history.lowestSince(component.id(), clock.instant().minus(RECENT)).orElse(null)));
         }
         Boolean withinBudget = request == null ? null : total.compareTo(request.budgetBrl()) <= 0;
         return new BuildResult(request, profile, items, report, future.analyze(catalog, parts, profile), total, withinBudget, allPriced, examples, notes, catalog.version());

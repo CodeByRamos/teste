@@ -12,6 +12,7 @@ import app.platform.infra.opendb.OpenDbIngestion;
 import app.platform.infra.persistence.JdbcCatalogRepository;
 import app.platform.infra.persistence.JdbcSavedBuildRepository;
 import app.platform.infra.pricing.ExamplePriceProvider;
+import app.platform.infra.pricing.JdbcPriceHistory;
 import app.platform.infra.pricing.feed.FeedImporter;
 import app.platform.infra.pricing.feed.StoreFeedPriceProvider;
 import app.platform.infra.pricing.feed.StoreOfferRepository;
@@ -122,8 +123,9 @@ public class PlatformConfiguration {
     }
 
     @Bean
-    BuildAssembler buildAssembler(RecommendationEngine recommendations, CompatibilityEngine compatibility, PriceService prices) {
-        return new BuildAssembler(recommendations, compatibility, prices);
+    BuildAssembler buildAssembler(RecommendationEngine recommendations, CompatibilityEngine compatibility, PriceService prices,
+                                  JdbcTemplate jdbc) {
+        return new BuildAssembler(recommendations, compatibility, prices, new JdbcPriceHistory(jdbc), java.time.Clock.systemUTC());
     }
 
     @Bean

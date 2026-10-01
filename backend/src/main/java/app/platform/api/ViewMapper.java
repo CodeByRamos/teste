@@ -99,7 +99,10 @@ final class ViewMapper {
                 new ApiViews.Explanation(explanation.whatItIs(), explanation.whyItMatters(), explanation.reason()),
                 specs(explanation.specs()),
                 item.alternatives().stream().map(ViewMapper::alternative).toList(),
-                ModelResolver.resolve(component));
+                ModelResolver.resolve(component),
+                item.offers().stream().map(ViewMapper::price).toList(),
+                item.lowestRecent() == null ? null : new ApiViews.LowestPrice(item.lowestRecent().priceBrl(),
+                        item.lowestRecent().storeName(), item.lowestRecent().observedAt()));
     }
 
     private static ApiViews.AlternativeView alternative(Alternative alternative) {

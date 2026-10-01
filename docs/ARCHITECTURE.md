@@ -143,6 +143,16 @@ aquecido sem gastar tokens (geração de schema e uma consulta gratuita ao model
 Quando a IA ajuda, a interface avisa. Em caso de recusa do modelo, o fallback são as regras locais, por isso não é
 usado o fallback de modelo do lado do servidor.
 
+### D15 — Bot de preços educado, que respeita bloqueios
+
+Um robô próprio (`StoreCrawler`, um por loja, desligado por padrão) lê preços das páginas de produto pelos dados
+estruturados JSON-LD, descobrindo-as pelo sitemap e obedecendo ao `robots.txt`. Ele faz uma requisição por vez, a cada
+5 s ou mais, se identifica com um contato e manda pedidos condicionais. Quando a loja recusa robôs (403/429 ou
+proteção anti-bot), o bot pausa; **nunca tenta contornar**. O casamento reaproveita o dos feeds e ganhou uma trava de
+categoria pelo título, depois de um caso real em que o dado de origem associava o código de um kit de ventoinhas a
+um water cooler. Cada preço aceito vira histórico, e a API expõe todas as ofertas por peça e o menor preço em 30 dias.
+Detalhes e situação de cada loja em [`docs/PRICE_BOT.md`](PRICE_BOT.md).
+
 ## Segurança
 
 - Validação de entrada com Bean Validation; erros em ProblemDetail sem detalhes internos.

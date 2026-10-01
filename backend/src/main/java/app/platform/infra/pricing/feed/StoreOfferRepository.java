@@ -40,7 +40,7 @@ public final class StoreOfferRepository {
     Map<String, Set<UUID>> mpnIndex() {
         Map<String, Set<UUID>> index = new HashMap<>();
         jdbc.query("select component_id, value from component_identifier where type = 'mpn'", row -> {
-            String mpn = FeedImporter.normalizeMpn(row.getString(2));
+            String mpn = CatalogMatcher.normalizeMpn(row.getString(2));
             if (mpn != null) {
                 index.computeIfAbsent(mpn, key -> new HashSet<>()).add(row.getObject(1, UUID.class));
             }
@@ -87,6 +87,17 @@ public final class StoreOfferRepository {
                 statement.setString(6, offer.availability().name());
                 statement.setTimestamp(7, Timestamp.from(offer.observedAt()));
                 statement.setLong(8, importId);
+            });
+            jdbc.batchUpdate("""
+                    insert into price_observation (component_id, store_id, store_name, price_brl, availability, observed_at)
+                    values (?, ?, ?, ?, ?, ?)
+                    """, offers, 500, (statement, offer) -> {
+                statement.setObject(1, offer.componentId());
+                statement.setString(2, offer.storeId());
+                statement.setString(3, offer.storeName());
+                statement.setBigDecimal(4, offer.priceBrl());
+                statement.setString(5, offer.availability().name());
+                statement.setTimestamp(6, Timestamp.from(offer.observedAt()));
             });
         });
     }
