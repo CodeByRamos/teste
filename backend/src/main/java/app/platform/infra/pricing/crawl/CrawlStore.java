@@ -39,4 +39,7 @@ public interface CrawlStore {
 
     /** Appends to the price history. */
     void observe(StoredOffer offer);
+
+    /** Records what the store called the product and how it matched (null when unmatched), for audits. */
+    void annotate(String storeId, String url, String listingTitle, String matchMethod);
 }

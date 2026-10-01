@@ -3,6 +3,7 @@ package app.platform.api;
 import app.platform.config.PlatformProperties;
 import app.platform.config.PriceBot;
 import app.platform.config.PriceFeeds;
+import app.platform.infra.pricing.crawl.JdbcCrawlStore;
 import app.platform.infra.pricing.crawl.StoreCrawler;
 import app.platform.infra.pricing.feed.FeedImporter;
 import app.platform.infra.pricing.feed.FeedStreams;
@@ -39,6 +40,22 @@ class AdminController {
         this.token = configured == null ? null : configured.getBytes(StandardCharsets.UTF_8);
         this.feeds = feeds;
         this.bot = bot;
+    }
+
+    /** Audit of the bot's work for one store: e.g. ?store=kabum-bot&status=matched to review every match. */
+    @GetMapping("/price-bot/pages")
+    ResponseEntity<List<JdbcCrawlStore.AuditRow>> priceBotPages(
+            @RequestHeader(value = "X-Admin-Token", required = false) String presented,
+            @org.springframework.web.bind.annotation.RequestParam String store,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) String status,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "200") int limit) {
+        if (token == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (presented == null || !MessageDigest.isEqual(token, presented.getBytes(StandardCharsets.UTF_8))) {
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.ok(bot.audit(store, status, limit));
     }
 
     /** What the price bot is doing per store: pages by status, offers accepted/held back, pauses and last problem. */

@@ -71,6 +71,12 @@ final class ApiViews {
     }
 
     /** {@code url} is null unless a real store provided it. */
+    record PricePoint(java.time.LocalDate day, String storeName, BigDecimal lowestBrl) {
+    }
+
+    record PriceHistoryView(UUID componentId, int days, List<PricePoint> points, LowestPrice lowest) {
+    }
+
     record LowestPrice(BigDecimal amountBrl, String storeName, Instant observedAt) {
     }
 

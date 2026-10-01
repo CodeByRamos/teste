@@ -55,6 +55,10 @@ Antes de ligar uma loja, confira os termos de uso do site: algumas proíbem aces
 `robots.txt` permita. Acompanhe com `GET /admin/price-bot` (cabeçalho `X-Admin-Token`): páginas por situação,
 sitemaps lidos, ofertas aceitas/retidas, pausa e último problema.
 
+Para **auditar os casamentos**: `GET /admin/price-bot/pages?store=kabum-bot&status=matched` lista cada página com o
+título da loja, a peça do catálogo associada, o método (`GTIN`, `MPN`, `MPN_IN_TITLE`) e o preço atual. Use
+`status=unmatched` para ver o que a loja vende e não casou.
+
 ## Para o frontend (comparação)
 
 Cada item de `POST /api/recommendations` e `POST /api/builds/evaluate` traz:
@@ -64,6 +68,9 @@ Cada item de `POST /api/recommendations` e `POST /api/builds/evaluate` traz:
 | `price` | o preço usado no total (menor oferta com estoque) |
 | `offers` | **todas** as lojas com preço para a peça, do menor para o maior: `amountBrl`, `storeName`, `url`, `observedAt`, `kind` (`REAL`/`EXAMPLE`), `isExample` |
 | `lowest30Days` | menor preço visto nos últimos 30 dias (`amountBrl`, `storeName`, `observedAt`), ou `null` sem histórico |
+
+Histórico para gráfico: `GET /api/catalog/components/{id}/price-history?days=90` (1 a 365) devolve `points`
+(um por loja por dia: `day`, `storeName`, `lowestBrl`) e `lowest` (menor preço do período, com loja e data).
 
 Sugestões de tela: lista de lojas por peça com destaque para a mais barata, "visto há X horas", link "Ver na loja"
 (`rel="sponsored nofollow noopener"`), e "menor preço em 30 dias: R$ X na loja Y" quando o preço atual estiver acima.

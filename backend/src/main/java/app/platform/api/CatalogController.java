@@ -1,5 +1,7 @@
 package app.platform.api;
 
+import java.time.Instant;
+import app.platform.pricing.PriceHistory;
 import app.platform.catalog.Catalog;
 import app.platform.catalog.CatalogHolder;
 import app.platform.hardware.ComponentCategory;
@@ -45,10 +47,12 @@ class CatalogController {
     private final JsonMapper json;
     private final StoreOfferRepository storeOffers;
     private final IntakeService intake;
+    private final PriceHistory history;
 
     CatalogController(CatalogHolder catalogs, PriceService prices, JdbcCatalogRepository repository, JsonMapper json,
-                      StoreOfferRepository storeOffers, IntakeService intake) {
+                      StoreOfferRepository storeOffers, IntakeService intake, PriceHistory history) {
         this.intake = intake;
+        this.history = history;
         this.catalogs = catalogs;
         this.prices = prices;
         this.repository = repository;
@@ -108,6 +112,20 @@ class CatalogController {
         document.put("pricesDisclaimer", ViewMapper.PRICE_DISCLAIMER);
         document.set("stores", json.valueToTree(storeOffers.storeSummaries()));
         return json.writeValueAsString(document);
+    }
+
+    /** Lowest price per store per day, for charts. Up to a year back. */
+    @GetMapping("/catalog/components/{id}/price-history")
+    ResponseEntity<ApiViews.PriceHistoryView> priceHistory(@PathVariable UUID id,
+                                                           @RequestParam(defaultValue = "90") @Min(1) @Max(365) int days) {
+        if (catalogs.current().find(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Instant since = Instant.now().minus(java.time.Duration.ofDays(days));
+        return ResponseEntity.ok(new ApiViews.PriceHistoryView(id, days, history.dailyLows(id, since).stream()
+                .map(point -> new ApiViews.PricePoint(point.day(), point.storeName(), point.priceBrl())).toList(),
+                history.lowestSince(id, since).map(low -> new ApiViews.LowestPrice(low.priceBrl(), low.storeName(), low.observedAt()))
+                        .orElse(null)));
     }
 
     private ApiViews.SearchResult summary(HardwareComponent component) {

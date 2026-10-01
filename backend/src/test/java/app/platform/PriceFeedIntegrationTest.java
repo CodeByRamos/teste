@@ -116,5 +116,14 @@ class PriceFeedIntegrationTest {
                 assertThat(price.get("kind").stringValue()).isEqualTo("EXAMPLE");
             }
         }
+
+        // Accepted prices also become history: one point per store per day, and the lowest of the period.
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(
+                        "/api/catalog/components/" + gpuId + "/price-history?days=30"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.points.length()").value(1))
+                .andExpect(jsonPath("$.points[0].storeName").value("Loja Teste"))
+                .andExpect(jsonPath("$.points[0].lowestBrl").value(3899.90))
+                .andExpect(jsonPath("$.lowest.storeName").value("Loja Teste"));
     }
 }

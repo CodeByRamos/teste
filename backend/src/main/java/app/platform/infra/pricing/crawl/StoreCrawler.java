@@ -244,6 +244,7 @@ public final class StoreCrawler {
             return;
         }
         ProductPageParser.PageProduct listing = product.get();
+        String listingTitle = listing.name();
         boolean brl = listing.currency() == null || listing.currency().equalsIgnoreCase("BRL");
         Optional<CatalogMatcher.Match> match = brl
                 ? matcher.get().match(listing.gtin(), listing.mpn(), listing.brand(), listing.name())
@@ -251,6 +252,7 @@ public final class StoreCrawler {
         if (match.isEmpty()) {
             dropOffer(page);
             store.save(with(fetched, CrawlStore.Status.UNMATCHED, null), now, now.plus(UNMATCHED_REVISIT));
+            store.annotate(config.id(), page.url(), listingTitle, null);
             return;
         }
         UUID componentId = match.get().componentId();
@@ -272,6 +274,7 @@ public final class StoreCrawler {
             onOffersChanged.run();
         }
         store.save(with(fetched, CrawlStore.Status.MATCHED, componentId), now, now.plus(MATCHED_REVISIT));
+        store.annotate(config.id(), page.url(), listingTitle, match.get().method().name());
     }
 
     private void dropOffer(CrawlStore.Page page) {

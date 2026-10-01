@@ -17,6 +17,7 @@ import app.platform.infra.pricing.feed.FeedImporter;
 import app.platform.infra.pricing.feed.StoreFeedPriceProvider;
 import app.platform.infra.pricing.feed.StoreOfferRepository;
 import app.platform.pricing.PriceProvider;
+import app.platform.pricing.PriceHistory;
 import app.platform.pricing.PriceService;
 import app.platform.recommendation.BudgetExplorer;
 import app.platform.recommendation.RecommendationEngine;
@@ -123,9 +124,14 @@ public class PlatformConfiguration {
     }
 
     @Bean
+    PriceHistory priceHistory(JdbcTemplate jdbc) {
+        return new JdbcPriceHistory(jdbc);
+    }
+
+    @Bean
     BuildAssembler buildAssembler(RecommendationEngine recommendations, CompatibilityEngine compatibility, PriceService prices,
-                                  JdbcTemplate jdbc) {
-        return new BuildAssembler(recommendations, compatibility, prices, new JdbcPriceHistory(jdbc), java.time.Clock.systemUTC());
+                                  PriceHistory history) {
+        return new BuildAssembler(recommendations, compatibility, prices, history, java.time.Clock.systemUTC());
     }
 
     @Bean

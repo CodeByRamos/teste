@@ -39,7 +39,7 @@ public class PriceBot {
     private final StoreOfferRepository offers;
     private final StoreFeedPriceProvider provider;
     private final CatalogHolder catalogs;
-    private final CrawlStore store;
+    private final JdbcCrawlStore store;
     private final List<StoreCrawler> crawlers = new ArrayList<>();
     private final AtomicBoolean offersChanged = new AtomicBoolean();
     private volatile boolean running;
@@ -115,6 +115,11 @@ public class PriceBot {
             matcherBuiltAt = now;
         }
         return matcher;
+    }
+
+    /** Pages the bot visited, newest first, with what the store sells and what we matched it to. */
+    public List<JdbcCrawlStore.AuditRow> audit(String storeId, String status, int limit) {
+        return store.audit(storeId, status == null ? null : status.toLowerCase(java.util.Locale.ROOT), Math.min(Math.max(limit, 1), 1000));
     }
 
     public List<StoreCrawler.Status> status() {

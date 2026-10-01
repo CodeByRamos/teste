@@ -93,6 +93,33 @@ public final class JdbcCrawlStore implements CrawlStore {
     }
 
     @Override
+    public void annotate(String storeId, String url, String listingTitle, String matchMethod) {
+        jdbc.update("update crawl_page set listing_title = ?, match_method = ? where store_id = ? and url = ?",
+                listingTitle == null ? null : listingTitle.substring(0, Math.min(500, listingTitle.length())), matchMethod,
+                storeId, url);
+    }
+
+    /** One audited page: what the store sells, what we matched it to, how, and the price we hold. */
+    public record AuditRow(String url, String listingTitle, String status, String matchMethod, String componentName,
+                           String category, java.math.BigDecimal priceBrl, Instant lastFetchedAt) {
+    }
+
+    public List<AuditRow> audit(String storeId, String status, int limit) {
+        return jdbc.query("""
+                select p.url, p.listing_title, p.status, p.match_method, c.name, c.category, o.price_brl, p.last_fetched_at
+                from crawl_page p
+                left join hardware_component c on c.id = p.component_id
+                left join store_offer o on o.component_id = p.component_id and o.store_id = p.store_id
+                where p.store_id = ? and (cast(? as text) is null or p.status = ?)
+                order by p.last_fetched_at desc nulls last
+                limit ?
+                """, (row, index) -> new AuditRow(row.getString(1), row.getString(2), row.getString(3), row.getString(4),
+                row.getString(5), row.getString(6), row.getBigDecimal(7),
+                row.getTimestamp(8) == null ? null : row.getTimestamp(8).toInstant()),
+                storeId, status, status, limit);
+    }
+
+    @Override
     public void observe(StoredOffer offer) {
         jdbc.update("""
                 insert into price_observation (component_id, store_id, store_name, price_brl, availability, observed_at)

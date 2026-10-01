@@ -254,6 +254,13 @@ class StoreCrawlerTest {
         public void observe(StoredOffer offer) {
             history.add(offer);
         }
+
+        final Map<String, String> titles = new HashMap<>();
+
+        @Override
+        public void annotate(String storeId, String url, String listingTitle, String matchMethod) {
+            titles.put(url, listingTitle + " | " + matchMethod);
+        }
     }
 
     static final class MutableClock extends Clock {
